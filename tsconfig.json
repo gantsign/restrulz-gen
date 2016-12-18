@@ -1,6 +1,9 @@
 {
-  "files": [
-    "src/main.ts"
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "compilerOptions": {
     "noImplicitAny": true,
