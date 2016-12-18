@@ -8,6 +8,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "target": "es5",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "sourceMap": true
   }
 }
