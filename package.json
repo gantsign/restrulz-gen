@@ -4,6 +4,7 @@
   "description": "REST API code generator.",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/.bin/ts-node src/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "./node_modules/.bin/tslint \"src/**/*.ts\""
   },
