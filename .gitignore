@@ -348,3 +348,8 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # End of https://www.gitignore.io/api/windows,linux,osx,vim,emacs,visualstudiocode,intellij,eclipse,netbeans,maven,gradle,java,node
+
+### Project specific ###
+
+# XText plugin temporary state
+/.idea/xtextAutoBuilderState.xml
