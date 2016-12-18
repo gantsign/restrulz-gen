@@ -4,6 +4,7 @@
   "description": "REST API code generator.",
   "main": "index.js",
   "scripts": {
+    "install": "./node_modules/.bin/tsc --outDir dist",
     "start": "./node_modules/.bin/ts-node src/main.ts",
     "test": "./node_modules/.bin/ts-node node_modules/istanbul/lib/cli.js cover --print both node_modules/jasmine/bin/jasmine.js",
     "lint": "./node_modules/.bin/tslint \"src/**/*.ts\""
