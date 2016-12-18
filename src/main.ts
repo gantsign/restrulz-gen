@@ -1,4 +1,6 @@
-function hello(compiler: string) {
-  console.log(`Hello from ${compiler}`);
+import {hello} from './hello';
+
+function main(compiler: string) {
+  console.log(hello(compiler));
 }
-hello('TypeScript');
+main('TypeScript');
