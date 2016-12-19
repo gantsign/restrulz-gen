@@ -7,6 +7,8 @@
     "**/*.spec.ts"
   ],
   "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "target": "es5",
     "strictNullChecks": true,
