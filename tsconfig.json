@@ -10,7 +10,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "target": "es5",
+    "target": "es6",
     "strictNullChecks": true,
     "sourceMap": true
   }
