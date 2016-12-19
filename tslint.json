@@ -60,7 +60,8 @@
     ],
     "radix": true,
     "semicolon": [
-      "always"
+      "always",
+      "ignore-bound-class-methods"
     ],
     "triple-equals": [
       true,
