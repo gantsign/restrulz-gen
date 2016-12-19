@@ -17,37 +17,37 @@
 
 import * as kebab from '../../src/util/kebab';
 
-describe("kebabToCamelReviver", () => {
+describe('kebabToCamelReviver', () => {
 
-  it("should pass through a null value", () => {
+  it('should pass through a null value', () => {
     expect(kebab.kebabToCamelReviver(null, null)).toBeNull();
   });
 
-  it("should pass through a number value", () => {
+  it('should pass through a number value', () => {
     expect(kebab.kebabToCamelReviver(null, 10)).toEqual(10);
   });
 
-  it("should pass through a boolean value", () => {
+  it('should pass through a boolean value', () => {
     expect(kebab.kebabToCamelReviver(null, true)).toBeTruthy();
   });
 
-  it("should pass through a string value", () => {
-    expect(kebab.kebabToCamelReviver(null, "Te-_sT")).toEqual("Te-_sT");
+  it('should pass through a string value', () => {
+    expect(kebab.kebabToCamelReviver(null, 'Te-_sT')).toEqual('Te-_sT');
   });
 
-  it("should pass through an array value", () => {
+  it('should pass through an array value', () => {
     expect(kebab.kebabToCamelReviver(null, [1, 2])).toEqual([1, 2]);
   });
 
-  it("should work with a kebab case value", () => {
+  it('should work with a kebab case value', () => {
     expect(kebab.kebabToCamelReviver(null, {'tesT-nAmE': null})).toEqual({'testName': null});
   });
 
-  it("should not fail with a snake case value", () => {
+  it('should not fail with a snake case value', () => {
     expect(kebab.kebabToCamelReviver(null, {'tesT_nAmE': null})).toEqual({'test_name': null});
   });
 
-  it("should not fail with a camel case value", () => {
+  it('should not fail with a camel case value', () => {
     expect(kebab.kebabToCamelReviver(null, {'TestName': null})).toEqual({'testname': null});
   });
 });

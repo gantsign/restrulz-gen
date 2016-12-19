@@ -29,210 +29,206 @@ const schema: restrulzSchema.Schema = JSON.parse(json, kebab.kebabToCamelReviver
 
 const {simpleTypes, classTypes, responses, pathScopes} = schema;
 
-describe("restrulz schema definition", () => {
+describe('restrulz schema definition', () => {
 
-  describe("simple-types", () => {
-    it("there should be two elements", () => {
+  describe('simple-types', () => {
+    it('there should be two elements', () => {
       expect(simpleTypes.length).toEqual(2);
     });
 
     const [simpleType1, simpleType2] = simpleTypes;
 
-    describe("simple-type 1", () => {
-      it("should match expected", () => {
+    describe('simple-type 1', () => {
+      it('should match expected', () => {
         const {name, kind, pattern, minLength, maxLength} = simpleType1;
-        expect(name).toEqual("name");
-        expect(kind).toEqual("string");
-        expect(pattern).toEqual("^[\\p{Alpha}']$");
+        expect(name).toEqual('name');
+        expect(kind).toEqual('string');
+        expect(pattern).toEqual('^[\\p{Alpha}\']$');
         expect(minLength).toEqual(1);
         expect(maxLength).toEqual(100);
       });
     });
 
-    describe("simple-type 2", () => {
-      it("should match expected", () => {
+    describe('simple-type 2', () => {
+      it('should match expected', () => {
         const {name, kind, pattern, minLength, maxLength} = simpleType2;
-        expect(name).toEqual("uuid");
-        expect(kind).toEqual("string");
-        expect(pattern).toEqual("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+        expect(name).toEqual('uuid');
+        expect(kind).toEqual('string');
+        expect(pattern).toEqual('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
         expect(minLength).toEqual(36);
         expect(maxLength).toEqual(36);
       });
     });
   });
 
-  describe("class-types", () => {
-    it("there should be one element", () => {
+  describe('class-types', () => {
+    it('there should be one element', () => {
       expect(classTypes.length).toEqual(1);
     });
 
     const [classType1] = classTypes;
 
-    describe("class-type 1", () => {
-      const {name, properties} = classType1;
-
-
-      it("should match expected", () => {
-        expect(name).toEqual("person");
+    describe('class-type 1', () => {
+      it('should match expected', () => {
+        const {name, properties} = classType1;
+        expect(name).toEqual('person');
         expect(properties.length).toEqual(2);
       });
 
-      const [property1, property2] = properties;
-      describe("propery 1", () => {
-        it("should match expected", () => {
+      const [property1, property2] = classType1.properties;
+      describe('propery 1', () => {
+        it('should match expected', () => {
           const {name, typeRef} = property1;
-          expect(name).toEqual("first-name");
-          expect(typeRef).toEqual("name");
+          expect(name).toEqual('first-name');
+          expect(typeRef).toEqual('name');
         });
       });
 
-      describe("propery 2", () => {
-        it("should match expected", () => {
+      describe('propery 2', () => {
+        it('should match expected', () => {
           const {name, typeRef} = property2;
-          expect(name).toEqual("last-name");
-          expect(typeRef).toEqual("name");
+          expect(name).toEqual('last-name');
+          expect(typeRef).toEqual('name');
         });
       });
     });
   });
 
-  describe("responses", () => {
-    it("there should be two elements", () => {
+  describe('responses', () => {
+    it('there should be two elements', () => {
       expect(responses.length).toEqual(2);
     });
 
     const [response1, response2] = responses;
 
-    describe("response 1", () => {
+    describe('response 1', () => {
       const {name, status, bodyTypeRef} = response1;
-      it("should match expected", () => {
-        expect(name).toEqual("get-person-success");
+      it('should match expected', () => {
+        expect(name).toEqual('get-person-success');
         expect(status).toEqual(200);
-        expect(bodyTypeRef).toEqual("person");
+        expect(bodyTypeRef).toEqual('person');
       });
     });
 
-    describe("response 2", () => {
+    describe('response 2', () => {
       const {name, status, bodyTypeRef} = response2;
-      it("should match expected", () => {
-        expect(name).toEqual("update-person-success");
+      it('should match expected', () => {
+        expect(name).toEqual('update-person-success');
         expect(status).toEqual(200);
-        expect(bodyTypeRef).toEqual("person");
+        expect(bodyTypeRef).toEqual('person');
       });
     });
   });
 
-  describe("path-scopes", () => {
-    it("there should be one element", () => {
+  describe('path-scopes', () => {
+    it('there should be one element', () => {
       expect(classTypes.length).toEqual(1);
     });
 
     const [pathScope1] = pathScopes;
 
-    describe("path-scope 1", () => {
-      const {path, name, mappings} = pathScope1;
-
-
-      it("should match expected", () => {
-        expect(name).toEqual("person-ws");
+    describe('path-scope 1', () => {
+      it('should match expected', () => {
+        const {path, name, mappings} = pathScope1;
+        expect(name).toEqual('person-ws');
         expect(path.length).toEqual(2);
         expect(mappings.length).toEqual(2);
       });
 
-      const [path1, path2] = path;
-      describe("path 1", () => {
-        it("should match expected", () => {
-          if (path1.kind != "static") {
+      const [path1, path2] = pathScope1.path;
+      describe('path 1', () => {
+        it('should match expected', () => {
+          if (path1.kind !== 'static') {
             fail(`Unexpected kind: ${path1.kind}`);
             return;
           }
           const {value} = path1;
-          expect(value).toEqual("person");
+          expect(value).toEqual('person');
         });
       });
 
-      describe("path 2", () => {
-        it("should match expected", () => {
-          if (path2.kind != "path-param") {
+      describe('path 2', () => {
+        it('should match expected', () => {
+          if (path2.kind !== 'path-param') {
             fail(`Unexpected kind: ${path2.kind}`);
             return;
           }
           const {name, typeRef} = path2;
-          expect(name).toEqual("id");
-          expect(typeRef).toEqual("uuid");
+          expect(name).toEqual('id');
+          expect(typeRef).toEqual('uuid');
         });
       });
 
-      const [mapping1, mapping2] = mappings;
-      describe("mapping 1", () => {
-        it("should match expected", () => {
-          if (mapping1.kind != "http-method") {
+      const [mapping1, mapping2] = pathScope1.mappings;
+      describe('mapping 1', () => {
+        it('should match expected', () => {
+          if (mapping1.kind !== 'http-method') {
             fail(`Unexpected kind: ${mapping1.kind}`);
             return;
           }
           const {method, name, parameters, responseRef} = mapping1;
-          expect(method).toEqual("GET");
-          expect(name).toEqual("get-person");
+          expect(method).toEqual('GET');
+          expect(name).toEqual('get-person');
           expect(parameters.length).toEqual(1);
-          expect(responseRef).toEqual("get-person-success");
+          expect(responseRef).toEqual('get-person-success');
         });
 
-        if (mapping1.kind != "http-method") {
+        if (mapping1.kind !== 'http-method') {
           return;
         }
         const {parameters} = mapping1;
         const [parameter1] = parameters;
 
-        describe("parameter 1", () => {
-          it("should match expected", () => {
-            if (parameter1.kind != "path-param-ref") {
+        describe('parameter 1', () => {
+          it('should match expected', () => {
+            if (parameter1.kind !== 'path-param-ref') {
               fail(`Unexpected kind: ${parameter1.kind}`);
               return;
             }
             const {valueRef} = parameter1;
-            expect(valueRef).toEqual("id");
+            expect(valueRef).toEqual('id');
           });
         });
       });
 
-      describe("mapping 2", () => {
-        it("should match expected", () => {
-          if (mapping2.kind != "http-method") {
+      describe('mapping 2', () => {
+        it('should match expected', () => {
+          if (mapping2.kind !== 'http-method') {
             fail(`Unexpected kind: ${mapping2.kind}`);
             return;
           }
           const {method, name, parameters, responseRef} = mapping2;
-          expect(method).toEqual("PUT");
-          expect(name).toEqual("update-person");
+          expect(method).toEqual('PUT');
+          expect(name).toEqual('update-person');
           expect(parameters.length).toEqual(2);
-          expect(responseRef).toEqual("update-person-success");
+          expect(responseRef).toEqual('update-person-success');
         });
 
-        if (mapping2.kind != "http-method") {
+        if (mapping2.kind !== 'http-method') {
           return;
         }
         const {parameters} = mapping2;
         const [parameter1, parameter2] = parameters;
 
-        describe("parameter 1", () => {
-          it("should match expected", () => {
-            if (parameter1.kind != "path-param-ref") {
+        describe('parameter 1', () => {
+          it('should match expected', () => {
+            if (parameter1.kind !== 'path-param-ref') {
               fail(`Unexpected kind: ${parameter1.kind}`);
               return;
             }
             const {valueRef} = parameter1;
-            expect(valueRef).toEqual("id");
+            expect(valueRef).toEqual('id');
           });
         });
 
-        describe("parameter 2", () => {
-          it("should match expected", () => {
-            if (parameter2.kind != "body-param-ref") {
+        describe('parameter 2', () => {
+          it('should match expected', () => {
+            if (parameter2.kind !== 'body-param-ref') {
               fail(`Unexpected kind: ${parameter2.kind}`);
               return;
             }
             const {typeRef} = parameter2;
-            expect(typeRef).toEqual("person");
+            expect(typeRef).toEqual('person');
           });
         });
       });
