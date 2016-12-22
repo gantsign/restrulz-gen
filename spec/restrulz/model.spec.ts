@@ -22,18 +22,18 @@ import {
   HttpMethod,
   HttpMethodHandler,
   HttpStatus,
-  parseModel,
+  parseSpecification,
   PathParam,
   PathParamRef,
   StringType,
   StaticPathElement
 } from '../../src/restrulz/model';
 
-const model = parseModel('spec/data/schema.json');
+const spec = parseSpecification('spec/data/schema.json');
 
-const {simpleTypes, classTypes, responses, pathScopes} = model;
+const {name: specName, simpleTypes, classTypes, responses, pathScopes} = spec;
 
-describe('restrulz model', () => {
+describe('restrulz specification', () => {
 
   describe('getHttpStatus', () => {
     it('should support OK', () => {
@@ -81,7 +81,7 @@ describe('restrulz model', () => {
 
   describe('getSimpleType', () => {
     it('should support simple-types', () => {
-      const type = model.getSimpleType('uuid');
+      const type = spec.getSimpleType('uuid');
       expect(type).toBeDefined();
       if (!(type instanceof StringType)) {
         fail(`Unexpected class: ${typeof type}`);
@@ -92,21 +92,21 @@ describe('restrulz model', () => {
     });
 
     it('should throw an error for class-types', () => {
-      expect(() => model.getSimpleType('person')).toThrowError()
+      expect(() => spec.getSimpleType('person')).toThrowError()
     });
 
     it('should throw an error for undefined types', () => {
-      expect(() => model.getSimpleType('ridiculous')).toThrowError()
+      expect(() => spec.getSimpleType('ridiculous')).toThrowError()
     });
   });
 
   describe('getClassType', () => {
     it('should throw an error for simple-types', () => {
-      expect(() => model.getClassType('uuid')).toThrowError()
+      expect(() => spec.getClassType('uuid')).toThrowError()
     });
 
     it('should support class-types', () => {
-      const type = model.getClassType('person');
+      const type = spec.getClassType('person');
       expect(type).toBeDefined();
       if (!(type instanceof ClassType)) {
         fail(`Unexpected class: ${typeof type}`);
@@ -117,13 +117,13 @@ describe('restrulz model', () => {
     });
 
     it('should throw an error for undefined types', () => {
-      expect(() => model.getClassType('ridiculous')).toThrowError()
+      expect(() => spec.getClassType('ridiculous')).toThrowError()
     });
   });
 
   describe('getType', () => {
     it('should support simple-types', () => {
-      const type = model.getType('uuid');
+      const type = spec.getType('uuid');
       expect(type).toBeDefined();
       if (!(type instanceof StringType)) {
         fail(`Unexpected class: ${typeof type}`);
@@ -134,7 +134,7 @@ describe('restrulz model', () => {
     });
 
     it('should support class-types', () => {
-      const type = model.getType('person');
+      const type = spec.getType('person');
       expect(type).toBeDefined();
       if (!(type instanceof ClassType)) {
         fail(`Unexpected class: ${typeof type}`);
@@ -145,25 +145,25 @@ describe('restrulz model', () => {
     });
 
     it('should throw an error for undefined types', () => {
-      expect(() => model.getType('ridiculous')).toThrowError()
+      expect(() => spec.getType('ridiculous')).toThrowError()
     });
   });
 
   describe('getResponse', () => {
     it('should return defined response', () => {
-      const response = model.getResponse('get-person-success');
+      const response = spec.getResponse('get-person-success');
       expect(response).toBeDefined();
       const {name} = response;
       expect(name).toEqual('get-person-success');
     });
 
     it('should throw an error for undefined responses', () => {
-      expect(() => model.getResponse('ridiculous')).toThrowError()
+      expect(() => spec.getResponse('ridiculous')).toThrowError()
     });
   });
 
   describe('pathScope.getPathParam', () => {
-    const [pathScope] = model.pathScopes;
+    const [pathScope] = spec.pathScopes;
 
     it('should return defined path-patah', () => {
       const param = pathScope.getPathParam('id');
@@ -174,6 +174,12 @@ describe('restrulz model', () => {
 
     it('should throw an error for undefined path param', () => {
       expect(() => pathScope.getPathParam('ridiculous')).toThrowError()
+    });
+  });
+
+  describe('name', () => {
+    it('should be passed through', () => {
+      expect(specName).toEqual('people');
     });
   });
 
@@ -233,7 +239,7 @@ describe('restrulz model', () => {
         it('should match expected', () => {
           const {name, type} = property1;
           expect(name).toEqual('first-name');
-          expect(type).toEqual(model.getType('name'));
+          expect(type).toEqual(spec.getType('name'));
         });
       });
 
@@ -241,7 +247,7 @@ describe('restrulz model', () => {
         it('should match expected', () => {
           const {name, type} = property2;
           expect(name).toEqual('last-name');
-          expect(type).toEqual(model.getType('name'));
+          expect(type).toEqual(spec.getType('name'));
         });
       });
     });
@@ -259,7 +265,7 @@ describe('restrulz model', () => {
       it('should match expected', () => {
         expect(name).toEqual('get-person-success');
         expect(status).toEqual(200);
-        expect(bodyTypeRef).toEqual(model.getClassType('person'));
+        expect(bodyTypeRef).toEqual(spec.getClassType('person'));
       });
     });
 
@@ -268,7 +274,7 @@ describe('restrulz model', () => {
       it('should match expected', () => {
         expect(name).toEqual('update-person-success');
         expect(status).toEqual(200);
-        expect(bodyTypeRef).toEqual(model.getClassType('person'));
+        expect(bodyTypeRef).toEqual(spec.getClassType('person'));
       });
     });
   });
@@ -308,7 +314,7 @@ describe('restrulz model', () => {
           }
           const {name, typeRef} = path2 as PathParam;
           expect(name).toEqual('id');
-          expect(typeRef).toEqual(model.getSimpleType('uuid'));
+          expect(typeRef).toEqual(spec.getSimpleType('uuid'));
         });
       });
 
@@ -323,7 +329,7 @@ describe('restrulz model', () => {
           expect(method).toEqual(HttpMethod.GET);
           expect(name).toEqual('get-person');
           expect(parameters.length).toEqual(1);
-          expect(responseRef).toEqual(model.getResponse('get-person-success'));
+          expect(responseRef).toEqual(spec.getResponse('get-person-success'));
         });
 
         if (!(mapping1 instanceof HttpMethodHandler)) {
@@ -355,7 +361,7 @@ describe('restrulz model', () => {
           expect(method).toEqual(HttpMethod.PUT);
           expect(name).toEqual('update-person');
           expect(parameters.length).toEqual(2);
-          expect(responseRef).toEqual(model.getResponse('update-person-success'));
+          expect(responseRef).toEqual(spec.getResponse('update-person-success'));
         });
 
         if (!(mapping2 instanceof HttpMethodHandler)) {
@@ -383,7 +389,7 @@ describe('restrulz model', () => {
               return;
             }
             const {typeRef} = parameter2 as BodyParamRef;
-            expect(typeRef).toEqual(model.getClassType('person'));
+            expect(typeRef).toEqual(spec.getClassType('person'));
           });
         });
       });

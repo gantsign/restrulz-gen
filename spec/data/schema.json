@@ -1,4 +1,5 @@
 {
+  "name": "people",
   "simple-types": [
     {
       "name": "name",

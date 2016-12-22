@@ -15,4 +15,4 @@
  */
 import * as model from './restrulz/model';
 
-console.log(JSON.stringify(model.parseModel('spec/data/schema.json')));
+console.log(JSON.stringify(model.parseSpecification('spec/data/schema.json')));

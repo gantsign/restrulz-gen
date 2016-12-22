@@ -80,7 +80,8 @@ export interface PathScope {
   mappings: Mapping[];
 }
 
-export interface Schema {
+export interface Specification {
+  name: string
   simpleTypes: SimpleType[];
   classTypes: ClassType[];
   responses: Response[];

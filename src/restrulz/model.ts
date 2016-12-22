@@ -143,7 +143,9 @@ export class PathScope {
   }
 }
 
-export class Model {
+export class Specification {
+  name: string;
+
   simpleTypes: SimpleType[];
 
   classTypes: ClassType[];
@@ -191,7 +193,7 @@ export class Model {
 }
 
 //noinspection UnterminatedStatementJS
-class ModelBuilder extends Model {
+class SpecificationBuilder extends Specification {
 
   deferredTyping: (() => void)[] = [];
 
@@ -344,19 +346,22 @@ class ModelBuilder extends Model {
     return dest;
   };
 
-  toModel = () => {
-    const {simpleTypes, classTypes, responses, pathScopes} = this;
+  toSpecification = () => {
+    const {name, simpleTypes, classTypes, responses, pathScopes} = this;
 
-    const model = new Model();
-    model.simpleTypes = simpleTypes;
-    model.classTypes = classTypes;
-    model.responses = responses;
-    model.pathScopes = pathScopes;
-    return model;
+    const spec = new Specification();
+    spec.name = name;
+    spec.simpleTypes = simpleTypes;
+    spec.classTypes = classTypes;
+    spec.responses = responses;
+    spec.pathScopes = pathScopes;
+    return spec;
   };
 
-  buildModel = (schema: schema.Schema): Model => {
-    const {simpleTypes, classTypes, responses, pathScopes} = schema;
+  buildSpecification = (schema: schema.Specification): Specification => {
+    const {name, simpleTypes, classTypes, responses, pathScopes} = schema;
+
+    this.name = name;
 
     this.simpleTypes = simpleTypes.map(this.toSimpleType);
 
@@ -366,12 +371,12 @@ class ModelBuilder extends Model {
     this.responses = responses.map(this.toResponse);
     this.pathScopes = pathScopes.map(this.toPathScope);
 
-    return this.toModel();
+    return this.toSpecification();
   }
 }
 
-export function parseModel(filePath: string): Model {
+export function parseSpecification(filePath: string): Specification {
   const json = fs.readFileSync(filePath, 'utf8');
-  const jsonSchema: schema.Schema = JSON.parse(json, kebabToCamelReviver);
-  return new ModelBuilder().buildModel(jsonSchema);
+  const jsonSchema: schema.Specification = JSON.parse(json, kebabToCamelReviver);
+  return new SpecificationBuilder().buildSpecification(jsonSchema);
 }

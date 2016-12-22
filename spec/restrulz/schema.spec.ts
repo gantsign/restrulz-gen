@@ -25,11 +25,17 @@ import * as restrulzSchema from '../../src/restrulz/schema';
  * JSON.
  */
 const json = fs.readFileSync('spec/data/schema.json', 'utf8');
-const schema: restrulzSchema.Schema = JSON.parse(json, kebab.kebabToCamelReviver);
+const schema: restrulzSchema.Specification = JSON.parse(json, kebab.kebabToCamelReviver);
 
-const {simpleTypes, classTypes, responses, pathScopes} = schema;
+const {name: specName, simpleTypes, classTypes, responses, pathScopes} = schema;
 
 describe('restrulz schema definition', () => {
+
+  describe('name', () => {
+    it('should match expected', () => {
+      expect(specName).toEqual('people');
+    });
+  });
 
   describe('simple-types', () => {
     it('there should be two elements', () => {
