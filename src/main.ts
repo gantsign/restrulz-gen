@@ -13,6 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as model from './restrulz/model';
+import {SchemaProcessor} from './processor';
+import {SwaggerGenerator} from './swagger/generator';
 
-console.log(JSON.stringify(model.parseSpecification('spec/data/schema.json')));
+const swaggerGenerator = new SwaggerGenerator();
+swaggerGenerator.outputFile = 'people.swagger.yml';
+
+const processor = new SchemaProcessor();
+processor.schemaFile = 'spec/data/schema.json';
+processor.outputDirectory = 'dest';
+processor.generators.push(swaggerGenerator);
+processor.execute();

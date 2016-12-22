@@ -1,0 +1,157 @@
+{
+  "name": "people",
+  "title": "",
+  "description": "",
+  "version": "",
+  "simple-types": [
+    {
+      "name": "address-line",
+      "kind": "string",
+      "pattern": "^[\\p{Alnum}',.]$",
+      "min-length": 1,
+      "max-length": 100
+    },
+    {
+      "name": "name",
+      "kind": "string",
+      "pattern": "^[\\p{Alpha}']$",
+      "min-length": 1,
+      "max-length": 100
+    },
+    {
+      "name": "uuid",
+      "kind": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "min-length": 36,
+      "max-length": 36
+    }
+  ],
+  "class-types": [
+    {
+      "name": "address",
+      "properties": [
+        {
+          "name": "address-line",
+          "type-ref": "address-line"
+        },
+        {
+          "name": "city",
+          "type-ref": "address-line"
+        }
+      ]
+    },
+    {
+      "name": "person",
+      "properties": [
+        {
+          "name": "first-name",
+          "type-ref": "name"
+        },
+        {
+          "name": "last-name",
+          "type-ref": "name"
+        },
+        {
+          "name": "address",
+          "type-ref": "address"
+        }
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "name": "get-person-success",
+      "status": 200,
+      "body-type-ref": "person"
+    },
+    {
+      "name": "add-person-success",
+      "status": 200,
+      "body-type-ref": "person"
+    },
+    {
+      "name": "update-person-success",
+      "status": 200,
+      "body-type-ref": "person"
+    },
+    {
+      "name": "delete-person-success",
+      "status": 200,
+      "body-type-ref": "person"
+    }
+  ],
+  "path-scopes": [
+    {
+      "name": "person-ws",
+      "path": [
+        {
+          "kind": "static",
+          "value": "person"
+        },
+        {
+          "kind": "path-param",
+          "name": "id",
+          "type-ref": "uuid"
+        }
+      ],
+      "mappings": [
+        {
+          "kind": "http-method",
+          "method": "GET",
+          "name": "get-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "id"
+            }
+          ],
+          "response-ref": "get-person-success"
+        },
+        {
+          "kind": "http-method",
+          "method": "POST",
+          "name": "add-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "id"
+            },
+            {
+              "kind": "body-param-ref",
+              "type-ref": "person"
+            }
+          ],
+          "response-ref": "add-person-success"
+        },
+        {
+          "kind": "http-method",
+          "method": "PUT",
+          "name": "update-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "id"
+            },
+            {
+              "kind": "body-param-ref",
+              "type-ref": "person"
+            }
+          ],
+          "response-ref": "update-person-success"
+        },
+        {
+          "kind": "http-method",
+          "method": "DELETE",
+          "name": "delete-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "id"
+            }
+          ],
+          "response-ref": "delete-person-success"
+        }
+      ]
+    }
+  ]
+}

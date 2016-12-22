@@ -1,0 +1,105 @@
+swagger: '2.0'
+info:
+  title: people
+  version: 0.0.0
+paths:
+  '/person/{id}':
+    get:
+      operationId: get-person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+      responses:
+        '200':
+          description: get-person-success
+          schema:
+            $ref: '#/definitions/person'
+    post:
+      operationId: add-person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        - name: person
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/person'
+      responses:
+        '200':
+          description: add-person-success
+          schema:
+            $ref: '#/definitions/person'
+    put:
+      operationId: update-person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        - name: person
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/person'
+      responses:
+        '200':
+          description: update-person-success
+          schema:
+            $ref: '#/definitions/person'
+    delete:
+      operationId: delete-person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+      responses:
+        '200':
+          description: delete-person-success
+          schema:
+            $ref: '#/definitions/person'
+definitions:
+  address:
+    type: object
+    properties:
+      address-line:
+        type: string
+        pattern: '^[\p{Alnum}'',.]$'
+        minLength: 1
+        maxLength: 100
+      city:
+        type: string
+        pattern: '^[\p{Alnum}'',.]$'
+        minLength: 1
+        maxLength: 100
+  person:
+    type: object
+    properties:
+      first-name:
+        type: string
+        pattern: '^[\p{Alpha}'']$'
+        minLength: 1
+        maxLength: 100
+      last-name:
+        type: string
+        pattern: '^[\p{Alpha}'']$'
+        minLength: 1
+        maxLength: 100
+      address:
+        $ref: '#/definitions/address'
