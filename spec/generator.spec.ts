@@ -35,19 +35,19 @@ class TestGenerator implements Generator {
   }
 }
 
-const processor = new SchemaProcessor();
-processor.schemaFile = 'spec/data/schema.json';
-processor.outputDirectory = 'tmp/output';
-const generator = new TestGenerator();
-processor.generators.push(generator);
-processor.execute();
-
-const {context} = generator;
-
-fsx.removeSync('tmp');
-
 describe('GeneratorContext', () => {
 
+  fsx.removeSync('tmp/output');
+  fsx.removeSync('tmp/abs');
+
+  const processor = new SchemaProcessor();
+  processor.schemaFile = 'spec/data/schema.json';
+  processor.outputDirectory = 'tmp/output';
+  const generator = new TestGenerator();
+  processor.generators.push(generator);
+  processor.execute();
+
+  const {context} = generator;
   describe('writeJsonToFile', () => {
     it('should write file with relative path', () => {
       context.writeJsonToFile('test1.json', {test: 'test1'});
