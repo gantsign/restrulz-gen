@@ -82,6 +82,9 @@ export interface PathScope {
 
 export interface Specification {
   name: string
+  title: string
+  description: string
+  version: string
   simpleTypes: SimpleType[];
   classTypes: ClassType[];
   responses: Response[];

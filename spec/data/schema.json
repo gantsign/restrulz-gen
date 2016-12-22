@@ -1,5 +1,8 @@
 {
   "name": "people",
+  "title": "People API",
+  "description": "A nice long description\n\n\t* With\n\t* Some\n\t* Bullet points.",
+  "version": "1.0.0",
   "simple-types": [
     {
       "name": "name",

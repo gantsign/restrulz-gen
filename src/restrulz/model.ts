@@ -146,6 +146,12 @@ export class PathScope {
 export class Specification {
   name: string;
 
+  title: string;
+
+  description: string;
+
+  version: string;
+
   simpleTypes: SimpleType[];
 
   classTypes: ClassType[];
@@ -347,10 +353,13 @@ class SpecificationBuilder extends Specification {
   };
 
   toSpecification = () => {
-    const {name, simpleTypes, classTypes, responses, pathScopes} = this;
+    const {name, title, description, version, simpleTypes, classTypes, responses, pathScopes} = this;
 
     const spec = new Specification();
     spec.name = name;
+    spec.title = title;
+    spec.description = description;
+    spec.version = version;
     spec.simpleTypes = simpleTypes;
     spec.classTypes = classTypes;
     spec.responses = responses;
@@ -359,9 +368,12 @@ class SpecificationBuilder extends Specification {
   };
 
   buildSpecification = (schema: schema.Specification): Specification => {
-    const {name, simpleTypes, classTypes, responses, pathScopes} = schema;
+    const {name, title, description, version, simpleTypes, classTypes, responses, pathScopes} = schema;
 
     this.name = name;
+    this.title = title;
+    this.description = description;
+    this.version = version;
 
     this.simpleTypes = simpleTypes.map(this.toSimpleType);
 

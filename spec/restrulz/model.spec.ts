@@ -31,7 +31,7 @@ import {
 
 const spec = parseSpecification('spec/data/schema.json');
 
-const {name: specName, simpleTypes, classTypes, responses, pathScopes} = spec;
+const {name: specName, title, description, version, simpleTypes, classTypes, responses, pathScopes} = spec;
 
 describe('restrulz specification', () => {
 
@@ -180,6 +180,21 @@ describe('restrulz specification', () => {
   describe('name', () => {
     it('should be passed through', () => {
       expect(specName).toEqual('people');
+    });
+  });
+  describe('title', () => {
+    it('should be passed through', () => {
+      expect(title).toEqual('People API');
+    });
+  });
+  describe('description', () => {
+    it('should be passed through', () => {
+      expect(description).toEqual('A nice long description\n\n\t* With\n\t* Some\n\t* Bullet points.');
+    });
+  });
+  describe('version', () => {
+    it('should be passed through', () => {
+      expect(version).toEqual('1.0.0');
     });
   });
 
