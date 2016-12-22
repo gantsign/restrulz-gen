@@ -165,7 +165,7 @@ describe('restrulz specification', () => {
   describe('pathScope.getPathParam', () => {
     const [pathScope] = spec.pathScopes;
 
-    it('should return defined path-patah', () => {
+    it('should return defined path-path', () => {
       const param = pathScope.getPathParam('id');
       expect(param).toBeDefined();
       const {name} = param;
@@ -235,7 +235,7 @@ describe('restrulz specification', () => {
       });
 
       const [property1, property2] = classType1.properties;
-      describe('propery 1', () => {
+      describe('property 1', () => {
         it('should match expected', () => {
           const {name, type} = property1;
           expect(name).toEqual('first-name');
@@ -243,7 +243,7 @@ describe('restrulz specification', () => {
         });
       });
 
-      describe('propery 2', () => {
+      describe('property 2', () => {
         it('should match expected', () => {
           const {name, type} = property2;
           expect(name).toEqual('last-name');

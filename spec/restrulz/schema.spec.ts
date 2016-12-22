@@ -82,7 +82,7 @@ describe('restrulz schema definition', () => {
       });
 
       const [property1, property2] = classType1.properties;
-      describe('propery 1', () => {
+      describe('property 1', () => {
         it('should match expected', () => {
           const {name, typeRef} = property1;
           expect(name).toEqual('first-name');
@@ -90,7 +90,7 @@ describe('restrulz schema definition', () => {
         });
       });
 
-      describe('propery 2', () => {
+      describe('property 2', () => {
         it('should match expected', () => {
           const {name, typeRef} = property2;
           expect(name).toEqual('last-name');
