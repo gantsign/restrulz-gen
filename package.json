@@ -29,7 +29,7 @@
     "istanbul": "^1.1.0-alpha.1",
     "jasmine": "^2.5.2",
     "jasmine-reporters": "^2.2.0",
-    "ts-node": "^1.7.2",
+    "ts-node": "^2.0.0",
     "tslint": "^4.1.1",
     "typescript": "^2.1.4"
   },
