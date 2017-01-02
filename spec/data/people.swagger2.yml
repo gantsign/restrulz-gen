@@ -83,13 +83,14 @@ definitions:
         pattern: '^[\p{Alnum}'',.]+$'
         minLength: 1
         maxLength: 100
-        required: true
       city:
         type: string
         pattern: '^[\p{Alnum}'',.]+$'
         minLength: 1
         maxLength: 100
-        required: true
+    required:
+      - address-line
+      - city
   person:
     type: object
     properties:
@@ -98,12 +99,14 @@ definitions:
         pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
-        required: true
       last-name:
         type: string
         pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
-        required: true
       address:
         $ref: '#/definitions/address'
+    required:
+      - first-name
+      - last-name
+      - address

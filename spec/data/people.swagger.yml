@@ -77,16 +77,18 @@ definitions:
         pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
-        required: true
       last-name:
         type: string
         pattern: '(^[\p{Alpha}'']+$|^$)'
         minLength: 0
         maxLength: 100
-        required: false
       age:
         type: integer
         minimum: 0
         maximum: 150
       employed:
         type: boolean
+    required:
+      - first-name
+      - age
+      - employed

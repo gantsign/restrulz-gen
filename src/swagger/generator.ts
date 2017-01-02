@@ -183,7 +183,6 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
         swaggerProperty.minLength = minLength;
       }
       swaggerProperty.maxLength = maxLength;
-      swaggerProperty.required = !property.allowEmpty;
 
     } else if (type instanceof IntegerType) {
       const {minimum, maximum} = type;
@@ -206,6 +205,12 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
   return dest;
 }
 
+function toRequiredProperties(properties: Property[]): string[] {
+  return properties
+      .filter(property => !property.allowEmpty)
+      .map(property => property.name)
+}
+
 function toDefinitions(classTypes: ClassType[]): {[definitionsName: string]: swagger.Schema} {
   const dest: {[definitionsName: string]: swagger.Schema} = {};
   classTypes.forEach((classType) => {
@@ -213,6 +218,7 @@ function toDefinitions(classTypes: ClassType[]): {[definitionsName: string]: swa
     const definition = new swagger.Schema();
     definition.type = 'object';
     definition.properties = toProperties(properties);
+    definition.required = toRequiredProperties(properties);
 
     dest[name] = definition;
   });

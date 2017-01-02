@@ -113,15 +113,13 @@
           "type": "string",
           "pattern": "^[\\p{Alpha}']+$",
           "minLength": 1,
-          "maxLength": 100,
-          "required": true
+          "maxLength": 100
         },
         "last-name": {
           "type": "string",
           "pattern": "(^[\\p{Alpha}']+$|^$)",
           "minLength": 0,
-          "maxLength": 100,
-          "required": false
+          "maxLength": 100
         },
         "age": {
           "type": "integer",
@@ -131,7 +129,12 @@
         "employed": {
           "type": "boolean"
         }
-      }
+      },
+      "required": [
+        "first-name",
+        "age",
+        "employed"
+      ]
     }
   }
 }
