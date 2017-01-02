@@ -225,7 +225,7 @@ describe('restrulz specification', () => {
         }
         const {name, pattern, minLength, maxLength} = simpleType1 as StringType;
         expect(name).toEqual('name');
-        expect(pattern).toEqual('^[\\p{Alpha}\']$');
+        expect(pattern).toEqual('^[\\p{Alpha}\']+$');
         expect(minLength).toEqual(1);
         expect(maxLength).toEqual(100);
       });

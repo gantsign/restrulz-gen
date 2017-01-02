@@ -7,14 +7,14 @@
     {
       "name": "address-line",
       "kind": "string",
-      "pattern": "^[\\p{Alnum}',.]$",
+      "pattern": "^[\\p{Alnum}',.]+$",
       "min-length": 1,
       "max-length": 100
     },
     {
       "name": "name",
       "kind": "string",
-      "pattern": "^[\\p{Alpha}']$",
+      "pattern": "^[\\p{Alpha}']+$",
       "min-length": 1,
       "max-length": 100
     },

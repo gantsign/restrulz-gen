@@ -74,13 +74,13 @@ definitions:
     properties:
       first-name:
         type: string
-        pattern: '^[\p{Alpha}'']$'
+        pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
         required: true
       last-name:
         type: string
-        pattern: '(^[\p{Alpha}'']$|^$)'
+        pattern: '(^[\p{Alpha}'']+$|^$)'
         minLength: 0
         maxLength: 100
         required: false

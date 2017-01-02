@@ -64,7 +64,7 @@ describe('restrulz schema definition', () => {
         const {name, kind, pattern, minLength, maxLength} = simpleType1 as StringType;
         expect(name).toEqual('name');
         expect(kind).toEqual('string');
-        expect(pattern).toEqual('^[\\p{Alpha}\']$');
+        expect(pattern).toEqual('^[\\p{Alpha}\']+$');
         expect(minLength).toEqual(1);
         expect(maxLength).toEqual(100);
       });

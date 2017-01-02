@@ -7,7 +7,7 @@
     {
       "name": "name",
       "kind": "string",
-      "pattern": "^[\\p{Alpha}']$",
+      "pattern": "^[\\p{Alpha}']+$",
       "min-length": 1,
       "max-length": 100
     },

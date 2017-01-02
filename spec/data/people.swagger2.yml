@@ -80,13 +80,13 @@ definitions:
     properties:
       address-line:
         type: string
-        pattern: '^[\p{Alnum}'',.]$'
+        pattern: '^[\p{Alnum}'',.]+$'
         minLength: 1
         maxLength: 100
         required: true
       city:
         type: string
-        pattern: '^[\p{Alnum}'',.]$'
+        pattern: '^[\p{Alnum}'',.]+$'
         minLength: 1
         maxLength: 100
         required: true
@@ -95,13 +95,13 @@ definitions:
     properties:
       first-name:
         type: string
-        pattern: '^[\p{Alpha}'']$'
+        pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
         required: true
       last-name:
         type: string
-        pattern: '^[\p{Alpha}'']$'
+        pattern: '^[\p{Alpha}'']+$'
         minLength: 1
         maxLength: 100
         required: true
