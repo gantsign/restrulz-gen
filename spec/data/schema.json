@@ -73,7 +73,13 @@
     },
     {
       "name": "address",
-      "properties": []
+      "properties": [
+        {
+          "name": "id",
+          "type-ref": "uuid",
+          "allow-empty": false
+        }
+      ]
     }
   ],
   "responses": [
