@@ -35,6 +35,7 @@ export interface Property {
   typeRef: string;
   allowEmpty: boolean | undefined;
   allowNull: boolean | undefined;
+  array: boolean;
 }
 
 export interface ClassType {
@@ -46,6 +47,7 @@ export interface Response {
   name: string;
   status: number;
   bodyTypeRef: string;
+  array: boolean;
 }
 
 export interface StaticPathElement {

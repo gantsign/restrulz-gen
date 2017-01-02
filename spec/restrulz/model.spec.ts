@@ -284,104 +284,134 @@ describe('restrulz specification', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(7);
+        expect(properties.length).toEqual(8);
       });
 
-      const [property1, property2, property3, property4, property5, property6, property7] = classType1.properties;
+      const [property1, property2, property3, property4, property5, property6, property7, property8] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property1;
+          const {name, type, allowEmpty, allowNull, isArray} = property1;
           expect(name).toEqual('first-name');
           expect(type).toEqual(spec.getType('name'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeFalsy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 2', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property2;
+          const {name, type, allowEmpty, allowNull, isArray} = property2;
           expect(name).toEqual('last-name');
           expect(type).toEqual(spec.getType('name'));
           expect(allowEmpty).toBeTruthy();
           expect(allowNull).toBeFalsy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 3', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property3;
+          const {name, type, allowEmpty, allowNull, isArray} = property3;
           expect(name).toEqual('age');
           expect(type).toEqual(spec.getType('age'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeFalsy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 4', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property4;
+          const {name, type, allowEmpty, allowNull, isArray} = property4;
           expect(name).toEqual('employed');
           expect(type).toEqual(spec.getType('boolean'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeFalsy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 5', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property5;
+          const {name, type, allowEmpty, allowNull, isArray} = property5;
           expect(name).toEqual('months-employed');
           expect(type).toEqual(spec.getType('months-employed'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeTruthy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 6', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property6;
+          const {name, type, allowEmpty, allowNull, isArray} = property6;
           expect(name).toEqual('work-address');
           expect(type).toEqual(spec.getType('address'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeTruthy();
+          expect(isArray).toBeFalsy();
         });
       });
 
       describe('property 7', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty, allowNull} = property7;
+          const {name, type, allowEmpty, allowNull, isArray} = property7;
           expect(name).toEqual('home-address');
           expect(type).toEqual(spec.getType('address'));
           expect(allowEmpty).toBeFalsy();
           expect(allowNull).toBeFalsy();
+          expect(isArray).toBeFalsy();
+        });
+      });
+
+      describe('property 8', () => {
+        it('should match expected', () => {
+          const {name, type, allowEmpty, allowNull, isArray} = property8;
+          expect(name).toEqual('address-history');
+          expect(type).toEqual(spec.getType('address'));
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeFalsy();
+          expect(isArray).toBeTruthy();
         });
       });
     });
   });
 
   describe('responses', () => {
-    it('there should be two elements', () => {
-      expect(responses.length).toEqual(2);
+    it('there should be three elements', () => {
+      expect(responses.length).toEqual(3);
     });
 
-    const [response1, response2] = responses;
+    const [response1, response2, response3] = responses;
 
     describe('response 1', () => {
-      const {name, status, bodyTypeRef} = response1;
+      const {name, status, bodyTypeRef, isArray} = response1;
       it('should match expected', () => {
         expect(name).toEqual('get-person-success');
         expect(status).toEqual(200);
         expect(bodyTypeRef).toEqual(spec.getClassType('person'));
+        expect(isArray).toBeFalsy();
       });
     });
 
     describe('response 2', () => {
-      const {name, status, bodyTypeRef} = response2;
+      const {name, status, bodyTypeRef, isArray} = response2;
       it('should match expected', () => {
         expect(name).toEqual('update-person-success');
         expect(status).toEqual(200);
         expect(bodyTypeRef).toEqual(spec.getClassType('person'));
+        expect(isArray).toBeFalsy();
+      });
+    });
+
+    describe('response 3', () => {
+      const {name, status, bodyTypeRef, isArray} = response3;
+      it('should match expected', () => {
+        expect(name).toEqual('get-person-array-success');
+        expect(status).toEqual(200);
+        expect(bodyTypeRef).toEqual(spec.getClassType('person'));
+        expect(isArray).toBeTruthy();
       });
     });
   });

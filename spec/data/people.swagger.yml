@@ -42,7 +42,7 @@ paths:
             $ref: '#/definitions/person'
   '/age/{age}':
     get:
-      operationId: get-first-person
+      operationId: get-persons-with-age
       parameters:
         - name: age
           in: path
@@ -52,12 +52,14 @@ paths:
           maximum: 150
       responses:
         '200':
-          description: get-person-success
+          description: get-person-array-success
           schema:
-            $ref: '#/definitions/person'
+            type: array
+            items:
+              $ref: '#/definitions/person'
   '/employed/{employed}':
     get:
-      operationId: get-last-person
+      operationId: get-persons-with-employment-status
       parameters:
         - name: employed
           in: path
@@ -65,9 +67,11 @@ paths:
           type: boolean
       responses:
         '200':
-          description: get-person-success
+          description: get-person-array-success
           schema:
-            $ref: '#/definitions/person'
+            type: array
+            items:
+              $ref: '#/definitions/person'
 definitions:
   person:
     type: object
@@ -96,11 +100,16 @@ definitions:
         $ref: '#/definitions/address'
       home-address:
         $ref: '#/definitions/address'
+      address-history:
+        type: array
+        items:
+          $ref: '#/definitions/address'
     required:
       - first-name
       - age
       - employed
       - home-address
+      - address-history
   address:
     type: object
     properties:

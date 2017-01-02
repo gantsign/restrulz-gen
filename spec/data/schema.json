@@ -38,36 +38,49 @@
         {
           "name": "first-name",
           "type-ref": "name",
-          "allow-empty": false
+          "allow-empty": false,
+          "array": false
         },
         {
           "name": "last-name",
           "type-ref": "name",
-          "allow-empty": true
+          "allow-empty": true,
+          "array": false
         },
         {
           "name": "age",
           "type-ref": "age",
-          "allow-null": false
+          "allow-null": false,
+          "array": false
         },
         {
           "name": "employed",
-          "type-ref": "boolean"
+          "type-ref": "boolean",
+          "array": false
         },
         {
           "name": "months-employed",
           "type-ref": "months-employed",
-          "allow-null": true
+          "allow-null": true,
+          "array": false
         },
         {
           "name": "work-address",
           "type-ref": "address",
-          "allow-null": true
+          "allow-null": true,
+          "array": false
         },
         {
           "name": "home-address",
           "type-ref": "address",
-          "allow-null": false
+          "allow-null": false,
+          "array": false
+        },
+        {
+          "name": "address-history",
+          "type-ref": "address",
+          "allow-null": false,
+          "array": true
         }
       ]
     },
@@ -86,12 +99,20 @@
     {
       "name": "get-person-success",
       "status": 200,
-      "body-type-ref": "person"
+      "body-type-ref": "person",
+      "array": false
     },
     {
       "name": "update-person-success",
       "status": 200,
-      "body-type-ref": "person"
+      "body-type-ref": "person",
+      "array": false
+    },
+    {
+      "name": "get-person-array-success",
+      "status": 200,
+      "body-type-ref": "person",
+      "array": true
     }
   ],
   "path-scopes": [
@@ -156,14 +177,14 @@
         {
           "kind": "http-method",
           "method": "GET",
-          "name": "get-first-person",
+          "name": "get-persons-with-age",
           "parameters": [
             {
               "kind": "path-param-ref",
               "value-ref": "age"
             }
           ],
-          "response-ref": "get-person-success"
+          "response-ref": "get-person-array-success"
         }
       ]
     },
@@ -184,14 +205,14 @@
         {
           "kind": "http-method",
           "method": "GET",
-          "name": "get-last-person",
+          "name": "get-persons-with-employment-status",
           "parameters": [
             {
               "kind": "path-param-ref",
               "value-ref": "employed"
             }
           ],
-          "response-ref": "get-person-success"
+          "response-ref": "get-person-array-success"
         }
       ]
     }

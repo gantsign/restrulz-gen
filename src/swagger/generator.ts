@@ -99,7 +99,15 @@ function toParameter(paramRef: ParamRef): swagger.Parameter {
 function toResponse(response: Response): swagger.Response {
   const dest = new swagger.Response();
   dest.description = response.name;
-  dest.schema = toSchema(response.bodyTypeRef);
+  if (response.isArray) {
+    const schema = new swagger.Schema();
+    schema.type = 'array';
+    schema.items = toSchema(response.bodyTypeRef);
+    dest.schema = schema;
+
+  } else {
+    dest.schema = toSchema(response.bodyTypeRef);
+  }
   return dest;
 }
 
@@ -167,37 +175,50 @@ function toPaths(pathScopes: PathScope[]): {[path: string]: swagger.Path} {
   return dest;
 }
 
+function setSchemaProperties(swaggerSchema: swagger.Schema, property: Property) {
+  const {type} = property;
+  if (type instanceof StringType) {
+    const {pattern, minLength, maxLength} = type;
+    swaggerSchema.type = 'string';
+    if (property.allowEmpty) {
+      swaggerSchema.pattern = `(${pattern}|^$)`;
+      swaggerSchema.minLength = 0;
+    } else {
+      swaggerSchema.pattern = pattern;
+      swaggerSchema.minLength = minLength;
+    }
+    swaggerSchema.maxLength = maxLength;
+
+  } else if (type instanceof IntegerType) {
+    const {minimum, maximum} = type;
+    swaggerSchema.type = 'integer';
+    swaggerSchema.minimum = minimum;
+    swaggerSchema.maximum = maximum;
+
+  } else if (type instanceof BooleanType) {
+    swaggerSchema.type = 'boolean';
+
+  } else if (type instanceof ClassType) {
+    swaggerSchema.$ref = `#/definitions/${type.name}`;
+
+  } else {
+    throw new Error(`Unsupported property: ${typeof type}`);
+  }
+}
+
 function toProperties(properties: Property[]): {[propertyName: string]: swagger.Schema} {
   const dest: {[propertyName: string]: swagger.Schema} = {};
   properties.forEach((property) => {
-    const {name, type} = property;
+    const {name} = property;
     const swaggerProperty = new swagger.Schema();
-    if (type instanceof StringType) {
-      const {pattern, minLength, maxLength} = type;
-      swaggerProperty.type = 'string';
-      if (property.allowEmpty) {
-        swaggerProperty.pattern = `(${pattern}|^$)`;
-        swaggerProperty.minLength = 0;
-      } else {
-        swaggerProperty.pattern = pattern;
-        swaggerProperty.minLength = minLength;
-      }
-      swaggerProperty.maxLength = maxLength;
-
-    } else if (type instanceof IntegerType) {
-      const {minimum, maximum} = type;
-      swaggerProperty.type = 'integer';
-      swaggerProperty.minimum = minimum;
-      swaggerProperty.maximum = maximum;
-
-    } else if (type instanceof BooleanType) {
-      swaggerProperty.type = 'boolean';
-
-    } else if (type instanceof ClassType) {
-      swaggerProperty.$ref = `#/definitions/${type.name}`;
+    if (property.isArray) {
+      swaggerProperty.type = 'array';
+      const items = new swagger.Schema();
+      setSchemaProperties(items, property);
+      swaggerProperty.items = items;
 
     } else {
-      throw new Error(`Unsupported property: ${typeof type}`);
+      setSchemaProperties(swaggerProperty, property);
     }
     dest[name] = swaggerProperty;
   });

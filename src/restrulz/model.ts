@@ -98,12 +98,14 @@ export class Property {
   type: Type;
   allowEmpty = false;
   allowNull = false;
+  isArray = false;
 }
 
 export class Response {
   name: string;
   status: HttpStatus;
   bodyTypeRef: ClassType;
+  isArray = false;
 }
 
 export class StaticPathElement {
@@ -260,7 +262,7 @@ class SpecificationBuilder extends Specification {
   };
 
   toProperty = (property: schema.Property): Property => {
-    const {name, typeRef, allowEmpty, allowNull} = property;
+    const {name, typeRef, allowEmpty, allowNull, array} = property;
 
     const dest = new Property();
     dest.name = name;
@@ -269,6 +271,7 @@ class SpecificationBuilder extends Specification {
     });
     dest.allowEmpty = allowEmpty === true;
     dest.allowNull = allowNull === true;
+    dest.isArray = array === true;
     return dest;
   };
 
@@ -282,12 +285,13 @@ class SpecificationBuilder extends Specification {
   };
 
   toResponse = (response: schema.Response): Response => {
-    const {name, status, bodyTypeRef} = response;
+    const {name, status, bodyTypeRef, array} = response;
 
     const dest = new Response();
     dest.name = name;
     dest.status = getHttpStatus(status);
     dest.bodyTypeRef = this.getClassType(bodyTypeRef);
+    dest.isArray = array;
     return dest;
   };
 

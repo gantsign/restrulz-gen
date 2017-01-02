@@ -113,96 +113,125 @@ describe('restrulz schema definition', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(7);
+        expect(properties.length).toEqual(8);
       });
 
-      const [property1, property2, property3, property4, property5, property6, property7] = classType1.properties;
+      const [property1, property2, property3, property4, property5, property6, property7, property8] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowEmpty} = property1;
+          const {name, typeRef, allowEmpty, array} = property1;
           expect(name).toEqual('first-name');
           expect(typeRef).toEqual('name');
           expect(allowEmpty).toBeFalsy();
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 2', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowEmpty} = property2;
+          const {name, typeRef, allowEmpty, array} = property2;
           expect(name).toEqual('last-name');
           expect(typeRef).toEqual('name');
           expect(allowEmpty).toBeTruthy();
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 3', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowNull} = property3;
+          const {name, typeRef, allowNull, array} = property3;
           expect(name).toEqual('age');
           expect(typeRef).toEqual('age');
           expect(allowNull).toBeFalsy();
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 4', () => {
         it('should match expected', () => {
-          const {name, typeRef} = property4;
+          const {name, typeRef, array} = property4;
           expect(name).toEqual('employed');
           expect(typeRef).toEqual('boolean');
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 5', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowNull} = property5;
+          const {name, typeRef, allowNull, array} = property5;
           expect(name).toEqual('months-employed');
           expect(typeRef).toEqual('months-employed');
           expect(allowNull).toBeTruthy();
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 6', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowNull} = property6;
+          const {name, typeRef, allowNull, array} = property6;
           expect(name).toEqual('work-address');
           expect(typeRef).toEqual('address');
           expect(allowNull).toBeTruthy();
+          expect(array).toBeFalsy();
         });
       });
 
       describe('property 7', () => {
         it('should match expected', () => {
-          const {name, typeRef, allowNull} = property7;
+          const {name, typeRef, allowNull, array} = property7;
           expect(name).toEqual('home-address');
           expect(typeRef).toEqual('address');
           expect(allowNull).toBeFalsy();
+          expect(array).toBeFalsy();
+        });
+      });
+
+      describe('property 8', () => {
+        it('should match expected', () => {
+          const {name, typeRef, allowNull, array} = property8;
+          expect(name).toEqual('address-history');
+          expect(typeRef).toEqual('address');
+          expect(allowNull).toBeFalsy();
+          expect(array).toBeTruthy();
         });
       });
     });
   });
 
   describe('responses', () => {
-    it('there should be two elements', () => {
-      expect(responses.length).toEqual(2);
+    it('there should be three elements', () => {
+      expect(responses.length).toEqual(3);
     });
 
-    const [response1, response2] = responses;
+    const [response1, response2, response3] = responses;
 
     describe('response 1', () => {
-      const {name, status, bodyTypeRef} = response1;
+      const {name, status, bodyTypeRef, array} = response1;
       it('should match expected', () => {
         expect(name).toEqual('get-person-success');
         expect(status).toEqual(200);
         expect(bodyTypeRef).toEqual('person');
+        expect(array).toBeFalsy();
       });
     });
 
     describe('response 2', () => {
-      const {name, status, bodyTypeRef} = response2;
+      const {name, status, bodyTypeRef, array} = response2;
       it('should match expected', () => {
         expect(name).toEqual('update-person-success');
         expect(status).toEqual(200);
         expect(bodyTypeRef).toEqual('person');
+        expect(array).toBeFalsy();
+      });
+    });
+
+    describe('response 3', () => {
+      const {name, status, bodyTypeRef, array} = response3;
+      it('should match expected', () => {
+        expect(name).toEqual('get-person-array-success');
+        expect(status).toEqual(200);
+        expect(bodyTypeRef).toEqual('person');
+        expect(array).toBeTruthy();
       });
     });
   });

@@ -29,6 +29,7 @@ export class Schema {
   minLength?: number;
   pattern?: string;
   required?: string[];
+  items?: Schema;
 }
 
 export class Response {
