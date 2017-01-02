@@ -18,8 +18,7 @@
 /// <reference path="../typings/globals/fs-extra/index.d.ts" />
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
-import {SchemaProcessor} from '../src/index'
-import {Generator, GeneratorContext} from '../src/generator'
+import {Generator, GeneratorContext, SchemaProcessor} from '../src/index'
 import {Specification} from '../src/restrulz/model';
 const jsyaml: any = require('js-yaml');
 

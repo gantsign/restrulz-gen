@@ -32,7 +32,7 @@ import {
   StringType
 } from '../restrulz/model';
 import * as swagger from './schema';
-import {Generator, GeneratorContext} from '../generator';
+import {Generator, GeneratorContext} from '../index';
 
 //noinspection JSUnusedLocalSymbols
 function toInfo(spec: Specification): swagger.Info {

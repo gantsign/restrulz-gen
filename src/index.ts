@@ -15,12 +15,23 @@
  */
 /// <reference path="../typings/globals/node/index.d.ts" />
 /// <reference path="../typings/globals/fs-extra/index.d.ts" />
-import {Generator, GeneratorContext} from './generator';
 import {Specification, parseSpecification} from './restrulz/model';
 import * as fs from 'fs'
 import * as path from 'path'
 import * as fsx from 'fs-extra'
 const jsyaml: any = require('js-yaml');
+
+export interface GeneratorContext {
+  writeJsonToFile(filePath: string, data: any): void;
+
+  writeYamlToFile(filePath: string, data: any): void;
+
+  writeStringToFile(filePath: string, data: any): void;
+}
+
+export interface Generator {
+  generateFiles(spec: Specification, context: GeneratorContext): void;
+}
 
 class GeneratorContextImpl implements GeneratorContext {
   schemaFile: string;

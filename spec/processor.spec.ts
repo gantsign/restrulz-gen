@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 /// <reference path="../typings/globals/jasmine/index.d.ts" />
-import {SchemaProcessor} from '../src/index'
-import {Generator, GeneratorContext} from '../src/generator'
+import {Generator, GeneratorContext, SchemaProcessor} from '../src/index'
 import {Specification} from '../src/restrulz/model';
 
 class TestGenerator implements Generator {
