@@ -96,6 +96,7 @@ export class ClassType implements Type {
 export class Property {
   name: string;
   type: Type;
+  allowEmpty = false;
 }
 
 export class Response {
@@ -258,13 +259,14 @@ class SpecificationBuilder extends Specification {
   };
 
   toProperty = (property: schema.Property): Property => {
-    const {name, typeRef} = property;
+    const {name, typeRef, allowEmpty} = property;
 
     const dest = new Property();
     dest.name = name;
     this.deferredTyping.push(() => {
       dest.type = this.getType(typeRef);
     });
+    dest.allowEmpty = allowEmpty === true;
     return dest;
   };
 

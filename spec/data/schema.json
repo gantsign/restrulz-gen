@@ -31,11 +31,13 @@
       "properties": [
         {
           "name": "first-name",
-          "type-ref": "name"
+          "type-ref": "name",
+          "allow-empty": false
         },
         {
           "name": "last-name",
-          "type-ref": "name"
+          "type-ref": "name",
+          "allow-empty": true
         },
         {
           "name": "age",

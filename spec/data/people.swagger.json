@@ -113,13 +113,15 @@
           "type": "string",
           "pattern": "^[\\p{Alpha}']$",
           "minLength": 1,
-          "maxLength": 100
+          "maxLength": 100,
+          "required": true
         },
         "last-name": {
           "type": "string",
-          "pattern": "^[\\p{Alpha}']$",
-          "minLength": 1,
-          "maxLength": 100
+          "pattern": "(^[\\p{Alpha}']$|^$)",
+          "minLength": 0,
+          "maxLength": 100,
+          "required": false
         },
         "age": {
           "type": "integer",

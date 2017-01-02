@@ -109,17 +109,19 @@ describe('restrulz schema definition', () => {
       const [property1, property2, property3, property4] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
-          const {name, typeRef} = property1;
+          const {name, typeRef, allowEmpty} = property1;
           expect(name).toEqual('first-name');
           expect(typeRef).toEqual('name');
+          expect(allowEmpty).toBeFalsy();
         });
       });
 
       describe('property 2', () => {
         it('should match expected', () => {
-          const {name, typeRef} = property2;
+          const {name, typeRef, allowEmpty} = property2;
           expect(name).toEqual('last-name');
           expect(typeRef).toEqual('name');
+          expect(allowEmpty).toBeTruthy();
         });
       });
 

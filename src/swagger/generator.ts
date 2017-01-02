@@ -175,9 +175,15 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
     if (type instanceof StringType) {
       const {pattern, minLength, maxLength} = type;
       swaggerProperty.type = 'string';
-      swaggerProperty.pattern = pattern;
-      swaggerProperty.minLength = minLength;
+      if (property.allowEmpty) {
+        swaggerProperty.pattern = `(${pattern}|^$)`;
+        swaggerProperty.minLength = 0;
+      } else {
+        swaggerProperty.pattern = pattern;
+        swaggerProperty.minLength = minLength;
+      }
       swaggerProperty.maxLength = maxLength;
+      swaggerProperty.required = !property.allowEmpty;
 
     } else if (type instanceof IntegerType) {
       const {minimum, maximum} = type;

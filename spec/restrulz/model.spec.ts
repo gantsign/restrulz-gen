@@ -277,33 +277,37 @@ describe('restrulz specification', () => {
       const [property1, property2, property3, property4] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
-          const {name, type} = property1;
+          const {name, type, allowEmpty} = property1;
           expect(name).toEqual('first-name');
           expect(type).toEqual(spec.getType('name'));
+          expect(allowEmpty).toBeFalsy()
         });
       });
 
       describe('property 2', () => {
         it('should match expected', () => {
-          const {name, type} = property2;
+          const {name, type, allowEmpty} = property2;
           expect(name).toEqual('last-name');
           expect(type).toEqual(spec.getType('name'));
+          expect(allowEmpty).toBeTruthy()
         });
       });
 
       describe('property 3', () => {
         it('should match expected', () => {
-          const {name, type} = property3;
+          const {name, type, allowEmpty} = property3;
           expect(name).toEqual('age');
           expect(type).toEqual(spec.getType('age'));
+          expect(allowEmpty).toBeFalsy()
         });
       });
 
       describe('property 4', () => {
         it('should match expected', () => {
-          const {name, type} = property4;
+          const {name, type, allowEmpty} = property4;
           expect(name).toEqual('employed');
           expect(type).toEqual(spec.getType('boolean'));
+          expect(allowEmpty).toBeFalsy()
         });
       });
     });

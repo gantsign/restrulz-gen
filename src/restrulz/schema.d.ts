@@ -33,6 +33,7 @@ export type SimpleType = StringType | IntegerType;
 export interface Property {
   name: string;
   typeRef: string;
+  allowEmpty: boolean | undefined;
 }
 
 export interface ClassType {

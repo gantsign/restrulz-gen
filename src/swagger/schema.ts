@@ -28,6 +28,7 @@ export class Schema {
   minimum?: number;
   minLength?: number;
   pattern?: string;
+  required?: boolean;
 }
 
 export class Response {
