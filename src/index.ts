@@ -84,7 +84,7 @@ export class SchemaProcessor {
   outputDirectory: string;
   generators: Generator[] = [];
 
-  execute = (): void => {
+  execute(): void {
     const context = new GeneratorContextImpl();
     context.schemaFile = this.schemaFile;
     context.outputDirectory = this.outputDirectory;
@@ -92,5 +92,9 @@ export class SchemaProcessor {
     context.specification = parseSpecification(this.schemaFile);
 
     this.generators.forEach((generator) => generator.generateFiles(context.specification, context));
-  };
+  }
+
+  constructor() {
+    this.execute = this.execute.bind(this);
+  }
 }
