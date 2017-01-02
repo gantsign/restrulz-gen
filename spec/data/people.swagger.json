@@ -82,6 +82,27 @@
           }
         }
       }
+    },
+    "/employed/{employed}": {
+      "get": {
+        "operationId": "get-last-person",
+        "parameters": [
+          {
+            "name": "employed",
+            "in": "path",
+            "required": true,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "get-person-success",
+            "schema": {
+              "$ref": "#/definitions/person"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -104,6 +125,9 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 150
+        },
+        "employed": {
+          "type": "boolean"
         }
       }
     }

@@ -103,10 +103,10 @@ describe('restrulz schema definition', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(3);
+        expect(properties.length).toEqual(4);
       });
 
-      const [property1, property2, property3] = classType1.properties;
+      const [property1, property2, property3, property4] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
           const {name, typeRef} = property1;
@@ -128,6 +128,14 @@ describe('restrulz schema definition', () => {
           const {name, typeRef} = property3;
           expect(name).toEqual('age');
           expect(typeRef).toEqual('age');
+        });
+      });
+
+      describe('property 4', () => {
+        it('should match expected', () => {
+          const {name, typeRef} = property4;
+          expect(name).toEqual('employed');
+          expect(typeRef).toEqual('boolean');
         });
       });
     });
@@ -160,8 +168,8 @@ describe('restrulz schema definition', () => {
   });
 
   describe('path-scopes', () => {
-    it('there should be two elements', () => {
-      expect(pathScopes.length).toEqual(2);
+    it('there should be three elements', () => {
+      expect(pathScopes.length).toEqual(3);
     });
 
     const [pathScope1] = pathScopes;

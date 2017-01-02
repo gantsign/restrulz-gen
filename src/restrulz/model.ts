@@ -82,6 +82,12 @@ export class IntegerType implements SimpleType {
   maximum: number;
 }
 
+export class BooleanType implements SimpleType {
+  name = 'boolean'
+}
+
+const BOOLEAN_TYPE = new BooleanType();
+
 export class ClassType implements Type {
   name: string;
   properties: Property[];
@@ -167,6 +173,9 @@ export class Specification {
   pathScopes: PathScope[];
 
   getSimpleType = (name: string): SimpleType => {
+    if (name === 'boolean') {
+      return BOOLEAN_TYPE;
+    }
     const type = this.simpleTypes.find((value) => value.name === name);
     if (type) {
       return type;
@@ -183,6 +192,9 @@ export class Specification {
   };
 
   getType = (name: string): Type => {
+    if (name === 'boolean') {
+      return BOOLEAN_TYPE;
+    }
     let type: Type | undefined = this.simpleTypes.find((value) => value.name === name);
     if (type) {
       return type;

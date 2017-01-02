@@ -40,6 +40,10 @@
         {
           "name": "age",
           "type-ref": "age"
+        },
+        {
+          "name": "employed",
+          "type-ref": "boolean"
         }
       ]
     }
@@ -123,6 +127,34 @@
             {
               "kind": "path-param-ref",
               "value-ref": "age"
+            }
+          ],
+          "response-ref": "get-person-success"
+        }
+      ]
+    },
+    {
+      "name": "employed-ws",
+      "path": [
+        {
+          "kind": "static",
+          "value": "employed"
+        },
+        {
+          "kind": "path-param",
+          "name": "employed",
+          "type-ref": "boolean"
+        }
+      ],
+      "mappings": [
+        {
+          "kind": "http-method",
+          "method": "GET",
+          "name": "get-last-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "employed"
             }
           ],
           "response-ref": "get-person-success"

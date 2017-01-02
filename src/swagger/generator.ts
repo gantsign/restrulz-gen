@@ -15,6 +15,7 @@
  */
 import {
   BodyParamRef,
+  BooleanType,
   ClassType,
   HttpMethod,
   HttpMethodHandler,
@@ -68,10 +69,13 @@ function toParameter(paramRef: ParamRef): swagger.Parameter {
       dest.maxLength = maxLength;
 
     } else if (paramType instanceof IntegerType) {
-        const {minimum, maximum} = paramType;
-        dest.type = 'integer';
-        dest.minimum = minimum;
-        dest.maximum = maximum;
+      const {minimum, maximum} = paramType;
+      dest.type = 'integer';
+      dest.minimum = minimum;
+      dest.maximum = maximum;
+
+    } else if (paramType instanceof BooleanType) {
+      dest.type = 'boolean';
 
     } else {
       throw new Error(`Unsupported parameter type: ${typeof paramRef.value.typeRef}`);
@@ -180,6 +184,9 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
       swaggerProperty.type = 'integer';
       swaggerProperty.minimum = minimum;
       swaggerProperty.maximum = maximum;
+
+    } else if (type instanceof BooleanType) {
+      swaggerProperty.type = 'boolean';
 
     } else if (type instanceof ClassType) {
       swaggerProperty.$ref = `#/definitions/${type.name}`;
