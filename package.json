@@ -2,7 +2,7 @@
   "name": "restrulz-gen",
   "version": "0.9.0",
   "description": "REST API code generator.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "clean": "./node_modules/.bin/rimraf dist tmp",
     "start": "./node_modules/.bin/ts-node src/main.ts",
