@@ -4,10 +4,11 @@
   "description": "REST API code generator.",
   "main": "index.js",
   "scripts": {
+    "clean": "./node_modules/.bin/rimraf dist tmp",
     "start": "./node_modules/.bin/ts-node src/main.ts",
     "test": "./node_modules/.bin/ts-node node_modules/istanbul/lib/cli.js cover --print both spec/run-jasmine.js",
     "lint": "./node_modules/.bin/tslint \"src/**/*.ts\" \"spec/**/*.ts\"",
-    "prebuild": "npm run lint && npm run test",
+    "prebuild": "npm run clean && npm run lint && npm run test",
     "build": "./node_modules/.bin/tsc --outDir dist"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "istanbul": "^1.1.0-alpha.1",
     "jasmine": "^2.5.2",
     "jasmine-reporters": "^2.2.0",
+    "rimraf": "^2.5.4",
     "ts-node": "^2.0.0",
     "tslint": "^4.1.1",
     "typescript": "^2.1.4"
