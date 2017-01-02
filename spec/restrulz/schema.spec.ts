@@ -17,7 +17,7 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import * as fs from 'fs';
 import * as kebab from '../../src/util/kebab';
-import * as restrulzSchema from '../../src/restrulz/schema';
+import {IntegerType, Specification, StringType} from '../../src/restrulz/schema';
 
 /*
  * Since we're testing the the schema definition is correct it only makes sense to test against a
@@ -25,7 +25,7 @@ import * as restrulzSchema from '../../src/restrulz/schema';
  * JSON.
  */
 const json = fs.readFileSync('spec/data/schema.json', 'utf8');
-const schema: restrulzSchema.Specification = JSON.parse(json, kebab.kebabToCamelReviver);
+const schema: Specification = JSON.parse(json, kebab.kebabToCamelReviver);
 
 const {name: specName, title, description, version, simpleTypes, classTypes, responses, pathScopes} = schema;
 
@@ -53,15 +53,15 @@ describe('restrulz schema definition', () => {
   });
 
   describe('simple-types', () => {
-    it('there should be two elements', () => {
-      expect(simpleTypes.length).toEqual(2);
+    it('there should be three elements', () => {
+      expect(simpleTypes.length).toEqual(3);
     });
 
-    const [simpleType1, simpleType2] = simpleTypes;
+    const [simpleType1, simpleType2, simpleType3] = simpleTypes;
 
     describe('simple-type 1', () => {
       it('should match expected', () => {
-        const {name, kind, pattern, minLength, maxLength} = simpleType1;
+        const {name, kind, pattern, minLength, maxLength} = simpleType1 as StringType;
         expect(name).toEqual('name');
         expect(kind).toEqual('string');
         expect(pattern).toEqual('^[\\p{Alpha}\']$');
@@ -72,12 +72,22 @@ describe('restrulz schema definition', () => {
 
     describe('simple-type 2', () => {
       it('should match expected', () => {
-        const {name, kind, pattern, minLength, maxLength} = simpleType2;
+        const {name, kind, pattern, minLength, maxLength} = simpleType2 as StringType;
         expect(name).toEqual('uuid');
         expect(kind).toEqual('string');
         expect(pattern).toEqual('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
         expect(minLength).toEqual(36);
         expect(maxLength).toEqual(36);
+      });
+    });
+
+    describe('simple-type 3', () => {
+      it('should match expected', () => {
+        const {name, kind, minimum, maximum} = simpleType3 as IntegerType;
+        expect(name).toEqual('age');
+        expect(kind).toEqual('integer');
+        expect(minimum).toEqual(0);
+        expect(maximum).toEqual(150);
       });
     });
   });
@@ -93,10 +103,10 @@ describe('restrulz schema definition', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(2);
+        expect(properties.length).toEqual(3);
       });
 
-      const [property1, property2] = classType1.properties;
+      const [property1, property2, property3] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
           const {name, typeRef} = property1;
@@ -110,6 +120,14 @@ describe('restrulz schema definition', () => {
           const {name, typeRef} = property2;
           expect(name).toEqual('last-name');
           expect(typeRef).toEqual('name');
+        });
+      });
+
+      describe('property 3', () => {
+        it('should match expected', () => {
+          const {name, typeRef} = property3;
+          expect(name).toEqual('age');
+          expect(typeRef).toEqual('age');
         });
       });
     });
@@ -142,8 +160,8 @@ describe('restrulz schema definition', () => {
   });
 
   describe('path-scopes', () => {
-    it('there should be one element', () => {
-      expect(classTypes.length).toEqual(1);
+    it('there should be two elements', () => {
+      expect(pathScopes.length).toEqual(2);
     });
 
     const [pathScope1] = pathScopes;

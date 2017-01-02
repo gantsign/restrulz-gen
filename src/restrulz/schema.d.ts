@@ -21,7 +21,14 @@ export interface StringType {
   maxLength: number;
 }
 
-export type SimpleType = StringType;
+export interface IntegerType {
+  name: string;
+  kind: 'integer';
+  minimum: number;
+  maximum: number;
+}
+
+export type SimpleType = StringType | IntegerType;
 
 export interface Property {
   name: string;

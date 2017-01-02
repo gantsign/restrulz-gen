@@ -17,6 +17,12 @@
       "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
       "min-length": 36,
       "max-length": 36
+    },
+    {
+      "name": "age",
+      "kind": "integer",
+      "minimum": 0,
+      "maximum": 150
     }
   ],
   "class-types": [
@@ -30,6 +36,10 @@
         {
           "name": "last-name",
           "type-ref": "name"
+        },
+        {
+          "name": "age",
+          "type-ref": "age"
         }
       ]
     }
@@ -88,6 +98,34 @@
             }
           ],
           "response-ref": "update-person-success"
+        }
+      ]
+    },
+    {
+      "name": "age-ws",
+      "path": [
+        {
+          "kind": "static",
+          "value": "age"
+        },
+        {
+          "kind": "path-param",
+          "name": "age",
+          "type-ref": "age"
+        }
+      ],
+      "mappings": [
+        {
+          "kind": "http-method",
+          "method": "GET",
+          "name": "get-first-person",
+          "parameters": [
+            {
+              "kind": "path-param-ref",
+              "value-ref": "age"
+            }
+          ],
+          "response-ref": "get-person-success"
         }
       ]
     }

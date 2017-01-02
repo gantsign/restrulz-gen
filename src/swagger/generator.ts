@@ -18,6 +18,7 @@ import {
   ClassType,
   HttpMethod,
   HttpMethodHandler,
+  IntegerType,
   ParamRef,
   PathElement,
   PathParam,
@@ -65,6 +66,13 @@ function toParameter(paramRef: ParamRef): swagger.Parameter {
       dest.pattern = pattern;
       dest.minLength = minLength;
       dest.maxLength = maxLength;
+
+    } else if (paramType instanceof IntegerType) {
+        const {minimum, maximum} = paramType;
+        dest.type = 'integer';
+        dest.minimum = minimum;
+        dest.maximum = maximum;
+
     } else {
       throw new Error(`Unsupported parameter type: ${typeof paramRef.value.typeRef}`);
     }
@@ -166,6 +174,12 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
       swaggerProperty.pattern = pattern;
       swaggerProperty.minLength = minLength;
       swaggerProperty.maxLength = maxLength;
+
+    } else if (type instanceof IntegerType) {
+      const {minimum, maximum} = type;
+      swaggerProperty.type = 'integer';
+      swaggerProperty.minimum = minimum;
+      swaggerProperty.maximum = maximum;
 
     } else if (type instanceof ClassType) {
       swaggerProperty.$ref = `#/definitions/${type.name}`;

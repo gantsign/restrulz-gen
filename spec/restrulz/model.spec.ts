@@ -22,6 +22,7 @@ import {
   HttpMethod,
   HttpMethodHandler,
   HttpStatus,
+  IntegerType,
   parseSpecification,
   PathParam,
   PathParamRef,
@@ -80,7 +81,7 @@ describe('restrulz specification', () => {
   });
 
   describe('getSimpleType', () => {
-    it('should support simple-types', () => {
+    it('should support string-types', () => {
       const type = spec.getSimpleType('uuid');
       expect(type).toBeDefined();
       if (!(type instanceof StringType)) {
@@ -89,6 +90,17 @@ describe('restrulz specification', () => {
       }
       const {name} = type;
       expect(name).toEqual('uuid');
+    });
+
+    it('should support integer-types', () => {
+      const type = spec.getSimpleType('age');
+      expect(type).toBeDefined();
+      if (!(type instanceof IntegerType)) {
+        fail(`Unexpected class: ${typeof type}`);
+        return;
+      }
+      const {name} = type;
+      expect(name).toEqual('age');
     });
 
     it('should throw an error for class-types', () => {
@@ -199,11 +211,11 @@ describe('restrulz specification', () => {
   });
 
   describe('simple-types', () => {
-    it('there should be two elements', () => {
-      expect(simpleTypes.length).toEqual(2);
+    it('there should be three elements', () => {
+      expect(simpleTypes.length).toEqual(3);
     });
 
-    const [simpleType1, simpleType2] = simpleTypes;
+    const [simpleType1, simpleType2, simpleType3] = simpleTypes;
 
     describe('simple-type 1', () => {
       it('should match expected', () => {
@@ -232,6 +244,19 @@ describe('restrulz specification', () => {
         expect(maxLength).toEqual(36);
       });
     });
+
+    describe('simple-type 3', () => {
+      it('should match expected', () => {
+        if (!(simpleType3 instanceof IntegerType)) {
+          fail(`Unexpected class: ${typeof simpleType3}`);
+          return;
+        }
+        const {name, minimum, maximum} = simpleType3 as IntegerType;
+        expect(name).toEqual('age');
+        expect(minimum).toEqual(0);
+        expect(maximum).toEqual(150);
+      });
+    });
   });
 
   describe('class-types', () => {
@@ -246,10 +271,10 @@ describe('restrulz specification', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(2);
+        expect(properties.length).toEqual(3);
       });
 
-      const [property1, property2] = classType1.properties;
+      const [property1, property2, property3] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
           const {name, type} = property1;
@@ -263,6 +288,14 @@ describe('restrulz specification', () => {
           const {name, type} = property2;
           expect(name).toEqual('last-name');
           expect(type).toEqual(spec.getType('name'));
+        });
+      });
+
+      describe('property 3', () => {
+        it('should match expected', () => {
+          const {name, type} = property3;
+          expect(name).toEqual('age');
+          expect(type).toEqual(spec.getType('age'));
         });
       });
     });
@@ -295,8 +328,8 @@ describe('restrulz specification', () => {
   });
 
   describe('path-scopes', () => {
-    it('there should be one element', () => {
-      expect(classTypes.length).toEqual(1);
+    it('there should be two elements', () => {
+      expect(pathScopes.length).toEqual(2);
     });
 
     const [pathScope1] = pathScopes;

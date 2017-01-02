@@ -76,6 +76,12 @@ export class StringType implements SimpleType {
   maxLength: number;
 }
 
+export class IntegerType implements SimpleType {
+  name: string;
+  minimum: number;
+  maximum: number;
+}
+
 export class ClassType implements Type {
   name: string;
   properties: Property[];
@@ -215,12 +221,25 @@ class SpecificationBuilder extends Specification {
     return dest;
   }
 
+  //noinspection JSMethodCanBeStatic
+  toIntegerType(integerType: schema.IntegerType): IntegerType {
+    const {name, minimum, maximum} = integerType;
+
+    const dest = new IntegerType();
+    dest.name = name;
+    dest.minimum = minimum;
+    dest.maximum = maximum;
+    return dest;
+  }
+
   toSimpleType = (simpleType: schema.SimpleType): SimpleType => {
     const {kind} = simpleType;
 
     switch (kind) {
       case 'string':
-        return this.toStringType(simpleType);
+        return this.toStringType(simpleType as schema.StringType);
+      case 'integer':
+        return this.toIntegerType(simpleType as schema.IntegerType);
       default:
         throw Error(`Unexpected simpleType: ${kind}`);
     }

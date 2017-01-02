@@ -40,6 +40,21 @@ paths:
           description: update-person-success
           schema:
             $ref: '#/definitions/person'
+  '/age/{age}':
+    get:
+      operationId: get-first-person
+      parameters:
+        - name: age
+          in: path
+          required: true
+          type: integer
+          minimum: 0
+          maximum: 150
+      responses:
+        '200':
+          description: get-person-success
+          schema:
+            $ref: '#/definitions/person'
 definitions:
   person:
     type: object
@@ -54,3 +69,7 @@ definitions:
         pattern: '^[\p{Alpha}'']$'
         minLength: 1
         maxLength: 100
+      age:
+        type: integer
+        minimum: 0
+        maximum: 150

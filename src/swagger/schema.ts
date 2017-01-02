@@ -23,7 +23,9 @@ export class Schema {
   $ref?: string;
   type?: string;
   properties?: {[propertyName: string]: Schema};
+  maximum?: number;
   maxLength?: number;
+  minimum?: number;
   minLength?: number;
   pattern?: string;
 }
@@ -44,7 +46,9 @@ export class PathParameter implements Parameter {
   in: string;
   required: boolean;
   type: string;
+  maximum?: number;
   maxLength?: number;
+  minimum?: number;
   minLength?: number;
   pattern?: string;
 }
