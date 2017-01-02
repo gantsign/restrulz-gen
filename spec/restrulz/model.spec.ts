@@ -212,10 +212,10 @@ describe('restrulz specification', () => {
 
   describe('simple-types', () => {
     it('there should be three elements', () => {
-      expect(simpleTypes.length).toEqual(3);
+      expect(simpleTypes.length).toEqual(4);
     });
 
-    const [simpleType1, simpleType2, simpleType3] = simpleTypes;
+    const [simpleType1, simpleType2, simpleType3, simpleType4] = simpleTypes;
 
     describe('simple-type 1', () => {
       it('should match expected', () => {
@@ -257,11 +257,24 @@ describe('restrulz specification', () => {
         expect(maximum).toEqual(150);
       });
     });
+
+    describe('simple-type 4', () => {
+      it('should match expected', () => {
+        if (!(simpleType4 instanceof IntegerType)) {
+          fail(`Unexpected class: ${typeof simpleType4}`);
+          return;
+        }
+        const {name, minimum, maximum} = simpleType4 as IntegerType;
+        expect(name).toEqual('months-employed');
+        expect(minimum).toEqual(0);
+        expect(maximum).toEqual(1000);
+      });
+    });
   });
 
   describe('class-types', () => {
-    it('there should be one element', () => {
-      expect(classTypes.length).toEqual(1);
+    it('there should be two elements', () => {
+      expect(classTypes.length).toEqual(2);
     });
 
     const [classType1] = classTypes;
@@ -271,43 +284,77 @@ describe('restrulz specification', () => {
       it('should match expected', () => {
         const {name, properties} = classType1;
         expect(name).toEqual('person');
-        expect(properties.length).toEqual(4);
+        expect(properties.length).toEqual(7);
       });
 
-      const [property1, property2, property3, property4] = classType1.properties;
+      const [property1, property2, property3, property4, property5, property6, property7] = classType1.properties;
       describe('property 1', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty} = property1;
+          const {name, type, allowEmpty, allowNull} = property1;
           expect(name).toEqual('first-name');
           expect(type).toEqual(spec.getType('name'));
-          expect(allowEmpty).toBeFalsy()
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeFalsy();
         });
       });
 
       describe('property 2', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty} = property2;
+          const {name, type, allowEmpty, allowNull} = property2;
           expect(name).toEqual('last-name');
           expect(type).toEqual(spec.getType('name'));
-          expect(allowEmpty).toBeTruthy()
+          expect(allowEmpty).toBeTruthy();
+          expect(allowNull).toBeFalsy();
         });
       });
 
       describe('property 3', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty} = property3;
+          const {name, type, allowEmpty, allowNull} = property3;
           expect(name).toEqual('age');
           expect(type).toEqual(spec.getType('age'));
-          expect(allowEmpty).toBeFalsy()
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeFalsy();
         });
       });
 
       describe('property 4', () => {
         it('should match expected', () => {
-          const {name, type, allowEmpty} = property4;
+          const {name, type, allowEmpty, allowNull} = property4;
           expect(name).toEqual('employed');
           expect(type).toEqual(spec.getType('boolean'));
-          expect(allowEmpty).toBeFalsy()
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeFalsy();
+        });
+      });
+
+      describe('property 5', () => {
+        it('should match expected', () => {
+          const {name, type, allowEmpty, allowNull} = property5;
+          expect(name).toEqual('months-employed');
+          expect(type).toEqual(spec.getType('months-employed'));
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeTruthy();
+        });
+      });
+
+      describe('property 6', () => {
+        it('should match expected', () => {
+          const {name, type, allowEmpty, allowNull} = property6;
+          expect(name).toEqual('work-address');
+          expect(type).toEqual(spec.getType('address'));
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeTruthy();
+        });
+      });
+
+      describe('property 7', () => {
+        it('should match expected', () => {
+          const {name, type, allowEmpty, allowNull} = property7;
+          expect(name).toEqual('home-address');
+          expect(type).toEqual(spec.getType('address'));
+          expect(allowEmpty).toBeFalsy();
+          expect(allowNull).toBeFalsy();
         });
       });
     });

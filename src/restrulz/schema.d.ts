@@ -34,6 +34,7 @@ export interface Property {
   name: string;
   typeRef: string;
   allowEmpty: boolean | undefined;
+  allowNull: boolean | undefined;
 }
 
 export interface ClassType {

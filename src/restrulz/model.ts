@@ -97,6 +97,7 @@ export class Property {
   name: string;
   type: Type;
   allowEmpty = false;
+  allowNull = false;
 }
 
 export class Response {
@@ -259,7 +260,7 @@ class SpecificationBuilder extends Specification {
   };
 
   toProperty = (property: schema.Property): Property => {
-    const {name, typeRef, allowEmpty} = property;
+    const {name, typeRef, allowEmpty, allowNull} = property;
 
     const dest = new Property();
     dest.name = name;
@@ -267,6 +268,7 @@ class SpecificationBuilder extends Specification {
       dest.type = this.getType(typeRef);
     });
     dest.allowEmpty = allowEmpty === true;
+    dest.allowNull = allowNull === true;
     return dest;
   };
 

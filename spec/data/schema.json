@@ -23,6 +23,12 @@
       "kind": "integer",
       "minimum": 0,
       "maximum": 150
+    },
+    {
+      "name": "months-employed",
+      "kind": "integer",
+      "minimum": 0,
+      "maximum": 1000
     }
   ],
   "class-types": [
@@ -41,13 +47,33 @@
         },
         {
           "name": "age",
-          "type-ref": "age"
+          "type-ref": "age",
+          "allow-null": false
         },
         {
           "name": "employed",
           "type-ref": "boolean"
+        },
+        {
+          "name": "months-employed",
+          "type-ref": "months-employed",
+          "allow-null": true
+        },
+        {
+          "name": "work-address",
+          "type-ref": "address",
+          "allow-null": true
+        },
+        {
+          "name": "home-address",
+          "type-ref": "address",
+          "allow-null": false
         }
       ]
+    },
+    {
+      "name": "address",
+      "properties": []
     }
   ],
   "responses": [

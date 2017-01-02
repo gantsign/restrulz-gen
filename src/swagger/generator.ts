@@ -207,7 +207,7 @@ function toProperties(properties: Property[]): {[propertyName: string]: swagger.
 
 function toRequiredProperties(properties: Property[]): string[] {
   return properties
-      .filter(property => !property.allowEmpty)
+      .filter(property => !(property.allowEmpty || property.allowNull))
       .map(property => property.name)
 }
 
