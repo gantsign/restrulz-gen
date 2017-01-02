@@ -9,7 +9,9 @@
     "test": "./node_modules/.bin/ts-node node_modules/istanbul/lib/cli.js cover --print both spec/run-jasmine.js",
     "lint": "./node_modules/.bin/tslint \"src/**/*.ts\" \"spec/**/*.ts\"",
     "prebuild": "npm run clean && npm run lint && npm run test",
-    "build": "./node_modules/.bin/tsc"
+    "build": "./node_modules/.bin/tsc",
+    "typings": "./node_modules/.bin/typings install",
+    "prepublish": "npm run typings && npm run build"
   },
   "repository": {
     "type": "git",
@@ -33,7 +35,8 @@
     "rimraf": "^2.5.4",
     "ts-node": "^2.0.0",
     "tslint": "^4.1.1",
-    "typescript": "^2.1.4"
+    "typescript": "^2.1.4",
+    "typings": "^2.1.0"
   },
   "dependencies": {
     "fs-extra": "^1.0.0",
