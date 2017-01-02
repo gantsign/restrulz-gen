@@ -3,6 +3,11 @@
   "version": "0.9.0",
   "description": "REST API code generator.",
   "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "typings.json",
+    "LICENSE"
+  ],
   "scripts": {
     "clean": "./node_modules/.bin/rimraf dist tmp",
     "start": "./node_modules/.bin/ts-node src/main.ts",
