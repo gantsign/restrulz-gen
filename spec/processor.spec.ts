@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /// <reference path="../typings/globals/jasmine/index.d.ts" />
-import {SchemaProcessor} from '../src/processor'
+import {SchemaProcessor} from '../src/index'
 import {Generator, GeneratorContext} from '../src/generator'
 import {Specification} from '../src/restrulz/model';
 
