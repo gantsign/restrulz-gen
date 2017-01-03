@@ -17,7 +17,7 @@
 /// <reference path="../../typings/globals/jasmine/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
 
-import {SchemaProcessor} from '../../src/index';
+import {SchemaProcessor} from '../../src/generator';
 import {SwaggerGenerator} from '../../src/swagger/generator';
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';

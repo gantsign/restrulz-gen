@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {SchemaProcessor} from './index';
+import {SchemaProcessor} from './generator';
 import {SwaggerGenerator} from './swagger/generator';
 
 const swaggerGenerator = new SwaggerGenerator();
