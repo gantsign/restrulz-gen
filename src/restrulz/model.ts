@@ -112,21 +112,21 @@ export class StaticPathElement {
   value: string;
 }
 
-export class PathParam {
+export class PathParameter {
   name: string;
   typeRef: SimpleType;
 }
 
-export type PathElement = StaticPathElement | PathParam;
+export type PathElement = StaticPathElement | PathParameter;
 
-export interface ParamRef {
+export interface HandlerParameter {
 }
 
-export class PathParamRef implements ParamRef {
-  value: PathParam;
+export class PathParameterReference implements HandlerParameter {
+  value: PathParameter;
 }
 
-export class BodyParamRef implements ParamRef {
+export class BodyParameterReference implements HandlerParameter {
   typeRef: ClassType;
 }
 
@@ -136,7 +136,7 @@ export interface Mapping {
 export class HttpMethodHandler implements Mapping {
   method: HttpMethod;
   name: string;
-  parameters: ParamRef[];
+  parameters: HandlerParameter[];
   responseRef: Response;
 }
 
@@ -145,14 +145,14 @@ export class PathScope {
   path: PathElement[];
   mappings: Mapping[];
 
-  getPathParam = (name: string): PathParam => {
+  getPathParameter = (name: string): PathParameter => {
     const param = this.path.find((element) => {
-      if (!(element instanceof PathParam)) {
+      if (!(element instanceof PathParameter)) {
         return false;
       }
       return element.name === name;
     });
-    if (param && param instanceof PathParam) {
+    if (param && param instanceof PathParameter) {
       return param;
     }
     throw new Error(`Path parameter not found: ${name}`);
@@ -304,10 +304,10 @@ class SpecificationBuilder extends Specification {
     return dest;
   }
 
-  toPathParam = (pathParam: schema.PathParam): PathParam => {
+  toPathParameter = (pathParam: schema.PathParam): PathParameter => {
     const {name, typeRef} = pathParam;
 
-    const dest = new PathParam();
+    const dest = new PathParameter();
     dest.name = name;
     dest.typeRef = this.getSimpleType(typeRef);
     return dest;
@@ -320,37 +320,37 @@ class SpecificationBuilder extends Specification {
       case 'static':
         return this.toStaticPathElement(pathElement);
       case 'path-param':
-        return this.toPathParam(pathElement);
+        return this.toPathParameter(pathElement);
       default:
         throw new Error(`Unsupported path element type: ${kind}`);
     }
   };
 
   //noinspection JSMethodCanBeStatic
-  toPathParamRef(pathParamRef: schema.PathParamRef, pathScope: PathScope): PathParamRef {
+  toPathParameterReference(pathParamRef: schema.PathParamRef, pathScope: PathScope): PathParameterReference {
     const {valueRef} = pathParamRef;
 
-    const dest = new PathParamRef();
-    dest.value = pathScope.getPathParam(valueRef);
+    const dest = new PathParameterReference();
+    dest.value = pathScope.getPathParameter(valueRef);
     return dest;
   }
 
-  toBodyParmRef = (bodyParamRef: schema.BodyParamRef): BodyParamRef => {
+  toBodyParameterReference = (bodyParamRef: schema.BodyParamRef): BodyParameterReference => {
     const {typeRef} = bodyParamRef;
 
-    const dest = new BodyParamRef();
+    const dest = new BodyParameterReference();
     dest.typeRef = this.getClassType(typeRef);
     return dest;
   };
 
-  toParameter = (parameter: schema.ParamRef, pathScope: PathScope): ParamRef => {
+  toParameter = (parameter: schema.ParamRef, pathScope: PathScope): HandlerParameter => {
     const {kind} = parameter;
 
     switch (parameter.kind) {
       case 'path-param-ref':
-        return this.toPathParamRef(parameter, pathScope);
+        return this.toPathParameterReference(parameter, pathScope);
       case 'body-param-ref':
-        return this.toBodyParmRef(parameter);
+        return this.toBodyParameterReference(parameter);
       default:
         throw new Error(`Unsupported parameter type: ${kind}`);
     }

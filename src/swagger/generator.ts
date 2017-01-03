@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 import {
-  BodyParamRef,
+  BodyParameterReference,
   BooleanType,
   ClassType,
+  HandlerParameter,
   HttpMethod,
   HttpMethodHandler,
   IntegerType,
-  ParamRef,
   PathElement,
-  PathParam,
-  PathParamRef,
+  PathParameter,
+  PathParameterReference,
   PathScope,
   Property,
   Response,
@@ -63,9 +63,9 @@ function toSwaggerSchema(classType: ClassType): SwaggerSchema {
   return dest;
 }
 
-function toSwaggerParameter(paramRef: ParamRef): SwaggerParameter {
-  if (paramRef instanceof PathParamRef) {
-    const {value: param} = paramRef;
+function toSwaggerParameter(handlerParam: HandlerParameter): SwaggerParameter {
+  if (handlerParam instanceof PathParameterReference) {
+    const {value: param} = handlerParam;
     const dest = new SwaggerPathParameter();
     dest.name = param.name;
     dest.in = 'path';
@@ -88,12 +88,12 @@ function toSwaggerParameter(paramRef: ParamRef): SwaggerParameter {
       dest.type = 'boolean';
 
     } else {
-      throw new Error(`Unsupported parameter type: ${typeof paramRef.value.typeRef}`);
+      throw new Error(`Unsupported parameter type: ${typeof handlerParam.value.typeRef}`);
     }
     return dest;
 
-  } else if (paramRef instanceof BodyParamRef) {
-    const {typeRef: paramType} = paramRef;
+  } else if (handlerParam instanceof BodyParameterReference) {
+    const {typeRef: paramType} = handlerParam;
     const dest = new SwaggerBodyParameter();
     dest.name = paramType.name;
     dest.in = 'body';
@@ -102,7 +102,7 @@ function toSwaggerParameter(paramRef: ParamRef): SwaggerParameter {
     return dest;
 
   } else {
-    throw new Error(`Unsupported parameter type: ${typeof paramRef}`);
+    throw new Error(`Unsupported parameter type: ${typeof handlerParam}`);
   }
 }
 
@@ -142,7 +142,7 @@ function toPathString(pathElements: PathElement[]): string {
   pathElements.forEach((pathElement) => {
     if (pathElement instanceof StaticPathElement) {
       path += `/${pathElement.value}`;
-    } else if (pathElement instanceof PathParam) {
+    } else if (pathElement instanceof PathParameter) {
       path += `/{${pathElement.name}}`
     } else {
       throw new Error(`Unsupported path element: ${typeof pathElement}`);

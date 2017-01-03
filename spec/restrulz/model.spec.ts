@@ -15,7 +15,7 @@
  */
 /// <reference path="../../typings/globals/jasmine/index.d.ts" />
 import {
-  BodyParamRef,
+  BodyParameterReference,
   ClassType,
   getHttpMethod,
   getHttpStatus,
@@ -24,8 +24,8 @@ import {
   HttpStatus,
   IntegerType,
   parseSpecification,
-  PathParam,
-  PathParamRef,
+  PathParameter,
+  PathParameterReference,
   StringType,
   StaticPathElement
 } from '../../src/restrulz/model';
@@ -174,18 +174,18 @@ describe('restrulz specification', () => {
     });
   });
 
-  describe('pathScope.getPathParam', () => {
+  describe('pathScope.getPathParameter', () => {
     const [pathScope] = spec.pathScopes;
 
     it('should return defined path-path', () => {
-      const param = pathScope.getPathParam('id');
+      const param = pathScope.getPathParameter('id');
       expect(param).toBeDefined();
       const {name} = param;
       expect(name).toEqual('id');
     });
 
     it('should throw an error for undefined path param', () => {
-      expect(() => pathScope.getPathParam('ridiculous')).toThrowError()
+      expect(() => pathScope.getPathParameter('ridiculous')).toThrowError()
     });
   });
 
@@ -445,11 +445,11 @@ describe('restrulz specification', () => {
 
       describe('path 2', () => {
         it('should match expected', () => {
-          if (!(path2 instanceof PathParam)) {
+          if (!(path2 instanceof PathParameter)) {
             fail(`Unexpected class: ${typeof path2}`);
             return;
           }
-          const {name, typeRef} = path2 as PathParam;
+          const {name, typeRef} = path2 as PathParameter;
           expect(name).toEqual('id');
           expect(typeRef).toEqual(spec.getSimpleType('uuid'));
         });
@@ -478,12 +478,12 @@ describe('restrulz specification', () => {
 
         describe('parameter 1', () => {
           it('should match expected', () => {
-            if (!(parameter1 instanceof PathParamRef)) {
+            if (!(parameter1 instanceof PathParameterReference)) {
               fail(`Unexpected class: ${typeof parameter1}`);
               return;
             }
-            const {value} = parameter1 as PathParamRef;
-            expect(value).toEqual(pathScope1.getPathParam('id'));
+            const {value} = parameter1 as PathParameterReference;
+            expect(value).toEqual(pathScope1.getPathParameter('id'));
           });
         });
       });
@@ -510,22 +510,22 @@ describe('restrulz specification', () => {
 
         describe('parameter 1', () => {
           it('should match expected', () => {
-            if (!(parameter1 instanceof PathParamRef)) {
+            if (!(parameter1 instanceof PathParameterReference)) {
               fail(`Unexpected class: ${typeof parameter1}`);
               return;
             }
-            const {value} = parameter1 as PathParamRef;
-            expect(value).toEqual(pathScope1.getPathParam('id'));
+            const {value} = parameter1 as PathParameterReference;
+            expect(value).toEqual(pathScope1.getPathParameter('id'));
           });
         });
 
         describe('parameter 2', () => {
           it('should match expected', () => {
-            if (!(parameter2 instanceof BodyParamRef)) {
+            if (!(parameter2 instanceof BodyParameterReference)) {
               fail(`Unexpected class: ${typeof parameter2}`);
               return;
             }
-            const {typeRef} = parameter2 as BodyParamRef;
+            const {typeRef} = parameter2 as BodyParameterReference;
             expect(typeRef).toEqual(spec.getClassType('person'));
           });
         });
