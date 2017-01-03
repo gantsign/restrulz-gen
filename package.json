@@ -1,5 +1,5 @@
 {
-  "name": "restrulz-gen",
+  "name": "@gantsign/restrulz-gen",
   "version": "0.9.0",
   "description": "REST API code generator.",
   "main": "dist/index.js",
