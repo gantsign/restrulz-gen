@@ -6,12 +6,28 @@ node_js:
 install:
   - npm install
   - npm install -g codecov
+  - npm install -g makeshift
+  - makeshift --scope @gantsign --registry https://api.bintray.com/npm/gantsign/npm/
 
 script:
-  - npm run build
+  - npm pack
   - codecov
 
 branches:
   only:
     - master
     - /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([\.\-].*)?$/
+
+env:
+  global:
+    # NPM_TOKEN
+    secure: Xrw87EigbvRQay4UmGxUJTz4OWikHLU9FVNmG+WRK7O/hUaAEWEv0MNzJNaQhmPSRQn/7nZ2wzHwCuhD/Z2detMSey/XLf2qCX2fg7ZWYpLSwz59F4JseVp/X5n3H3O473gvm/6zsKgi0O9PX5wmh/YYh8qpuekdTdySNi8XqexVb6LCUy0SqYUsIOPqvcw7KkjZvOX9CfdbUulGFvVE7ReK+RsKPpLZ0sOBq72qWdFhunEU9dg8E1RLB6H63si7pJAnevL+XxdwH3lJaJrX/xQ7Q/nYRO+zRiDQJr54PC8+nTgUljyYQBDuw8ppK7rzf1Omt0rZtXPINm0BWmTWlKi2AHqBBgheLo/mAJ9gHjgRV49pR0sufbX5rLlGCDnUwAlOVxE39ey6RKEXCcG0FCGY7hwSYmXumFlBw0TKEVsqL4hr1vE9YmvGapzZoaMPtIz80P1dr0O8QCMvQc4KKvHE3J6Sx8hI7OBQlcotxMttsvKh7b89QxlMAClPsJHmjBf21D13Tofx7CBQyFdkZUiQ00wL7pmZwiQWjgmDZHWrIkDmE0A87bcvn/KXzCcNFAlX79ow1NYmSNeQLCMwCbcuIQfU948jeH83uiytBRL+osdxSWfT96xJ6Vna0XVfmI+Ley/jOlrvrOl0KEHOjZozBcSiQrm18xct71LkkIc=
+
+deploy:
+  provider: npm
+  email: john.freeman.opensource@gmail.com
+  api_key:
+    api_key: $NPM_TOKEN
+  on:
+    tags: true
+    repo: gantsign/restrulz-gen
