@@ -6,8 +6,7 @@ node_js:
 install:
   - npm install
   - npm install -g codecov
-  - npm install -g makeshift
-  - makeshift --scope @gantsign --registry https://api.bintray.com/npm/gantsign/npm/
+  - printf "@gantsign:registry=https://api.bintray.com/npm/gantsign/npm/\n//api.bintray.com/npm/gantsign/npm/:_authToken=${NPM_TOKEN}\n//api.bintray.com/npm/gantsign/npm/:username=freemanjp\n//api.bintray.com/npm/gantsign/npm/:email=john.freeman.opensource@gmail.com\n//api.bintray.com/npm/gantsign/npm/:always-auth=true\n" >> ~/.npmrc
 
 script:
   - npm pack
