@@ -18,8 +18,12 @@
 /// <reference path="../typings/globals/fs-extra/index.d.ts" />
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
-import {Generator, GeneratorContext, SchemaProcessor} from '../src/generator'
-import {Specification} from '../src/restrulz/model';
+import {
+  Generator,
+  GeneratorContext,
+  SchemaProcessor,
+  Specification
+} from '../src/index'
 const jsyaml: any = require('js-yaml');
 
 class TestGenerator implements Generator {
