@@ -37,3 +37,14 @@ export {
   StringType
 } from './restrulz/model';
 export {SwaggerGenerator} from './swagger/generator';
+export {
+  SwaggerBodyParameter,
+  SwaggerInfo,
+  SwaggerOperation,
+  SwaggerParameter,
+  SwaggerPath,
+  SwaggerPathParameter,
+  SwaggerSchema,
+  SwaggerSpecification,
+  SwaggerResponse
+} from './swagger/schema';
