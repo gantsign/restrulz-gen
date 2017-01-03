@@ -31,13 +31,23 @@ import {
   StaticPathElement,
   StringType
 } from '../restrulz/model';
-import * as swagger from './schema';
+import {
+  SwaggerBodyParameter,
+  SwaggerInfo,
+  SwaggerOperation,
+  SwaggerParameter,
+  SwaggerPath,
+  SwaggerPathParameter,
+  SwaggerSchema,
+  SwaggerSpecification,
+  SwaggerResponse
+} from './schema';
 import {Generator, GeneratorContext} from '../generator';
 
 //noinspection JSUnusedLocalSymbols
-function toInfo(spec: Specification): swagger.Info {
+function toInfo(spec: Specification): SwaggerInfo {
   const {name, title, description, version} = spec;
-  const dest = new swagger.Info();
+  const dest = new SwaggerInfo();
 
   dest.title = title !== '' ? title : name;
   if (description !== '') {
@@ -47,16 +57,16 @@ function toInfo(spec: Specification): swagger.Info {
   return dest
 }
 
-function toSchema(classType: ClassType): swagger.Schema {
-  const dest = new swagger.Schema();
+function toSchema(classType: ClassType): SwaggerSchema {
+  const dest = new SwaggerSchema();
   dest.$ref = `#/definitions/${classType.name}`;
   return dest;
 }
 
-function toParameter(paramRef: ParamRef): swagger.Parameter {
+function toParameter(paramRef: ParamRef): SwaggerParameter {
   if (paramRef instanceof PathParamRef) {
     const {value: param} = paramRef;
-    const dest = new swagger.PathParameter();
+    const dest = new SwaggerPathParameter();
     dest.name = param.name;
     dest.in = 'path';
     dest.required = true;
@@ -84,7 +94,7 @@ function toParameter(paramRef: ParamRef): swagger.Parameter {
 
   } else if (paramRef instanceof BodyParamRef) {
     const {typeRef: paramType} = paramRef;
-    const dest = new swagger.BodyParameter();
+    const dest = new SwaggerBodyParameter();
     dest.name = paramType.name;
     dest.in = 'body';
     dest.required = true;
@@ -96,11 +106,11 @@ function toParameter(paramRef: ParamRef): swagger.Parameter {
   }
 }
 
-function toResponse(response: Response): swagger.Response {
-  const dest = new swagger.Response();
+function toResponse(response: Response): SwaggerResponse {
+  const dest = new SwaggerResponse();
   dest.description = response.name;
   if (response.isArray) {
-    const schema = new swagger.Schema();
+    const schema = new SwaggerSchema();
     schema.type = 'array';
     schema.items = toSchema(response.bodyTypeRef);
     dest.schema = schema;
@@ -111,16 +121,16 @@ function toResponse(response: Response): swagger.Response {
   return dest;
 }
 
-function toResponses(responses: Response[]): {[statusCode: string]: swagger.Response} {
-  const dest: {[statusCode: string]: swagger.Response} = {};
+function toResponses(responses: Response[]): {[statusCode: string]: SwaggerResponse} {
+  const dest: {[statusCode: string]: SwaggerResponse} = {};
   responses.forEach((response) => {
     dest[response.status] = toResponse(response);
   });
   return dest;
 }
 
-function toOperation(handler: HttpMethodHandler): swagger.Operation {
-  const dest = new swagger.Operation();
+function toOperation(handler: HttpMethodHandler): SwaggerOperation {
+  const dest = new SwaggerOperation();
   dest.operationId = handler.name;
   dest.parameters = handler.parameters.map(toParameter);
   dest.responses = toResponses([handler.responseRef]);
@@ -141,11 +151,11 @@ function toPathString(pathElements: PathElement[]): string {
   return path;
 }
 
-function toPaths(pathScopes: PathScope[]): {[path: string]: swagger.Path} {
-  const dest: {[path: string]: swagger.Path} = {};
+function toPaths(pathScopes: PathScope[]): {[path: string]: SwaggerPath} {
+  const dest: {[path: string]: SwaggerPath} = {};
   pathScopes.forEach((pathScope) => {
     const location = toPathString(pathScope.path);
-    const path = new swagger.Path();
+    const path = new SwaggerPath();
     pathScope.mappings.forEach((mapping) => {
       if (mapping instanceof HttpMethodHandler) {
         const operation = toOperation(mapping);
@@ -175,7 +185,7 @@ function toPaths(pathScopes: PathScope[]): {[path: string]: swagger.Path} {
   return dest;
 }
 
-function setSchemaProperties(swaggerSchema: swagger.Schema, property: Property) {
+function setSchemaProperties(swaggerSchema: SwaggerSchema, property: Property) {
   const {type} = property;
   if (type instanceof StringType) {
     const {pattern, minLength, maxLength} = type;
@@ -206,14 +216,14 @@ function setSchemaProperties(swaggerSchema: swagger.Schema, property: Property) 
   }
 }
 
-function toProperties(properties: Property[]): {[propertyName: string]: swagger.Schema} {
-  const dest: {[propertyName: string]: swagger.Schema} = {};
+function toProperties(properties: Property[]): {[propertyName: string]: SwaggerSchema} {
+  const dest: {[propertyName: string]: SwaggerSchema} = {};
   properties.forEach((property) => {
     const {name} = property;
-    const swaggerProperty = new swagger.Schema();
+    const swaggerProperty = new SwaggerSchema();
     if (property.isArray) {
       swaggerProperty.type = 'array';
-      const items = new swagger.Schema();
+      const items = new SwaggerSchema();
       setSchemaProperties(items, property);
       swaggerProperty.items = items;
 
@@ -232,11 +242,11 @@ function toRequiredProperties(properties: Property[]): string[] {
       .map(property => property.name)
 }
 
-function toDefinitions(classTypes: ClassType[]): {[definitionsName: string]: swagger.Schema} {
-  const dest: {[definitionsName: string]: swagger.Schema} = {};
+function toDefinitions(classTypes: ClassType[]): {[definitionsName: string]: SwaggerSchema} {
+  const dest: {[definitionsName: string]: SwaggerSchema} = {};
   classTypes.forEach((classType) => {
     const {name, properties} = classType;
-    const definition = new swagger.Schema();
+    const definition = new SwaggerSchema();
     definition.type = 'object';
     definition.properties = toProperties(properties);
     definition.required = toRequiredProperties(properties);
@@ -246,10 +256,10 @@ function toDefinitions(classTypes: ClassType[]): {[definitionsName: string]: swa
   return dest;
 }
 
-function toSwagger(spec: Specification): swagger.Spec {
+function toSwagger(spec: Specification): SwaggerSpecification {
   const {pathScopes, classTypes} = spec;
 
-  const dest = new swagger.Spec();
+  const dest = new SwaggerSpecification();
   dest.swagger = '2.0';
   dest.info = toInfo(spec);
   dest.paths = toPaths(pathScopes);

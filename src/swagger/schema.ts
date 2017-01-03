@@ -13,37 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class Info {
+export class SwaggerInfo {
   title: string;
   description?: string;
   version: string;
 }
 
-export class Schema {
+export class SwaggerSchema {
   $ref?: string;
   type?: string;
-  properties?: {[propertyName: string]: Schema};
+  properties?: {[propertyName: string]: SwaggerSchema};
   maximum?: number;
   maxLength?: number;
   minimum?: number;
   minLength?: number;
   pattern?: string;
   required?: string[];
-  items?: Schema;
+  items?: SwaggerSchema;
 }
 
-export class Response {
+export class SwaggerResponse {
   description: string;
-  schema?: Schema;
+  schema?: SwaggerSchema;
 }
 
-export interface Parameter {
+export interface SwaggerParameter {
   name: string;
   in: string;
   required: boolean;
 }
 
-export class PathParameter implements Parameter {
+export class SwaggerPathParameter implements SwaggerParameter {
   name: string;
   in: string;
   required: boolean;
@@ -55,29 +55,29 @@ export class PathParameter implements Parameter {
   pattern?: string;
 }
 
-export class BodyParameter implements Parameter {
+export class SwaggerBodyParameter implements SwaggerParameter {
   name: string;
   in: string;
   required: boolean;
-  schema?: Schema;
+  schema?: SwaggerSchema;
 }
 
-export class Operation {
+export class SwaggerOperation {
   operationId?: string;
-  parameters?: Parameter[];
-  responses: {[statusCode: string]: Response};
+  parameters?: SwaggerParameter[];
+  responses: {[statusCode: string]: SwaggerResponse};
 }
 
-export class Path {
-  get?: Operation;
-  put?: Operation;
-  post?: Operation;
-  delete?: Operation;
+export class SwaggerPath {
+  get?: SwaggerOperation;
+  put?: SwaggerOperation;
+  post?: SwaggerOperation;
+  delete?: SwaggerOperation;
 }
 
-export class Spec {
+export class SwaggerSpecification {
   swagger: string;
-  info: Info;
-  paths: {[p: string]: Path};
-  definitions?: {[definitionName: string]: Schema };
+  info: SwaggerInfo;
+  paths: {[p: string]: SwaggerPath};
+  definitions?: {[definitionName: string]: SwaggerSchema };
 }
