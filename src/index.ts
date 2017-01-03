@@ -14,4 +14,22 @@
  * limitations under the License.
  */
 export {SchemaProcessor} from './generator';
+export {
+  BodyParameterReference,
+  BooleanType,
+  ClassType,
+  HandlerParameter,
+  HttpMethod,
+  HttpMethodHandler,
+  IntegerType,
+  PathElement,
+  PathParameter,
+  PathParameterReference,
+  PathScope,
+  Property,
+  Response,
+  Specification,
+  StaticPathElement,
+  StringType
+} from './restrulz/model';
 export {SwaggerGenerator} from './swagger/generator';
