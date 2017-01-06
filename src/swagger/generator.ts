@@ -44,8 +44,13 @@ import {
 } from './schema';
 import {Generator, GeneratorContext} from '../generator';
 
+export enum SwaggerFormat {
+  YAML,
+  JSON
+}
+
 export class SwaggerGenerator implements Generator {
-  outputFile: string = 'swagger.yml';
+  format = SwaggerFormat.YAML;
 
   //noinspection JSUnusedLocalSymbols,JSMethodCanBeStatic
   protected toSwaggerInfo(spec: Specification): SwaggerInfo {
@@ -273,13 +278,20 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
+  //noinspection JSMethodCanBeStatic
+  protected getSwaggerOutputPath(spec: Specification) {
+    const extension = this.format === SwaggerFormat.JSON ? 'json' : 'yml';
+    return `${spec.name}.swagger.${extension}`;
+  }
+
   generateFiles(spec: Specification, context: GeneratorContext): void {
     const swaggerModel = this.toSwaggerSpecification(spec);
-    if (this.outputFile.toLowerCase().endsWith('.json')) {
-      context.writeJsonToFile(this.outputFile, swaggerModel);
+    const outputPath = this.getSwaggerOutputPath(spec);
+    if (outputPath.toLowerCase().endsWith('.json')) {
+      context.writeJsonToFile(outputPath, swaggerModel);
       return;
     }
-    context.writeYamlToFile(this.outputFile, swaggerModel);
+    context.writeYamlToFile(outputPath, swaggerModel);
   }
 
   constructor() {

@@ -36,7 +36,7 @@ class TestGenerator implements Generator {
 }
 
 const processor = new SchemaProcessor();
-processor.schemaFile = 'spec/data/schema.json';
+processor.schemaFiles = ['spec/data/schema.json'];
 processor.outputDirectory = 'tmp/output';
 
 const generator1 = new TestGenerator();

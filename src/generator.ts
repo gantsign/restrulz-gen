@@ -80,18 +80,22 @@ class GeneratorContextImpl implements GeneratorContext {
 }
 
 export class SchemaProcessor {
-  schemaFile: string;
+  schemaFiles: string[] = [];
   outputDirectory: string;
   generators: Generator[] = [];
 
   execute(): void {
-    const context = new GeneratorContextImpl();
-    context.schemaFile = this.schemaFile;
-    context.outputDirectory = this.outputDirectory;
-    context.generators = this.generators;
-    context.specification = parseSpecification(this.schemaFile);
+    this.generators.forEach((generator) => {
+      this.schemaFiles.forEach((schemaFile) => {
+        const context = new GeneratorContextImpl();
+        context.schemaFile = schemaFile;
+        context.outputDirectory = this.outputDirectory;
+        context.generators = this.generators;
+        context.specification = parseSpecification(schemaFile);
 
-    this.generators.forEach((generator) => generator.generateFiles(context.specification, context));
+        generator.generateFiles(context.specification, context);
+      });
+    });
   }
 
   constructor() {

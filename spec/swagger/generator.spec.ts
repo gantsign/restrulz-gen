@@ -18,7 +18,8 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 
 import {SchemaProcessor} from '../../src/generator';
-import {SwaggerGenerator} from '../../src/swagger/generator';
+import {SwaggerGenerator, SwaggerFormat} from '../../src/swagger/generator';
+import {Specification} from '../../src/restrulz/model';
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
 
@@ -28,10 +29,9 @@ describe('SwaggerGenerator', () => {
     fsx.removeSync('tmp/people.swagger.yml');
 
     const swaggerGenerator = new SwaggerGenerator();
-    swaggerGenerator.outputFile = 'people.swagger.yml';
 
     const processor = new SchemaProcessor();
-    processor.schemaFile = 'spec/data/schema.json';
+    processor.schemaFiles = ['spec/data/schema.json'];
     processor.outputDirectory = 'tmp';
     processor.generators.push(swaggerGenerator);
     processor.execute();
@@ -46,11 +46,16 @@ describe('SwaggerGenerator', () => {
   describe('test with example file 2', () => {
     fsx.removeSync('tmp/people.swagger2.yml');
 
-    const swaggerGenerator = new SwaggerGenerator();
-    swaggerGenerator.outputFile = 'people.swagger2.yml';
+    class FixedNameSwaggerGenerator extends SwaggerGenerator {
+      //noinspection JSMethodCanBeStatic
+      protected getSwaggerOutputPath(spec: Specification): string {
+        return 'people.swagger2.yml';
+      }
+    }
+    const swaggerGenerator = new FixedNameSwaggerGenerator();
 
     const processor = new SchemaProcessor();
-    processor.schemaFile = 'spec/data/schema2.json';
+    processor.schemaFiles = ['spec/data/schema2.json'];
     processor.outputDirectory = 'tmp';
     processor.generators.push(swaggerGenerator);
     processor.execute();
@@ -66,10 +71,10 @@ describe('SwaggerGenerator', () => {
     fsx.removeSync('tmp/people.swagger.json');
 
     const swaggerGenerator = new SwaggerGenerator();
-    swaggerGenerator.outputFile = 'people.swagger.json';
+    swaggerGenerator.format = SwaggerFormat.JSON;
 
     const processor = new SchemaProcessor();
-    processor.schemaFile = 'spec/data/schema.json';
+    processor.schemaFiles = ['spec/data/schema.json'];
     processor.outputDirectory = 'tmp';
     processor.generators.push(swaggerGenerator);
     processor.execute();

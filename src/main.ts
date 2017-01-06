@@ -17,10 +17,9 @@ import {SchemaProcessor} from './generator';
 import {SwaggerGenerator} from './swagger/generator';
 
 const swaggerGenerator = new SwaggerGenerator();
-swaggerGenerator.outputFile = 'people.swagger.yml';
 
 const processor = new SchemaProcessor();
-processor.schemaFile = 'spec/data/schema.json';
+processor.schemaFiles = ['spec/data/schema.json'];
 processor.outputDirectory = 'dest';
 processor.generators.push(swaggerGenerator);
 processor.execute();
