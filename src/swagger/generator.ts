@@ -74,9 +74,9 @@ export class SwaggerGenerator implements Generator {
 
   protected toSwaggerParameter(handlerParam: HandlerParameter): SwaggerParameter {
     if (handlerParam instanceof PathParameterReference) {
-      const {value: param} = handlerParam;
+      const {name, value: param} = handlerParam;
       const dest = new SwaggerPathParameter();
-      dest.name = param.name;
+      dest.name = name;
       dest.in = 'path';
       dest.required = true;
       const {typeRef: paramType} = param;
@@ -102,9 +102,9 @@ export class SwaggerGenerator implements Generator {
       return dest;
 
     } else if (handlerParam instanceof BodyParameterReference) {
-      const {typeRef: paramType} = handlerParam;
+      const {name, typeRef: paramType} = handlerParam;
       const dest = new SwaggerBodyParameter();
-      dest.name = paramType.name;
+      dest.name = name;
       dest.in = 'body';
       dest.required = true;
       dest.schema = this.toSwaggerSchema(paramType);

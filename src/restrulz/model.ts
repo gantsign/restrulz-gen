@@ -120,13 +120,16 @@ export class PathParameter {
 export type PathElement = StaticPathElement | PathParameter;
 
 export interface HandlerParameter {
+  name: string;
 }
 
 export class PathParameterReference implements HandlerParameter {
+  name: string;
   value: PathParameter;
 }
 
 export class BodyParameterReference implements HandlerParameter {
+  name: string;
   typeRef: ClassType;
 }
 
@@ -328,17 +331,19 @@ class SpecificationBuilder extends Specification {
 
   //noinspection JSMethodCanBeStatic
   toPathParameterReference(pathParamRef: schema.PathParamRef, pathScope: PathScope): PathParameterReference {
-    const {valueRef} = pathParamRef;
+    const {name, valueRef} = pathParamRef;
 
     const dest = new PathParameterReference();
+    dest.name = name;
     dest.value = pathScope.getPathParameter(valueRef);
     return dest;
   }
 
   toBodyParameterReference = (bodyParamRef: schema.BodyParamRef): BodyParameterReference => {
-    const {typeRef} = bodyParamRef;
+    const {name, typeRef} = bodyParamRef;
 
     const dest = new BodyParameterReference();
+    dest.name = name;
     dest.typeRef = this.getClassType(typeRef);
     return dest;
   };

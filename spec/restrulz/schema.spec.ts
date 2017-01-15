@@ -332,7 +332,8 @@ describe('restrulz schema definition', () => {
               fail(`Unexpected kind: ${parameter1.kind}`);
               return;
             }
-            const {valueRef} = parameter1;
+            const {name, valueRef} = parameter1;
+            expect(name).toEqual('id');
             expect(valueRef).toEqual('id');
           });
         });
@@ -343,7 +344,8 @@ describe('restrulz schema definition', () => {
               fail(`Unexpected kind: ${parameter2.kind}`);
               return;
             }
-            const {typeRef} = parameter2;
+            const {name, typeRef} = parameter2;
+            expect(name).toEqual('person');
             expect(typeRef).toEqual('person');
           });
         });

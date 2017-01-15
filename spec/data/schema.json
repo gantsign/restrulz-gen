@@ -136,6 +136,7 @@
           "name": "get-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             }
@@ -148,10 +149,12 @@
           "name": "update-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             },
             {
+              "name": "person",
               "kind": "body-param-ref",
               "type-ref": "person"
             }
@@ -180,6 +183,7 @@
           "name": "get-persons-with-age",
           "parameters": [
             {
+              "name": "age",
               "kind": "path-param-ref",
               "value-ref": "age"
             }
@@ -208,6 +212,7 @@
           "name": "get-persons-with-employment-status",
           "parameters": [
             {
+              "name": "employed",
               "kind": "path-param-ref",
               "value-ref": "employed"
             }

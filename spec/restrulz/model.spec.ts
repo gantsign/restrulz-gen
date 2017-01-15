@@ -482,7 +482,8 @@ describe('restrulz specification', () => {
               fail(`Unexpected class: ${typeof parameter1}`);
               return;
             }
-            const {value} = parameter1 as PathParameterReference;
+            const {name, value} = parameter1 as PathParameterReference;
+            expect(name).toEqual('id');
             expect(value).toEqual(pathScope1.getPathParameter('id'));
           });
         });
@@ -514,7 +515,8 @@ describe('restrulz specification', () => {
               fail(`Unexpected class: ${typeof parameter1}`);
               return;
             }
-            const {value} = parameter1 as PathParameterReference;
+            const {name, value} = parameter1 as PathParameterReference;
+            expect(name).toEqual('id');
             expect(value).toEqual(pathScope1.getPathParameter('id'));
           });
         });
@@ -525,7 +527,8 @@ describe('restrulz specification', () => {
               fail(`Unexpected class: ${typeof parameter2}`);
               return;
             }
-            const {typeRef} = parameter2 as BodyParameterReference;
+            const {name, typeRef} = parameter2 as BodyParameterReference;
+            expect(name).toEqual('person');
             expect(typeRef).toEqual(spec.getClassType('person'));
           });
         });

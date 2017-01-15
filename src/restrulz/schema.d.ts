@@ -65,11 +65,13 @@ export type PathElement = StaticPathElement | PathParam;
 
 export interface PathParamRef {
   kind: 'path-param-ref';
+  name: string;
   valueRef: string;
 }
 
 export interface BodyParamRef {
   kind: 'body-param-ref';
+  name: string;
   typeRef: string;
 }
 

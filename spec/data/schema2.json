@@ -101,6 +101,7 @@
           "name": "get-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             }
@@ -113,10 +114,12 @@
           "name": "add-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             },
             {
+              "name": "person",
               "kind": "body-param-ref",
               "type-ref": "person"
             }
@@ -129,10 +132,12 @@
           "name": "update-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             },
             {
+              "name": "person",
               "kind": "body-param-ref",
               "type-ref": "person"
             }
@@ -145,6 +150,7 @@
           "name": "delete-person",
           "parameters": [
             {
+              "name": "id",
               "kind": "path-param-ref",
               "value-ref": "id"
             }
