@@ -2,7 +2,6 @@ instrumentation:
   extensions:
     - .ts
   excludes:
-    - 'src/main.*'
     - 'spec/**'
     - '*.d.ts'
     - '*.spec.ts'
