@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/// <reference path="../../typings/globals/fs-extra/index.d.ts" />
+/// <reference path="../../typings/modules/fs-extra/index.d.ts" />
 /// <reference path="../../typings/globals/jasmine/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
 

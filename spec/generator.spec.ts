@@ -15,7 +15,7 @@
  */
 /// <reference path="../typings/globals/jasmine/index.d.ts" />
 /// <reference path="../typings/globals/node/index.d.ts" />
-/// <reference path="../typings/globals/fs-extra/index.d.ts" />
+/// <reference path="../typings/modules/fs-extra/index.d.ts" />
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
 import {

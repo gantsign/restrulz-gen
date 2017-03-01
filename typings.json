@@ -1,9 +1,11 @@
 {
   "globalDependencies": {
-    "fs-extra": "registry:dt/fs-extra#0.0.0+20161208164608",
-    "node": "registry:env/node#6.0.0+20170102175725"
+    "node": "registry:env/node#6.0.0+20170213133316"
   },
   "globalDevDependencies": {
-    "jasmine": "registry:dt/jasmine#2.5.0+20161228223817"
+    "jasmine": "registry:dt/jasmine#2.5.0+20170207112528"
+  },
+  "dependencies": {
+    "fs-extra": "registry:dt/fs-extra#0.0.0+20170109012028"
   }
 }

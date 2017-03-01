@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /// <reference path="../typings/globals/node/index.d.ts" />
-/// <reference path="../typings/globals/fs-extra/index.d.ts" />
+/// <reference path="../typings/modules/fs-extra/index.d.ts" />
 import {Specification, parseSpecification} from './restrulz/model';
 import * as fs from 'fs'
 import * as path from 'path'
