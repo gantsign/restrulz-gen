@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
+ * Copyright 2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function kebabToCamel(name: string) {
-  return name.toLowerCase().replace(/(-\w)/g, match => match[1].toUpperCase());
-}
+/// <reference path="../../typings/globals/jasmine/index.d.ts" />
 
-//noinspection JSUnusedLocalSymbols
-export function kebabToCamelReviver(key: string | null, value: any) {
-  if (value instanceof Array || !(value instanceof Object)) {
-    return value;
-  }
+import {firstCharToUppercase} from '../../src/util/strings';
 
-  const obj: any = {};
-  for (const name in value) {
-    if (!value.hasOwnProperty(name)) {
-      continue;
-    }
-    obj[kebabToCamel(name)] = value[name];
-  }
-  return obj;
-}
+describe('firstCharToUppercase', () => {
+
+  it('should change the first character to uppercase', () => {
+    expect(firstCharToUppercase('test')).toBe('Test');
+  });
+
+});

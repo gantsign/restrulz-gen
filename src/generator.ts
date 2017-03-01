@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ export interface GeneratorContext {
 }
 
 export interface Generator {
+  licenseHeader: string;
+
+  init(generators: Generator[]): void;
+
   generateFiles(spec: Specification, context: GeneratorContext): void;
 }
 
@@ -85,6 +89,9 @@ export class SchemaProcessor {
   generators: Generator[] = [];
 
   execute(): void {
+    this.generators.forEach((generator) => {
+      generator.init(this.generators);
+    });
     this.generators.forEach((generator) => {
       this.schemaFiles.forEach((schemaFile) => {
         const context = new GeneratorContextImpl();

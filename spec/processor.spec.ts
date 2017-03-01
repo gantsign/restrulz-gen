@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,14 @@ import {
 } from '../src/index'
 
 class TestGenerator implements Generator {
+  licenseHeader = '';
+
   spec: Specification | null;
   context: GeneratorContext | null;
+
+  init(generators: Generator[]): void {
+    // do nothing
+  }
 
   generateFiles(spec: Specification, context: GeneratorContext): void {
     this.spec = spec;

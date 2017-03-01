@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,20 @@ export class PathScope {
       return param;
     }
     throw new Error(`Path parameter not found: ${name}`);
+  };
+
+  getPathAsString = (): string => {
+    let pathString = '';
+    for (let pathElement of this.path) {
+      if (pathElement instanceof StaticPathElement) {
+        pathString += `/${pathElement.value}`;
+      } else if (pathElement instanceof PathParameter) {
+        pathString += `/{${pathElement.name}}`;
+      } else {
+        throw Error(`Unsupported type: ${pathElement}`);
+      }
+    }
+    return pathString;
   }
 }
 
