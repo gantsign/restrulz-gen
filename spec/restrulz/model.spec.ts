@@ -26,6 +26,7 @@ import {
   parseSpecification,
   PathParameter,
   PathParameterReference,
+  PathScope,
   StringType,
   StaticPathElement
 } from '../../src/restrulz/model';
@@ -186,6 +187,49 @@ describe('restrulz specification', () => {
 
     it('should throw an error for undefined path param', () => {
       expect(() => pathScope.getPathParameter('ridiculous')).toThrowError()
+    });
+  });
+
+  describe('pathScope.getPathAsString', () => {
+    const [pathScope] = spec.pathScopes;
+
+    it('should support static path element', () => {
+      const staticPathScope = new PathScope();
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test1';
+      staticPathScope.path = [staticPathElement];
+
+      expect(staticPathScope.getPathAsString()).toBe('/test1');
+    });
+
+    it('should support path parameters', () => {
+      const paramPathScope = new PathScope();
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'test2';
+      paramPathScope.path = [pathParameter];
+
+      expect(paramPathScope.getPathAsString()).toBe('/{test2}');
+    });
+
+    it('should throw error for unsupported parameter type', () => {
+      class UnsupportedTypeTest {}
+      const paramPathScope = new PathScope();
+      const pathParameter = new UnsupportedTypeTest();
+      paramPathScope.path = [<StaticPathElement>pathParameter];
+
+      expect(() => paramPathScope.getPathAsString())
+          .toThrowError('Unsupported PathElement type: UnsupportedTypeTest');
+    });
+
+    it('should support multiple parameters', () => {
+      const multiplePathScope = new PathScope();
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test1';
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'test2';
+      multiplePathScope.path = [staticPathElement, pathParameter];
+
+      expect(multiplePathScope.getPathAsString()).toBe('/test1/{test2}');
     });
   });
 

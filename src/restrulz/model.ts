@@ -163,13 +163,13 @@ export class PathScope {
 
   getPathAsString = (): string => {
     let pathString = '';
-    for (let pathElement of this.path) {
+    for (let pathElement of <any>this.path) {
       if (pathElement instanceof StaticPathElement) {
         pathString += `/${pathElement.value}`;
       } else if (pathElement instanceof PathParameter) {
         pathString += `/{${pathElement.name}}`;
       } else {
-        throw Error(`Unsupported type: ${pathElement}`);
+        throw new Error(`Unsupported PathElement type: ${pathElement.constructor.name}`);
       }
     }
     return pathString;
