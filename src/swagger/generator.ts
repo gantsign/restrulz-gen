@@ -196,7 +196,7 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected setSwaggerSchemaProperties(swaggerSchema: SwaggerSchema, property: Property) {
+  protected setSwaggerSchemaProperties(swaggerSchema: SwaggerSchema, property: Property): void {
     const {type} = property;
     if (type instanceof StringType) {
       const {pattern, minLength, maxLength} = type;
@@ -280,7 +280,7 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected getSwaggerOutputPath(spec: Specification) {
+  protected getSwaggerOutputPath(spec: Specification): string {
     const extension = this.format === SwaggerFormat.JSON ? 'json' : 'yml';
     return `${spec.name}.swagger.${extension}`;
   }

@@ -204,7 +204,7 @@ export class KotlinSerializer {
   }
 
   protected serializeFunctionSignatureCommon(fileKt: FileKt,
-                                             functionSignatureKt: FunctionSignatureKt) {
+                                             functionSignatureKt: FunctionSignatureKt): string {
 
     const {annotations, name, parameters, returnType} = functionSignatureKt;
     const indent = this.indent;
@@ -252,7 +252,7 @@ export class KotlinSerializer {
   }
 
   public serializeFunctionSignature(fileKt: FileKt,
-                                    functionSignatureKt: FunctionSignatureKt) {
+                                    functionSignatureKt: FunctionSignatureKt): string {
     return `${this.serializeFunctionSignatureCommon(fileKt, functionSignatureKt)}\n`
   }
 

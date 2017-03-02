@@ -34,7 +34,7 @@ export abstract class KotlinGenerator implements Generator {
   packageMapping: {[key: string]: string; } = {};
 
   //noinspection JSMethodCanBeStatic
-  public toKotlinClassName(typeName: string) {
+  public toKotlinClassName(typeName: string): string {
 
     let name = kebabToCamel(typeName);
     name = firstCharToUppercase(name);
@@ -83,14 +83,14 @@ export abstract class KotlinGenerator implements Generator {
     return this.getKotlinSerializer().indent(value);
   }
 
-  public writeFile(context: GeneratorContext, fileKt: FileKt) {
+  public writeFile(context: GeneratorContext, fileKt: FileKt): void {
 
     const outputPath = fileKt.getOutputPath();
     const serializer = this.getKotlinSerializer();
     context.writeStringToFile(outputPath, serializer.serializeFile(fileKt));
   }
 
-  public createKotlinFile(packageName: string, fileName: string) {
+  public createKotlinFile(packageName: string, fileName: string): FileKt {
 
     const fileKt = new FileKt(packageName, fileName);
     fileKt.licenseHeader = this.licenseHeader;

@@ -38,7 +38,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
   public addConstructorParameter(constructorKt: PrimaryConstructorKt,
                                  spec: Specification,
-                                 property: Property) {
+                                 property: Property): void {
 
     const {name, type, isArray, allowNull} = property;
 
@@ -67,7 +67,9 @@ export class KotlinModelGenerator extends KotlinGenerator {
     }
   }
 
-  public setConstructorParameters(classKt: ClassKt, spec: Specification, properties: Property[]) {
+  public setConstructorParameters(classKt: ClassKt,
+                                  spec: Specification,
+                                  properties: Property[]): void {
 
     classKt.setPrimaryConstructor(constructorKt => {
 
@@ -87,7 +89,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
     return value;
   }
 
-  public addModelProperty(classKt: ClassKt, spec: Specification, property: Property) {
+  public addModelProperty(classKt: ClassKt, spec: Specification, property: Property): void {
 
     const {name, type, isArray, allowNull} = property;
 
@@ -107,14 +109,16 @@ export class KotlinModelGenerator extends KotlinGenerator {
     });
   }
 
-  public addModelProperties(classKt: ClassKt, spec: Specification, properties: Property[]) {
+  public addModelProperties(classKt: ClassKt, spec: Specification, properties: Property[]): void {
 
     properties
         .filter(prop => this.needsProcessing(prop))
         .forEach(prop => this.addModelProperty(classKt, spec, prop));
   }
 
-  public addCopyFunctionParameter(functionKt: FunctionKt, spec: Specification, property: Property) {
+  public addCopyFunctionParameter(functionKt: FunctionKt,
+                                  spec: Specification,
+                                  property: Property): void {
 
     const {name, type, isArray, allowNull} = property;
 
@@ -137,7 +141,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
   public addCopyFunction(classKt: ClassKt,
                          spec: Specification,
                          classType: ClassType,
-                         properties: Property[]) {
+                         properties: Property[]): void {
 
     classKt.addFunction('copy', functionKt => {
 
@@ -163,7 +167,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
     });
   }
 
-  public addModelClass(fileKt: FileKt, spec: Specification, classType: ClassType) {
+  public addModelClass(fileKt: FileKt, spec: Specification, classType: ClassType): void {
 
     const {properties} = classType;
 
@@ -189,7 +193,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
   }
 
   //noinspection JSMethodCanBeStatic
-  public addBlankToEmptyFunctions(fileKt: FileKt) {
+  public addBlankToEmptyFunctions(fileKt: FileKt): void {
 
     fileKt.addExtensionFunction('blankToEmpty', 'kotlin.String', (functionKt, typeSignatureKt) => {
 

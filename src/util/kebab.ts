@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function kebabToCamel(name: string) {
+export function kebabToCamel(name: string): string {
   return name.toLowerCase().replace(/(-\w)/g, match => match[1].toUpperCase());
 }
 
 //noinspection JSUnusedLocalSymbols
-export function kebabToCamelReviver(key: string | null, value: any) {
+export function kebabToCamelReviver(key: string | null, value: any): any {
   if (value instanceof Array || !(value instanceof Object)) {
     return value;
   }

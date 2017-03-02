@@ -31,12 +31,12 @@ export class TypeSignatureKt {
     this.name = className;
   }
 
-  addGenericParameter(typeClassName: string) {
+  addGenericParameter(typeClassName: string): void {
 
     this.genericParameters.push(new TypeSignatureKt(typeClassName));
   }
 
-  addGenericParameterNullable(typeClassName: string) {
+  addGenericParameterNullable(typeClassName: string): void {
 
     const typeSignatureKt = new TypeSignatureKt(typeClassName);
     typeSignatureKt.isNullable = true;
@@ -55,7 +55,7 @@ export class ParameterKt {
     this.name = name;
   }
 
-  addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}) {
+  addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}): void {
 
     const annotationKt = new AnnotationKt(name);
     callback(annotationKt);
@@ -108,14 +108,14 @@ export class AnnotationKt {
     this.className = className;
   }
 
-  addParameter(name: string, valueFactory: (fileKt: FileKt) => string) {
+  addParameter(name: string, valueFactory: (fileKt: FileKt) => string): void {
 
     const parameterKt = new AnnotationParameterKt(name);
     parameterKt.valueFactory = valueFactory;
     this.parameters.push(parameterKt);
   }
 
-  addSimpleParameter(name: string, value: string) {
+  addSimpleParameter(name: string, value: string): void {
 
     this.addParameter(name, () => value);
   }
@@ -143,7 +143,7 @@ export class ExtendsKt extends ImplementsKt {
   arguments: ArgumentKt[] = [];
   wrapArguments: Boolean = false;
 
-  addArgument(name: string, value: string) {
+  addArgument(name: string, value: string): void {
 
     const argumentKt = new ArgumentKt(name);
     argumentKt.value = value;
@@ -162,7 +162,7 @@ export class PrimaryConstructorKt {
 
   addParameter(name: string,
                typeClassName: string,
-               callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+               callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const parameterKt = new ParameterKt(name);
     const typeSignatureKt = new TypeSignatureKt(typeClassName);
@@ -174,7 +174,7 @@ export class PrimaryConstructorKt {
   addProperty(name: string,
               typeClassName: string,
               callback: (constructorPropertyKt: ConstructorPropertyKt,
-                         typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+                         typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const propertyKt = new ConstructorPropertyKt(name);
     const typeSignatureKt = new TypeSignatureKt(typeClassName);
@@ -190,7 +190,7 @@ export class CompanionObjectKt {
 
   members: CompanionObjectMemberKt[] = [];
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void) {
+  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
     callback(functionKt);
@@ -208,7 +208,7 @@ export abstract class AbstractClassKt {
     this.name = name;
   }
 
-  setPrimaryConstructor(callback: (constructorKt: PrimaryConstructorKt) => void) {
+  setPrimaryConstructor(callback: (constructorKt: PrimaryConstructorKt) => void): void {
 
     const constructorKt = new PrimaryConstructorKt();
     callback(constructorKt);
@@ -217,7 +217,7 @@ export abstract class AbstractClassKt {
 
   extendsClass(name: string,
                callback: (extendsKt: ExtendsKt,
-                          typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+                          typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const typeSignatureKt = new TypeSignatureKt(name);
     const extendsKt = new ExtendsKt(typeSignatureKt);
@@ -227,7 +227,7 @@ export abstract class AbstractClassKt {
   }
 
   implementsInterface(interfaceClassName: string,
-                      callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+                      callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const typeSignatureKt = new TypeSignatureKt(interfaceClassName);
     const implementsKt = new ImplementsKt(typeSignatureKt);
@@ -235,7 +235,7 @@ export abstract class AbstractClassKt {
     this.extendsClasses.push(implementsKt);
   }
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void) {
+  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
     callback(functionKt);
@@ -245,7 +245,7 @@ export abstract class AbstractClassKt {
   addProperty(name: string,
               typeClassName: string,
               callback: (propertyKt: PropertyKt,
-                         typeSignatureKt: TypeSignatureKt) => void) {
+                         typeSignatureKt: TypeSignatureKt) => void): void {
 
     const propertyKt = new PropertyKt(name);
     const typeSignatureKt = new TypeSignatureKt(typeClassName);
@@ -254,7 +254,7 @@ export abstract class AbstractClassKt {
     this.members.push(propertyKt);
   }
 
-  addInitBlock(bodyFactory: (fileKt: FileKt) => string) {
+  addInitBlock(bodyFactory: (fileKt: FileKt) => string): void {
 
     this.members.push(new InitBlockKt(bodyFactory));
   }
@@ -269,7 +269,7 @@ export class ClassKt extends AbstractClassKt implements FileMemberKt {
     super(name);
   }
 
-  setCompanionObject(callback: (companionObjectKt: CompanionObjectKt) => void) {
+  setCompanionObject(callback: (companionObjectKt: CompanionObjectKt) => void): void {
 
     const companionObjectKt = new CompanionObjectKt();
     callback(companionObjectKt);
@@ -300,15 +300,15 @@ export class PropertyKt implements ClassMemberKt {
     this.name = name;
   }
 
-  setDefaultValue(valueFactory: (fileKt: FileKt) => string) {
+  setDefaultValue(valueFactory: (fileKt: FileKt) => string): void {
     this.defaultValueFactory = valueFactory;
   }
 
-  setSimpleDefaultValue(value: string) {
+  setSimpleDefaultValue(value: string): void {
     this.setDefaultValue(() => value);
   }
 
-  setGetterBody(bodyFactory: (fileKt: FileKt) => string) {
+  setGetterBody(bodyFactory: (fileKt: FileKt) => string): void {
     this.getterBodyFactory = bodyFactory;
   }
 
@@ -334,7 +334,7 @@ export class FunctionSignatureKt {
     this.name = name;
   }
 
-  addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}) {
+  addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}): void {
 
     const annotationKt = new AnnotationKt(name);
     callback(annotationKt);
@@ -344,7 +344,7 @@ export class FunctionSignatureKt {
   addParameter(name: string,
                typeClassName: string,
                callback: (parameterKt: ParameterKt,
-                          typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+                          typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const parameterKt = new ParameterKt(name);
     const typeSignatureKt = new TypeSignatureKt(typeClassName);
@@ -353,7 +353,7 @@ export class FunctionSignatureKt {
     this.parameters.push(parameterKt);
   }
 
-  addParameterNullable(name: string, typeClassName: string) {
+  addParameterNullable(name: string, typeClassName: string): void {
 
     this.addParameter(name, typeClassName, (parameterKt, typeSignatureKt) => {
       typeSignatureKt.isNullable = true;
@@ -361,14 +361,14 @@ export class FunctionSignatureKt {
   }
 
   setReturnType(className: string,
-                callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}) {
+                callback: (typeSignatureKt: TypeSignatureKt) => void = () => {}): void {
 
     const typeSignatureKt = new TypeSignatureKt(className);
     callback(typeSignatureKt);
     this.returnType = typeSignatureKt;
   }
 
-  setReturnTypeNullable(className: string) {
+  setReturnTypeNullable(className: string): void {
     this.setReturnType(className, typeSignatureKt => {
       typeSignatureKt.isNullable = true;
     });
@@ -395,7 +395,7 @@ implements
     return 'classes:restrulz.kotlin.FunctionKt' in functionKt;
   }
 
-  setBody(bodyFactory: (fileKt: FileKt) => string) {
+  setBody(bodyFactory: (fileKt: FileKt) => string): void {
 
     this.bodyFactory = bodyFactory;
   }
@@ -416,15 +416,17 @@ export class InterfaceKt implements FileMemberKt {
     this.name = name;
   }
 
-  addAnnotation(className: string, callback: (annotationKt: AnnotationKt) => void = () => {}) {
+  addAnnotation(className: string,
+                callback: (annotationKt: AnnotationKt) => void = () => {}): void {
 
     const annotationKt = new AnnotationKt(className);
     callback(annotationKt);
     this.annotations.push(annotationKt);
   }
 
-  addFunctionSignature(name: string,
-                       callback: (functionSignatureKt: FunctionSignatureKt) => any = () => {}) {
+  addFunctionSignature(
+      name: string,
+      callback: (functionSignatureKt: FunctionSignatureKt) => any = () => {}): void {
 
     const functionSignatureKt = new FunctionSignatureKt(name);
     callback(functionSignatureKt);
@@ -475,28 +477,28 @@ export class FileKt {
     this.fileName = fileName;
   }
 
-  addInterface(name: string, callback: (interfaceKt: InterfaceKt) => any) {
+  addInterface(name: string, callback: (interfaceKt: InterfaceKt) => any): void {
 
     const interfaceKt = new InterfaceKt(name);
     callback(interfaceKt);
     this.members.push(interfaceKt);
   }
 
-  addClass(name: string, callback: (classKt: ClassKt) => void) {
+  addClass(name: string, callback: (classKt: ClassKt) => void): void {
 
     const classKt = new ClassKt(name);
     callback(classKt);
     this.members.push(classKt);
   }
 
-  addObject(name: string, callback: (objectKt: ObjectKt) => void) {
+  addObject(name: string, callback: (objectKt: ObjectKt) => void): void {
 
     const objectKt = new ObjectKt(name);
     callback(objectKt);
     this.members.push(objectKt);
   }
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void) {
+  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
     callback(functionKt);
@@ -506,7 +508,7 @@ export class FileKt {
   addExtensionFunction(name: string,
                        extendedClassName: string,
                        callback: (extensionFunctionKt: ExtensionFunctionKt,
-                                  typeSignatureKt: TypeSignatureKt) => void) {
+                                  typeSignatureKt: TypeSignatureKt) => void): void {
 
     const extensionFunctionKt = new ExtensionFunctionKt(name);
     const typeSignatureKt = new TypeSignatureKt(extendedClassName);
@@ -515,7 +517,7 @@ export class FileKt {
     this.members.push(extensionFunctionKt);
   }
 
-  public getOutputPath() {
+  public getOutputPath(): string {
     const {packageName, fileName} = this;
 
     return `${packageName.replace(/\./g, '/')}/${fileName}.kt`;
