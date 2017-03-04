@@ -80,8 +80,8 @@ export class KotlinSerializer {
   public serializeTypeSignature(fileKt: FileKt,
                                 typeSignatureKt: TypeSignatureKt): string {
 
-    const {name, genericParameters, isNullable} = typeSignatureKt;
-    const shortTypeName = fileKt.tryImport(name);
+    const {className, genericParameters, isNullable} = typeSignatureKt;
+    const shortTypeName = fileKt.tryImport(className);
     let result = '';
     if (genericParameters.length > 0) {
       result += `${shortTypeName}<`;

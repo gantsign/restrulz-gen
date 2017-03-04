@@ -22,13 +22,13 @@ export enum VisibilityKt {
 
 export class TypeSignatureKt {
 
-  name: string;
+  className: string;
   genericParameters: TypeSignatureKt[] = [];
   isNullable = false;
 
   constructor(className: string) {
 
-    this.name = className;
+    this.className = className;
   }
 
   addGenericParameter(typeClassName: string): void {

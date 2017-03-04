@@ -103,7 +103,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.ShortValidator');
 
       expect(extendsKt.arguments.length).toBe(2);
@@ -141,7 +141,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.LongValidator');
 
       expect(extendsKt.arguments.length).toBe(2);
@@ -183,7 +183,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.StringValidator');
 
       expect(extendsKt.arguments.length).toBe(3);
@@ -229,7 +229,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.ShortValidator');
 
       expect(extendsKt.arguments.length).toBe(2);
@@ -268,7 +268,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.StringValidator');
 
       expect(extendsKt.arguments.length).toBe(3);
@@ -324,7 +324,7 @@ describe('KotlinValidatorGenerator', () => {
         fail(`Expected ExtendsKt but was ${extendsKt.constructor.name}`);
         return;
       }
-      expect(extendsKt.type.name)
+      expect(extendsKt.type.className)
           .toBe('com.gantsign.restrulz.validation.ShortValidator');
 
       expect(extendsKt.arguments.length).toBe(2);

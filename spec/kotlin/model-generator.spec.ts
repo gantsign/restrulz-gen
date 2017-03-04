@@ -105,7 +105,7 @@ describe('KotlinModelGenerator', () => {
       const {name, type} = propertyKt;
 
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.Byte');
+      expect(type.className).toBe('kotlin.Byte');
     });
 
     it('should support array property without processing', () => {
@@ -132,11 +132,11 @@ describe('KotlinModelGenerator', () => {
       const {name, type} = propertyKt;
 
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.collections.List');
+      expect(type.className).toBe('kotlin.collections.List');
       expect(type.genericParameters.length).toBe(1);
 
       const genericType = type.genericParameters[0];
-      expect(genericType.name).toBe('kotlin.Byte');
+      expect(genericType.className).toBe('kotlin.Byte');
     });
 
     it('should support simple property with processing', () => {
@@ -160,7 +160,7 @@ describe('KotlinModelGenerator', () => {
       const {name, type} = parameterKt;
 
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.String');
+      expect(type.className).toBe('kotlin.String');
     });
 
     it('should support array property with processing', () => {
@@ -185,11 +185,11 @@ describe('KotlinModelGenerator', () => {
       const {name, type} = parameterKt;
 
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.collections.List');
+      expect(type.className).toBe('kotlin.collections.List');
       expect(type.genericParameters.length).toBe(1);
 
       const genericType = type.genericParameters[0];
-      expect(genericType.name).toBe('kotlin.String');
+      expect(genericType.className).toBe('kotlin.String');
     });
 
   });
@@ -228,7 +228,7 @@ describe('KotlinModelGenerator', () => {
       }
 
       expect(propertyKt.name).toBe('testProperty1');
-      expect(propertyKt.type.name).toBe('kotlin.Byte');
+      expect(propertyKt.type.className).toBe('kotlin.Byte');
 
       if (!(<any>parameterKt instanceof ParameterKt)) {
         fail(`Expected ParameterKt but was ${parameterKt.constructor.name}`);
@@ -236,7 +236,7 @@ describe('KotlinModelGenerator', () => {
       }
 
       expect(parameterKt.name).toBe('testProperty2');
-      expect(parameterKt.type.name).toBe('kotlin.String');
+      expect(parameterKt.type.className).toBe('kotlin.String');
     });
 
   });
@@ -296,7 +296,7 @@ describe('KotlinModelGenerator', () => {
 
       const {name, type, defaultValueFactory} = propertyKt;
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.String');
+      expect(type.className).toBe('kotlin.String');
       expect(defaultValueFactory(fileKt)).toBe('testProperty.blankToEmpty()')
     });
 
@@ -323,10 +323,10 @@ describe('KotlinModelGenerator', () => {
 
       const {name, type, defaultValueFactory} = propertyKt;
       expect(name).toBe('testProperty');
-      expect(type.name).toBe('kotlin.collections.List');
+      expect(type.className).toBe('kotlin.collections.List');
       expect(type.genericParameters.length).toBe(1);
       const genericType = type.genericParameters[0];
-      expect(genericType.name).toBe('kotlin.String');
+      expect(genericType.className).toBe('kotlin.String');
       expect(defaultValueFactory(fileKt)).toBe('testProperty.blankToEmpty()')
     });
 
@@ -359,7 +359,7 @@ describe('KotlinModelGenerator', () => {
       }
 
       expect(propertyKt1.name).toBe('testProperty1');
-      expect(propertyKt1.type.name).toBe('kotlin.String');
+      expect(propertyKt1.type.className).toBe('kotlin.String');
       expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
 
       const propertyKt2 = classKt.members[1];
@@ -369,7 +369,7 @@ describe('KotlinModelGenerator', () => {
       }
 
       expect(propertyKt2.name).toBe('testProperty2');
-      expect(propertyKt2.type.name).toBe('kotlin.String');
+      expect(propertyKt2.type.className).toBe('kotlin.String');
       expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
     });
 
@@ -408,7 +408,7 @@ describe('KotlinModelGenerator', () => {
       const parameterKt = functionKt.parameters[0];
       const {name, type, defaultValue} = parameterKt;
       expect(name).toBe('testProperty1');
-      expect(type.name).toBe('kotlin.String');
+      expect(type.className).toBe('kotlin.String');
       expect(defaultValue).toBe('this.testProperty1');
     });
 
@@ -429,10 +429,10 @@ describe('KotlinModelGenerator', () => {
       const parameterKt = functionKt.parameters[0];
       const {name, type, defaultValue} = parameterKt;
       expect(name).toBe('testProperty1');
-      expect(type.name).toBe('kotlin.collections.List');
+      expect(type.className).toBe('kotlin.collections.List');
       expect(type.genericParameters.length).toBe(1);
       const genericType = type.genericParameters[0];
-      expect(genericType.name).toBe('kotlin.String');
+      expect(genericType.className).toBe('kotlin.String');
       expect(defaultValue).toBe('this.testProperty1');
     });
   });
@@ -470,12 +470,12 @@ describe('KotlinModelGenerator', () => {
 
       const parameterKt1 = functionKt.parameters[0];
       expect(parameterKt1.name).toBe('testProperty1');
-      expect(parameterKt1.type.name).toBe('kotlin.String');
+      expect(parameterKt1.type.className).toBe('kotlin.String');
       expect(parameterKt1.defaultValue).toBe('this.testProperty1');
 
       const parameterKt2 = functionKt.parameters[1];
       expect(parameterKt2.name).toBe('testProperty2');
-      expect(parameterKt2.type.name).toBe('kotlin.String');
+      expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
       expect(functionKt.bodyFactory(fileKt)).toBe(`\
@@ -548,7 +548,7 @@ return TestClass(
       }
 
       expect(constructorParamKt1.name).toBe('testProperty1');
-      expect(constructorParamKt1.type.name).toBe('kotlin.String');
+      expect(constructorParamKt1.type.className).toBe('kotlin.String');
 
       if (!(<any>constructorParamKt2 instanceof ParameterKt)) {
         fail(`Expected ParameterKt but was ${constructorParamKt2.constructor.name}`);
@@ -556,7 +556,7 @@ return TestClass(
       }
 
       expect(constructorParamKt2.name).toBe('testProperty2');
-      expect(constructorParamKt2.type.name).toBe('kotlin.String');
+      expect(constructorParamKt2.type.className).toBe('kotlin.String');
 
       expect(classKt.members.length).toBe(3);
 
@@ -567,7 +567,7 @@ return TestClass(
       }
 
       expect(propertyKt1.name).toBe('testProperty1');
-      expect(propertyKt1.type.name).toBe('kotlin.String');
+      expect(propertyKt1.type.className).toBe('kotlin.String');
       expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
 
       const propertyKt2 = classKt.members[1];
@@ -577,7 +577,7 @@ return TestClass(
       }
 
       expect(propertyKt2.name).toBe('testProperty2');
-      expect(propertyKt2.type.name).toBe('kotlin.String');
+      expect(propertyKt2.type.className).toBe('kotlin.String');
       expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
 
       const functionKt = classKt.members[2];
@@ -590,12 +590,12 @@ return TestClass(
 
       const parameterKt1 = functionKt.parameters[0];
       expect(parameterKt1.name).toBe('testProperty1');
-      expect(parameterKt1.type.name).toBe('kotlin.String');
+      expect(parameterKt1.type.className).toBe('kotlin.String');
       expect(parameterKt1.defaultValue).toBe('this.testProperty1');
 
       const parameterKt2 = functionKt.parameters[1];
       expect(parameterKt2.name).toBe('testProperty2');
-      expect(parameterKt2.type.name).toBe('kotlin.String');
+      expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
       expect(functionKt.bodyFactory(fileKt)).toBe(`\
@@ -680,7 +680,7 @@ return TestClass(
       }
 
       expect(constructorParamKt1.name).toBe('testProperty1');
-      expect(constructorParamKt1.type.name).toBe('kotlin.String');
+      expect(constructorParamKt1.type.className).toBe('kotlin.String');
 
       if (!(<any>constructorParamKt2 instanceof ParameterKt)) {
         fail(`Expected ParameterKt but was ${constructorParamKt2.constructor.name}`);
@@ -688,7 +688,7 @@ return TestClass(
       }
 
       expect(constructorParamKt2.name).toBe('testProperty2');
-      expect(constructorParamKt2.type.name).toBe('kotlin.String');
+      expect(constructorParamKt2.type.className).toBe('kotlin.String');
 
       expect(classKt.members.length).toBe(3);
 
@@ -699,7 +699,7 @@ return TestClass(
       }
 
       expect(propertyKt1.name).toBe('testProperty1');
-      expect(propertyKt1.type.name).toBe('kotlin.String');
+      expect(propertyKt1.type.className).toBe('kotlin.String');
       expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
 
       const propertyKt2 = classKt.members[1];
@@ -709,7 +709,7 @@ return TestClass(
       }
 
       expect(propertyKt2.name).toBe('testProperty2');
-      expect(propertyKt2.type.name).toBe('kotlin.String');
+      expect(propertyKt2.type.className).toBe('kotlin.String');
       expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
 
       const functionKt = classKt.members[2];
@@ -722,12 +722,12 @@ return TestClass(
 
       const parameterKt1 = functionKt.parameters[0];
       expect(parameterKt1.name).toBe('testProperty1');
-      expect(parameterKt1.type.name).toBe('kotlin.String');
+      expect(parameterKt1.type.className).toBe('kotlin.String');
       expect(parameterKt1.defaultValue).toBe('this.testProperty1');
 
       const parameterKt2 = functionKt.parameters[1];
       expect(parameterKt2.name).toBe('testProperty2');
-      expect(parameterKt2.type.name).toBe('kotlin.String');
+      expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
       expect(functionKt.bodyFactory(fileKt)).toBe(`\
@@ -756,11 +756,11 @@ return TestClass(
       }
       expect(functionKt1.name).toBe('blankToEmpty');
       const extendedType1 = functionKt1.extendedType;
-      expect(extendedType1.name).toBe('kotlin.String');
+      expect(extendedType1.className).toBe('kotlin.String');
       expect(extendedType1.isNullable).toBeTruthy();
       expect(functionKt1.visibility).toBe(VisibilityKt.Internal);
       const returnType1 = functionKt1.returnType;
-      expect(returnType1.name).toBe('kotlin.String');
+      expect(returnType1.className).toBe('kotlin.String');
       expect(returnType1.isNullable).toBeFalsy();
       expect(functionKt1.bodyFactory(fileKt))
           .toBe('return if (this === null || this.isBlank()) "" else this\n');
@@ -772,13 +772,13 @@ return TestClass(
       }
       expect(functionKt2.name).toBe('blankToEmpty');
       const extendedType2 = functionKt2.extendedType;
-      expect(extendedType2.name).toBe('kotlin.collections.List');
+      expect(extendedType2.className).toBe('kotlin.collections.List');
       expect(extendedType2.isNullable).toBeFalsy();
       expect(extendedType2.genericParameters.length).toBe(1);
-      expect(extendedType2.genericParameters[0].name).toBe('kotlin.String');
+      expect(extendedType2.genericParameters[0].className).toBe('kotlin.String');
       expect(functionKt2.visibility).toBe(VisibilityKt.Internal);
       const returnType2 = functionKt1.returnType;
-      expect(returnType2.name).toBe('kotlin.String');
+      expect(returnType2.className).toBe('kotlin.String');
       expect(returnType2.isNullable).toBeFalsy();
       expect(functionKt2.bodyFactory(fileKt))
           .toBe('return this.map(String::blankToEmpty)\n');
@@ -804,11 +804,11 @@ return TestClass(
       }
       expect(functionKt1.name).toBe('blankToEmpty');
       const extendedType1 = functionKt1.extendedType;
-      expect(extendedType1.name).toBe('kotlin.String');
+      expect(extendedType1.className).toBe('kotlin.String');
       expect(extendedType1.isNullable).toBeTruthy();
       expect(functionKt1.visibility).toBe(VisibilityKt.Internal);
       const returnType1 = functionKt1.returnType;
-      expect(returnType1.name).toBe('kotlin.String');
+      expect(returnType1.className).toBe('kotlin.String');
       expect(returnType1.isNullable).toBeFalsy();
       expect(functionKt1.bodyFactory(fileKt))
           .toBe('return if (this === null || this.isBlank()) "" else this\n');
@@ -820,13 +820,13 @@ return TestClass(
       }
       expect(functionKt2.name).toBe('blankToEmpty');
       const extendedType2 = functionKt2.extendedType;
-      expect(extendedType2.name).toBe('kotlin.collections.List');
+      expect(extendedType2.className).toBe('kotlin.collections.List');
       expect(extendedType2.isNullable).toBeFalsy();
       expect(extendedType2.genericParameters.length).toBe(1);
-      expect(extendedType2.genericParameters[0].name).toBe('kotlin.String');
+      expect(extendedType2.genericParameters[0].className).toBe('kotlin.String');
       expect(functionKt2.visibility).toBe(VisibilityKt.Internal);
       const returnType2 = functionKt1.returnType;
-      expect(returnType2.name).toBe('kotlin.String');
+      expect(returnType2.className).toBe('kotlin.String');
       expect(returnType2.isNullable).toBeFalsy();
       expect(functionKt2.bodyFactory(fileKt))
           .toBe('return this.map(String::blankToEmpty)\n');

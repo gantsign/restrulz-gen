@@ -326,9 +326,9 @@ describe('KotlinJsonWriterGenerator', () => {
       }
 
       const extendsType = extendsKt.type;
-      expect(extendsType.name).toBe('com.gantsign.restrulz.jackson.writer.JacksonObjectWriter');
+      expect(extendsType.className).toBe('com.gantsign.restrulz.jackson.writer.JacksonObjectWriter');
       expect(extendsType.genericParameters.length).toBe(1);
-      expect(extendsType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(extendsType.genericParameters[0].className).toBe('testing.model.DeliveryAddress');
 
       expect(objectKt.members.length).toBe(1);
       const functionKt = objectKt.members[0];
@@ -343,11 +343,11 @@ describe('KotlinJsonWriterGenerator', () => {
       expect(functionKt.parameters.length).toBe(2);
       const param1 = functionKt.parameters[0];
       expect(param1.name).toBe('generator');
-      expect(param1.type.name).toBe('com.fasterxml.jackson.core.JsonGenerator');
+      expect(param1.type.className).toBe('com.fasterxml.jackson.core.JsonGenerator');
 
       const param2 = functionKt.parameters[1];
       expect(param2.name).toBe('value');
-      expect(param2.type.name).toBe('testing.model.DeliveryAddress');
+      expect(param2.type.className).toBe('testing.model.DeliveryAddress');
 
       expect(functionKt.bodyFactory(fileKt)).toBe(`
 if (value === null) {
@@ -392,9 +392,11 @@ generator.writeEndObject()
       }
 
       const implementsType = implementsKt.type;
-      expect(implementsType.name).toBe('com.gantsign.restrulz.json.writer.JsonObjectWriterFactory');
+      expect(implementsType.className)
+          .toBe('com.gantsign.restrulz.json.writer.JsonObjectWriterFactory');
       expect(implementsType.genericParameters.length).toBe(1);
-      expect(implementsType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(implementsType.genericParameters[0].className)
+          .toBe('testing.model.DeliveryAddress');
 
       expect(objectKt.members.length).toBe(1);
       const propertyKt = objectKt.members[0];
@@ -407,9 +409,11 @@ generator.writeEndObject()
       expect(propertyKt.overrides).toBeTruthy();
 
       const propertyType = propertyKt.type;
-      expect(propertyType.name).toBe('com.gantsign.restrulz.json.writer.JsonObjectWriter');
+      expect(propertyType.className)
+          .toBe('com.gantsign.restrulz.json.writer.JsonObjectWriter');
       expect(propertyType.genericParameters.length).toBe(1);
-      expect(propertyType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(propertyType.genericParameters[0].className)
+          .toBe('testing.model.DeliveryAddress');
 
       expect(propertyKt.getterBodyFactory(fileKt)).toBe('return DeliveryAddressWriter\n');
     });
@@ -454,9 +458,11 @@ generator.writeEndObject()
       }
 
       const extendsType = extendsKt.type;
-      expect(extendsType.name).toBe('com.gantsign.restrulz.jackson.writer.JacksonObjectWriter');
+      expect(extendsType.className)
+          .toBe('com.gantsign.restrulz.jackson.writer.JacksonObjectWriter');
       expect(extendsType.genericParameters.length).toBe(1);
-      expect(extendsType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(extendsType.genericParameters[0].className)
+          .toBe('testing.model.DeliveryAddress');
 
       expect(objectKt.members.length).toBe(1);
       const functionKt = objectKt.members[0];
@@ -471,11 +477,11 @@ generator.writeEndObject()
       expect(functionKt.parameters.length).toBe(2);
       const param1 = functionKt.parameters[0];
       expect(param1.name).toBe('generator');
-      expect(param1.type.name).toBe('com.fasterxml.jackson.core.JsonGenerator');
+      expect(param1.type.className).toBe('com.fasterxml.jackson.core.JsonGenerator');
 
       const param2 = functionKt.parameters[1];
       expect(param2.name).toBe('value');
-      expect(param2.type.name).toBe('testing.model.DeliveryAddress');
+      expect(param2.type.className).toBe('testing.model.DeliveryAddress');
 
       expect(functionKt.bodyFactory(fileKt)).toBe(`
 if (value === null) {
@@ -521,9 +527,11 @@ generator.writeEndObject()
       }
 
       const implementsType = implementsKt.type;
-      expect(implementsType.name).toBe('com.gantsign.restrulz.json.writer.JsonObjectWriterFactory');
+      expect(implementsType.className)
+          .toBe('com.gantsign.restrulz.json.writer.JsonObjectWriterFactory');
       expect(implementsType.genericParameters.length).toBe(1);
-      expect(implementsType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(implementsType.genericParameters[0].className)
+          .toBe('testing.model.DeliveryAddress');
 
       expect(objectKt.members.length).toBe(1);
       const propertyKt = objectKt.members[0];
@@ -536,9 +544,11 @@ generator.writeEndObject()
       expect(propertyKt.overrides).toBeTruthy();
 
       const propertyType = propertyKt.type;
-      expect(propertyType.name).toBe('com.gantsign.restrulz.json.writer.JsonObjectWriter');
+      expect(propertyType.className)
+          .toBe('com.gantsign.restrulz.json.writer.JsonObjectWriter');
       expect(propertyType.genericParameters.length).toBe(1);
-      expect(propertyType.genericParameters[0].name).toBe('testing.model.DeliveryAddress');
+      expect(propertyType.genericParameters[0].className)
+          .toBe('testing.model.DeliveryAddress');
 
       expect(propertyKt.getterBodyFactory(fileKt)).toBe('return DeliveryAddressWriter\n');
     });
