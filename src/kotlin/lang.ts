@@ -63,6 +63,61 @@ export class ArgumentKt {
 
 }
 
+export interface BodyContentKt {
+
+}
+
+export class LineKt implements BodyContentKt {
+
+  constructor(public text: string) { }
+
+}
+
+export class TextKt implements BodyContentKt {
+
+  constructor(public text: string) { }
+
+}
+
+export class DynamicLineKt implements BodyContentKt {
+
+  constructor(public contentFactory: (fileKt: FileKt) => string) { }
+
+}
+
+export class IfBlockKt implements BodyContentKt {
+  body: BodyKt = new BodyKt();
+
+  constructor(public conditionFactory: (fileKt: FileKt) => string) {}
+}
+
+export class BodyKt implements BodyContentKt {
+  content: BodyContentKt[] = [];
+
+  write(text: string) {
+    this.content.push(new TextKt(text));
+  }
+
+  writeLn(text: string) {
+    this.content.push(new LineKt(text));
+  }
+
+  writeDynamicLn(contentFactory: (fileKt: FileKt) => string) {
+    this.content.push(new DynamicLineKt(contentFactory));
+  }
+
+  //noinspection JSMethodCanBeStatic
+  writeIf(conditionFactory: (fileKt: FileKt) => string,
+          callback: (bodyKt: BodyKt) => void): IfBlockKt {
+
+    const ifBlockKt = new IfBlockKt(conditionFactory);
+    callback(ifBlockKt.body);
+
+    this.content.push(ifBlockKt);
+    return ifBlockKt;
+  }
+}
+
 export class ConstructorPropertyKt extends ParameterKt {
 
   visibility: VisibilityKt = VisibilityKt.Public;
@@ -168,10 +223,10 @@ export class CompanionObjectKt {
 
   members: CompanionObjectMemberKt[] = [];
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
+  addFunction(name: string, callback: (bodyKt: BodyKt, functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
-    callback(functionKt);
+    callback(functionKt.body, functionKt);
     this.members.push(functionKt);
   }
 }
@@ -210,10 +265,10 @@ export abstract class AbstractClassKt {
     this.extendsClasses.push(implementsKt);
   }
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
+  addFunction(name: string, callback: (bodyKt: BodyKt, functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
-    callback(functionKt);
+    callback(functionKt.body, functionKt);
     this.members.push(functionKt);
   }
 
@@ -229,9 +284,11 @@ export abstract class AbstractClassKt {
     this.members.push(propertyKt);
   }
 
-  addInitBlock(bodyFactory: (fileKt: FileKt) => string): void {
+  addInitBlock(callback: (bodyKt: BodyKt) => void): void {
 
-    this.members.push(new InitBlockKt(bodyFactory));
+    const bodyKt = new BodyKt();
+    callback(bodyKt);
+    this.members.push(new InitBlockKt(bodyKt));
   }
 }
 
@@ -268,7 +325,7 @@ export class PropertyKt implements ClassMemberKt {
   type: TypeSignatureKt;
   defaultValueFactory: (fileKt: FileKt) => string;
   wrapAssignment = false;
-  getterBodyFactory: (fileKt: FileKt) => string;
+  getterBody: BodyKt;
 
   constructor(public name: string) { }
 
@@ -280,15 +337,17 @@ export class PropertyKt implements ClassMemberKt {
     this.setDefaultValue(() => value);
   }
 
-  setGetterBody(bodyFactory: (fileKt: FileKt) => string): void {
-    this.getterBodyFactory = bodyFactory;
+  setGetter(callback: (bodyKt: BodyKt) => void): void {
+    const bodyKt = new BodyKt();
+    callback(bodyKt);
+    this.getterBody = bodyKt;
   }
 
 }
 
 export class InitBlockKt implements ClassMemberKt {
 
-  constructor(public bodyFactory: (fileKt: FileKt) => string) { }
+  constructor(public body: BodyKt) { }
 }
 
 export class FunctionSignatureKt {
@@ -352,7 +411,7 @@ implements
 
   visibility: VisibilityKt = VisibilityKt.Public;
   overrides = false;
-  bodyFactory: (fileKt: FileKt) => string;
+  body: BodyKt = new BodyKt();
 
   public static assignableFrom(
       functionKt: FunctionSignatureKt | ClassMemberKt | FileMemberKt): functionKt is FunctionKt {
@@ -360,10 +419,6 @@ implements
     return 'classes:restrulz.kotlin.FunctionKt' in functionKt;
   }
 
-  setBody(bodyFactory: (fileKt: FileKt) => string): void {
-
-    this.bodyFactory = bodyFactory;
-  }
 }
 
 export class ExtensionFunctionKt extends FunctionKt implements FileMemberKt {
@@ -454,21 +509,22 @@ export class FileKt {
     this.members.push(objectKt);
   }
 
-  addFunction(name: string, callback: (functionKt: FunctionKt) => void): void {
+  addFunction(name: string, callback: (bodyKt: BodyKt, functionKt: FunctionKt) => void): void {
 
     const functionKt = new FunctionKt(name);
-    callback(functionKt);
+    callback(functionKt.body, functionKt);
     this.members.push(functionKt);
   }
 
   addExtensionFunction(name: string,
                        extendedClassName: string,
-                       callback: (extensionFunctionKt: ExtensionFunctionKt,
+                       callback: (bodyKt: BodyKt,
+                                  extensionFunctionKt: ExtensionFunctionKt,
                                   typeSignatureKt: TypeSignatureKt) => void): void {
 
     const extensionFunctionKt = new ExtensionFunctionKt(name);
     const typeSignatureKt = new TypeSignatureKt(extendedClassName);
-    callback(extensionFunctionKt, typeSignatureKt);
+    callback(extensionFunctionKt.body, extensionFunctionKt, typeSignatureKt);
     extensionFunctionKt.extendedType = typeSignatureKt;
     this.members.push(extensionFunctionKt);
   }

@@ -17,10 +17,13 @@ import {
   AbstractClassKt,
   AnnotationKt,
   AnnotationParameterKt,
+  BodyKt,
+  BodyContentKt,
   ClassKt,
   ClassMemberKt,
   CompanionObjectKt,
   ConstructorPropertyKt,
+  DynamicLineKt,
   ExtendsKt,
   ExtendsOrImplementsKt,
   ExtensionFunctionKt,
@@ -28,12 +31,15 @@ import {
   FileMemberKt,
   FunctionKt,
   FunctionSignatureKt,
+  IfBlockKt,
   InitBlockKt,
   InterfaceKt,
+  LineKt,
   ObjectKt,
   ParameterKt,
   PrimaryConstructorKt,
   PropertyKt,
+  TextKt,
   TypeSignatureKt,
   VisibilityKt
 } from './lang';
@@ -159,7 +165,7 @@ export class KotlinSerializer {
   public serializeProperty(fileKt: FileKt, propertyKt: PropertyKt): string {
 
     const {overrides, visibility, name, type, isMutable, defaultValueFactory, wrapAssignment,
-        getterBodyFactory} = propertyKt;
+        getterBody} = propertyKt;
 
     const typeString = this.serializeTypeSignature(fileKt, type);
 
@@ -185,9 +191,9 @@ export class KotlinSerializer {
       result += defaultValueFactory(fileKt);
     }
 
-    if (getterBodyFactory) {
+    if (getterBody) {
       result += '\n';
-      result += this.indent(`get() {\n${this.indent(getterBodyFactory(fileKt))}}`);
+      result += this.indent(`get() {\n${this.indent(this.serializeBody(fileKt, getterBody))}}`);
     }
     result += '\n';
     return result;
@@ -195,9 +201,9 @@ export class KotlinSerializer {
 
   public serializeInitBlock(fileKt: FileKt, initBlockKt: InitBlockKt): string {
 
-    const {bodyFactory} = initBlockKt;
+    const {body} = initBlockKt;
     let result = 'init {\n';
-    result += this.indent(bodyFactory(fileKt));
+    result += this.indent(this.serializeBody(fileKt, body));
     result += '}\n';
 
     return result;
@@ -257,11 +263,11 @@ export class KotlinSerializer {
   }
 
   public serializeFunction(fileKt: FileKt, functionKt: FunctionKt): string {
-    const {bodyFactory} = functionKt;
+    const {body} = functionKt;
 
     let result = this.serializeFunctionSignatureCommon(fileKt, functionKt);
     result += ' {\n';
-    result += this.indent(bodyFactory(fileKt));
+    result += this.indent(this.serializeBody(fileKt, body));
     result += '}\n';
     return result;
   }
@@ -516,6 +522,33 @@ export class KotlinSerializer {
       return '';
     }
     return `${importStatements.join('\n')}\n`;
+  }
+
+  public serializeIfBlock(fileKt: FileKt, ifBlockKt: IfBlockKt): string {
+      let result = `if (${ifBlockKt.conditionFactory(fileKt)}) {\n`;
+      result += this.indent(this.serializeBody(fileKt, ifBlockKt.body));
+      result += '}\n';
+      return result;
+  }
+
+  public serializeBodyContent(fileKt: FileKt, content: BodyContentKt): string {
+    if (content instanceof TextKt) {
+      return content.text;
+    } if (content instanceof LineKt) {
+      return `${content.text}\n`;
+    } if (content instanceof DynamicLineKt) {
+      return `${content.contentFactory(fileKt)}\n`;
+    } if (content instanceof IfBlockKt) {
+      return this.serializeIfBlock(fileKt, content);
+    } else {
+      throw new Error(`Unsupported BodyContentKt type: ${content.constructor.name}`);
+    }
+  }
+
+  public serializeBody(fileKt: FileKt, body: BodyKt): string {
+    return body.content
+        .map(item => this.serializeBodyContent(fileKt, item))
+        .join('');
   }
 
   public serializeFileBody(fileKt: FileKt): string {

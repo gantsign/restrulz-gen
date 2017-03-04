@@ -143,7 +143,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
                          classType: ClassType,
                          properties: Property[]): void {
 
-    classKt.addFunction('copy', functionKt => {
+    classKt.addFunction('copy', (bodyKt, functionKt) => {
 
       const className = this.toKotlinClassName(classType.name);
       properties.forEach(prop => this.addCopyFunctionParameter(functionKt, spec, prop));
@@ -151,19 +151,16 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
       const indent = this.indent;
 
-      functionKt.setBody(() => {
-        let result = `return ${className}(`;
-        if (properties.length > 0) {
-          result += '\n';
-          result += indent(indent(properties
-              .map(prop => kebabToCamel(prop.name))
-              .map(propName => `${propName} = ${propName}`)
-              .join(',\n')));
-        }
-        result += ')\n';
-        return result;
-      });
-
+      bodyKt.write(`return ${className}(`);
+      if (properties.length > 0) {
+        bodyKt.writeLn('');
+        bodyKt.write(indent(indent(
+            properties
+                .map(prop => kebabToCamel(prop.name))
+                .map(propName => `${propName} = ${propName}`)
+                .join(',\n'))));
+      }
+      bodyKt.writeLn(')');
     });
   }
 
@@ -195,21 +192,24 @@ export class KotlinModelGenerator extends KotlinGenerator {
   //noinspection JSMethodCanBeStatic
   public addBlankToEmptyFunctions(fileKt: FileKt): void {
 
-    fileKt.addExtensionFunction('blankToEmpty', 'kotlin.String', (functionKt, typeSignatureKt) => {
+    fileKt.addExtensionFunction(
+        'blankToEmpty',
+        'kotlin.String',
+        (bodyKt, functionKt, typeSignatureKt) => {
 
       typeSignatureKt.isNullable = true;
 
       functionKt.visibility = VisibilityKt.Internal;
       functionKt.setReturnType('kotlin.String');
 
-      functionKt.setBody(() => 'return if (this === null || this.isBlank()) "" else this\n');
+      bodyKt.writeLn('return if (this === null || this.isBlank()) "" else this');
 
     });
 
     fileKt.addExtensionFunction(
         'blankToEmpty',
         'kotlin.collections.List',
-        (functionKt, extendedTypeSignatureKt) => {
+        (bodyKt, functionKt, extendedTypeSignatureKt) => {
 
       extendedTypeSignatureKt.addGenericParameter('kotlin.String');
 
@@ -220,7 +220,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
       const shortStringName = fileKt.tryImport('kotlin.String');
 
-      functionKt.setBody(() => `return this.map(${shortStringName}::blankToEmpty)\n`);
+      bodyKt.writeLn(`return this.map(${shortStringName}::blankToEmpty)`);
 
     });
   }

@@ -35,9 +35,11 @@ import {
   VisibilityKt
 } from '../../src/kotlin/lang';
 import {GeneratorContext} from '../../src/generator';
+import {KotlinSerializer} from '../../src/kotlin/serializer';
 
 describe('KotlinModelGenerator', () => {
   const generator = new KotlinModelGenerator();
+  const serializer = new KotlinSerializer();
   const spec = new Specification();
   spec.name = 'testing';
 
@@ -478,7 +480,7 @@ describe('KotlinModelGenerator', () => {
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(functionKt.bodyFactory(fileKt)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -504,7 +506,8 @@ return TestClass(
 
       expect(functionKt.parameters.length).toBe(0);
 
-      expect(functionKt.bodyFactory(fileKt)).toBe('return TestClass()\n');
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe('return TestClass()\n');
     });
   });
 
@@ -598,7 +601,7 @@ return TestClass(
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(functionKt.bodyFactory(fileKt)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -635,7 +638,8 @@ return TestClass(
 
       expect(functionKt.parameters.length).toBe(0);
 
-      expect(functionKt.bodyFactory(fileKt)).toBe('return TestClass()\n');
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe('return TestClass()\n');
     });
   });
 
@@ -730,7 +734,7 @@ return TestClass(
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(functionKt.bodyFactory(fileKt)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -762,7 +766,7 @@ return TestClass(
       const returnType1 = functionKt1.returnType;
       expect(returnType1.className).toBe('kotlin.String');
       expect(returnType1.isNullable).toBeFalsy();
-      expect(functionKt1.bodyFactory(fileKt))
+      expect(serializer.serializeBody(fileKt, functionKt1.body))
           .toBe('return if (this === null || this.isBlank()) "" else this\n');
 
       const functionKt2 = fileKt.members[1];
@@ -780,7 +784,7 @@ return TestClass(
       const returnType2 = functionKt1.returnType;
       expect(returnType2.className).toBe('kotlin.String');
       expect(returnType2.isNullable).toBeFalsy();
-      expect(functionKt2.bodyFactory(fileKt))
+      expect(serializer.serializeBody(fileKt, functionKt2.body))
           .toBe('return this.map(String::blankToEmpty)\n');
     });
 
@@ -810,7 +814,7 @@ return TestClass(
       const returnType1 = functionKt1.returnType;
       expect(returnType1.className).toBe('kotlin.String');
       expect(returnType1.isNullable).toBeFalsy();
-      expect(functionKt1.bodyFactory(fileKt))
+      expect(serializer.serializeBody(fileKt, functionKt1.body))
           .toBe('return if (this === null || this.isBlank()) "" else this\n');
 
       const functionKt2 = fileKt.members[1];
@@ -828,7 +832,7 @@ return TestClass(
       const returnType2 = functionKt1.returnType;
       expect(returnType2.className).toBe('kotlin.String');
       expect(returnType2.isNullable).toBeFalsy();
-      expect(functionKt2.bodyFactory(fileKt))
+      expect(serializer.serializeBody(fileKt, functionKt2.body))
           .toBe('return this.map(String::blankToEmpty)\n');
     });
 

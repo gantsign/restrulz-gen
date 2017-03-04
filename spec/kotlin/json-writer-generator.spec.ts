@@ -32,10 +32,12 @@ import {
 } from '../../src/kotlin/lang';
 import {GeneratorContext} from '../../src/generator';
 import {KotlinJsonWriterGenerator} from '../../src/kotlin/json-writer-generator';
+import {KotlinSerializer} from '../../src/kotlin/serializer';
 
 describe('KotlinJsonWriterGenerator', () => {
 
   const generator = new KotlinJsonWriterGenerator();
+  const serializer = new KotlinSerializer();
   const spec = new Specification();
   spec.name = 'testing';
 
@@ -349,7 +351,7 @@ describe('KotlinJsonWriterGenerator', () => {
       expect(param2.name).toBe('value');
       expect(param2.type.className).toBe('testing.model.DeliveryAddress');
 
-      expect(functionKt.bodyFactory(fileKt)).toBe(`
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`
 if (value === null) {
     generator.writeNull()
     return
@@ -415,7 +417,8 @@ generator.writeEndObject()
       expect(propertyType.genericParameters[0].className)
           .toBe('testing.model.DeliveryAddress');
 
-      expect(propertyKt.getterBodyFactory(fileKt)).toBe('return DeliveryAddressWriter\n');
+      expect(serializer.serializeBody(fileKt, propertyKt.getterBody))
+          .toBe('return DeliveryAddressWriter\n');
     });
   });
 
@@ -483,7 +486,7 @@ generator.writeEndObject()
       expect(param2.name).toBe('value');
       expect(param2.type.className).toBe('testing.model.DeliveryAddress');
 
-      expect(functionKt.bodyFactory(fileKt)).toBe(`
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`
 if (value === null) {
     generator.writeNull()
     return
@@ -550,7 +553,8 @@ generator.writeEndObject()
       expect(propertyType.genericParameters[0].className)
           .toBe('testing.model.DeliveryAddress');
 
-      expect(propertyKt.getterBodyFactory(fileKt)).toBe('return DeliveryAddressWriter\n');
+      expect(serializer.serializeBody(fileKt, propertyKt.getterBody))
+          .toBe('return DeliveryAddressWriter\n');
     });
   });
 

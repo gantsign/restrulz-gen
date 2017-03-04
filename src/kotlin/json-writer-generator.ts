@@ -100,26 +100,24 @@ export class KotlinJsonWriterGenerator extends KotlinGenerator {
         typeSignatureKt.addGenericParameter(modelClass);
       });
 
-      objectKt.addFunction('writeObject', functionKt => {
+      objectKt.addFunction('writeObject', (bodyKt, functionKt) => {
         functionKt.overrides = true;
         functionKt.addParameter('generator', 'com.fasterxml.jackson.core.JsonGenerator');
         functionKt.addParameterNullable('value', modelClass);
 
-        functionKt.setBody(() => {
-          const indent = this.indent;
-          let result = '\n';
-          result += 'if (value === null) {\n';
-          result += indent('generator.writeNull()') + '\n';
-          result += indent('return') + '\n';
-          result += '}\n\n';
-          result += 'generator.writeStartObject()\n';
-          result += classType.properties
-                  .map(prop => this.jacksonMethodForProperty(spec, fileKt, prop))
-                  .join('\n') + '\n';
-
-          result += 'generator.writeEndObject()\n';
-          return result;
+        const indent = this.indent;
+        bodyKt.writeLn('');
+        bodyKt.writeIf(() => 'value === null', ifBodyKt => {
+          ifBodyKt.writeLn('generator.writeNull()');
+          ifBodyKt.writeLn('return');
         });
+        bodyKt.writeLn('');
+        bodyKt.writeLn('generator.writeStartObject()');
+        bodyKt.writeDynamicLn(() =>
+            classType.properties
+                .map(prop => this.jacksonMethodForProperty(spec, fileKt, prop))
+                .join('\n'));
+        bodyKt.writeLn('generator.writeEndObject()');
       });
     });
   }
@@ -146,11 +144,11 @@ export class KotlinJsonWriterGenerator extends KotlinGenerator {
 
         typeSignatureKt.addGenericParameter(modelClass);
 
-        propertyKt.setGetterBody(() => {
+        propertyKt.setGetter(bodyKt => {
           const writerClass = this.getQualifiedWriterClass(spec, classType);
           const shortWriterClass = fileKt.tryImport(writerClass);
 
-          return `return ${shortWriterClass}\n`;
+          bodyKt.writeLn(`return ${shortWriterClass}`);
         });
       });
     });

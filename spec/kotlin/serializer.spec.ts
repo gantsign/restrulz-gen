@@ -18,23 +18,28 @@
 import {KotlinSerializer} from '../../src/kotlin/serializer';
 import {
   AnnotationKt,
+  BodyKt,
   ClassKt,
   ClassMemberKt,
   ConstructorPropertyKt,
   CompanionObjectKt,
+  DynamicLineKt,
   ExtendsKt,
   ExtensionFunctionKt,
   FileKt,
   FileMemberKt,
   FunctionKt,
   FunctionSignatureKt,
+  IfBlockKt,
   InitBlockKt,
   InterfaceKt,
   ImplementsKt,
+  LineKt,
   ObjectKt,
   ParameterKt,
   PrimaryConstructorKt,
   PropertyKt,
+  TextKt,
   TypeSignatureKt,
   VisibilityKt
 } from '../../src/kotlin/lang';
@@ -322,7 +327,9 @@ val prop1: String
       const fileKt = createFile();
       const propertyKt = new PropertyKt('prop1');
       propertyKt.type = new TypeSignatureKt('kotlin.String');
-      propertyKt.setGetterBody(() => 'return "test1"\n');
+      propertyKt.setGetter(bodyKt => {
+        bodyKt.writeLn('return "test1"');
+      });
 
       expect(serializer.serializeProperty(fileKt, propertyKt))
           .toBe(`\
@@ -338,7 +345,9 @@ val prop1: String
 
     it('should support init block', () => {
       const fileKt = createFile();
-      const initBlockKt = new InitBlockKt(() => 'throw RuntimeException()\n');
+      const bodyKt = new BodyKt();
+      bodyKt.writeLn('throw RuntimeException()');
+      const initBlockKt = new InitBlockKt(bodyKt);
 
       expect(serializer.serializeInitBlock(fileKt, initBlockKt))
           .toBe(`\
@@ -413,7 +422,7 @@ fun test1(): String?
     it('should support simple function', () => {
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFunction(fileKt, functionKt))
           .toBe(`\
@@ -430,7 +439,7 @@ fun test1() {
       functionKt.addAnnotation('com.example.Ann2', annotation => {
         annotation.addSimpleParameter('value', '"test1"');
       });
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFunction(fileKt, functionKt))
           .toBe(`\
@@ -446,7 +455,7 @@ fun test1() {
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
       functionKt.overrides = true;
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFunction(fileKt, functionKt))
           .toBe(`\
@@ -465,7 +474,7 @@ override fun test1() {
         parameterKt.defaultValue = '"test2"';
         typeSignatureKt.isNullable = true;
       });
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFunction(fileKt, functionKt))
           .toBe(`\
@@ -482,7 +491,7 @@ fun test1(
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
       functionKt.setReturnTypeNullable('kotlin.String');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFunction(fileKt, functionKt))
           .toBe(`\
@@ -499,7 +508,7 @@ fun test1(): String? {
       const fileKt = createFile();
       const functionKt = new ExtensionFunctionKt('test1');
       functionKt.extendedType = new TypeSignatureKt('kotlin.String');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeExtensionFunction(fileKt, functionKt))
           .toBe(`\
@@ -519,7 +528,7 @@ fun String.test1() {
         parameterKt.defaultValue = '"test2"';
         typeSignatureKt.isNullable = true;
       });
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeExtensionFunction(fileKt, functionKt))
           .toBe(`\
@@ -537,7 +546,7 @@ fun String.test1(
       const functionKt = new ExtensionFunctionKt('test1');
       functionKt.extendedType = new TypeSignatureKt('kotlin.String');
       functionKt.setReturnTypeNullable('kotlin.String');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeExtensionFunction(fileKt, functionKt))
           .toBe(`\
@@ -560,7 +569,9 @@ fun String.test1(): String? {
 
     it('should support init block', () => {
       const fileKt = createFile();
-      const initBlockKt = new InitBlockKt(() => 'throw RuntimeException()\n');
+      const bodyKt = new BodyKt();
+      bodyKt.writeLn('throw RuntimeException()');
+      const initBlockKt = new InitBlockKt(bodyKt);
 
       expect(serializer.serializeClassMember(fileKt, initBlockKt))
           .toBe(`\
@@ -573,7 +584,7 @@ init {
     it('should support functions', () => {
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeClassMember(fileKt, functionKt))
           .toBe(`\
@@ -645,7 +656,7 @@ fun test1() {
     it('should support functions', () => {
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeCompanionObjectMember(fileKt, functionKt))
           .toBe(`\
@@ -671,11 +682,11 @@ fun test1() {
     it('should support members', () => {
       const fileKt = createFile();
       const companionObjectKt = new CompanionObjectKt();
-      companionObjectKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      companionObjectKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      companionObjectKt.addFunction('test2', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      companionObjectKt.addFunction('test2', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeCompanionObject(fileKt, companionObjectKt))
@@ -809,12 +820,14 @@ class TestClass : TestInterface1, TestInterface2\<String>
         propertyKt.isMutable = true;
         typeSignatureKt.isNullable = true;
       });
-      classKt.addInitBlock(() => 'throw RuntimeException()\n');
-      classKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      classKt.addInitBlock(bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      classKt.addFunction('test2', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      classKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
+      });
+      classKt.addFunction('test2', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeClass(fileKt, classKt))
@@ -849,11 +862,11 @@ class TestClass {
         propertyKt.isMutable = true;
         typeSignatureKt.isNullable = true;
       });
-      objectKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      objectKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      objectKt.addFunction('test2', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      objectKt.addFunction('test2', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeClass(fileKt, objectKt))
@@ -879,11 +892,11 @@ object TestClass {
     const fileKt = createFile();
     const classKt = new ClassKt('TestClass');
     classKt.setCompanionObject(companionObjectKt => {
-      companionObjectKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      companionObjectKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      companionObjectKt.addFunction('test2', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n');
+      companionObjectKt.addFunction('test2', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
     });
 
@@ -984,7 +997,7 @@ interface TestInterface {
       const fileKt = createFile();
       const functionKt = new ExtensionFunctionKt('test1');
       functionKt.extendedType = new TypeSignatureKt('kotlin.String');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFileMember(fileKt, functionKt))
           .toBe(`\
@@ -997,7 +1010,7 @@ fun String.test1() {
     it('should support functions', () => {
       const fileKt = createFile();
       const functionKt = new FunctionKt('test1');
-      functionKt.setBody(() => 'throw RuntimeException()\n');
+      functionKt.body.writeLn('throw RuntimeException()');
 
       expect(serializer.serializeFileMember(fileKt, functionKt))
           .toBe(`\
@@ -1033,11 +1046,11 @@ fun test1() {
       fileKt.addInterface('TestInterface', interfaceKt => {
         interfaceKt.addAnnotation('com.example.Ann1');
       });
-      fileKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()')
       });
-      fileKt.addExtensionFunction('test2', 'kotlin.String', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addExtensionFunction('test2', 'kotlin.String', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeFileMembers(fileKt))
@@ -1110,6 +1123,88 @@ import com.example.C
     });
   });
 
+  describe('serializeIfBlock()', () => {
+
+    it('should render if block', () => {
+      const fileKt = createFile();
+      const ifBlockKt = new IfBlockKt(() => 'true');
+      ifBlockKt.body.writeLn('throw RuntimeException()');
+
+      expect(serializer.serializeIfBlock(fileKt, ifBlockKt))
+          .toBe(`\
+if (true) {
+    throw RuntimeException()
+}
+`);
+    });
+
+  });
+
+  describe('serializeBodyContent()', () => {
+
+    it('should render text', () => {
+      const fileKt = createFile();
+      const textKt = new TextKt('test1');
+
+      expect(serializer.serializeBodyContent(fileKt, textKt))
+          .toBe('test1');
+    });
+
+    it('should render line', () => {
+      const fileKt = createFile();
+      const lineKt = new LineKt('test1');
+
+      expect(serializer.serializeBodyContent(fileKt, lineKt))
+          .toBe('test1\n');
+    });
+
+    it('should render dynamic line', () => {
+      const fileKt = createFile();
+      const lineKt = new DynamicLineKt(nestedFileKt => nestedFileKt.tryImport('kotlin.String'));
+
+      expect(serializer.serializeBodyContent(fileKt, lineKt))
+          .toBe('String\n');
+    });
+
+    it('should render if block', () => {
+      const fileKt = createFile();
+      const ifBlockKt = new IfBlockKt(() => 'true');
+      ifBlockKt.body.writeLn('throw RuntimeException()');
+
+      expect(serializer.serializeBodyContent(fileKt, ifBlockKt))
+          .toBe(`\
+if (true) {
+    throw RuntimeException()
+}
+`);
+    });
+
+    it('should throw error for unsupported type', () => {
+      const fileKt = createFile();
+
+      class UnsupportedTypeTest { }
+      const unsupportedType = new UnsupportedTypeTest();
+
+      expect(() => serializer.serializeBodyContent(fileKt, unsupportedType))
+          .toThrowError('Unsupported BodyContentKt type: UnsupportedTypeTest');
+    });
+  });
+
+  describe('serializeBody()', () => {
+
+    it('should render multiple items', () => {
+      const fileKt = createFile();
+
+      const bodyKt = new BodyKt();
+      bodyKt.write('test1');
+      bodyKt.writeLn('test2');
+
+      expect(serializer.serializeBody(fileKt, bodyKt))
+          .toBe('test1test2\n');
+    });
+
+  });
+
   describe('serializeFileBody()', () => {
 
     it('should support many members', () => {
@@ -1123,11 +1218,11 @@ import com.example.C
       fileKt.addInterface('TestInterface', interfaceKt => {
         interfaceKt.addAnnotation('com.example.Ann1');
       });
-      fileKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      fileKt.addExtensionFunction('test2', 'kotlin.String', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addExtensionFunction('test2', 'kotlin.String', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeFileBody(fileKt))
@@ -1206,11 +1301,11 @@ package com.example.package
       fileKt.addInterface('TestInterface', interfaceKt => {
         interfaceKt.addAnnotation('com.example.Ann1');
       });
-      fileKt.addFunction('test1', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addFunction('test1', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
-      fileKt.addExtensionFunction('test2', 'kotlin.String', functionKt => {
-        functionKt.setBody(() => 'throw RuntimeException()\n')
+      fileKt.addExtensionFunction('test2', 'kotlin.String', bodyKt => {
+        bodyKt.writeLn('throw RuntimeException()');
       });
 
       expect(serializer.serializeFile(fileKt))
