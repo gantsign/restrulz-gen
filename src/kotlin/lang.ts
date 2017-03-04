@@ -22,14 +22,10 @@ export enum VisibilityKt {
 
 export class TypeSignatureKt {
 
-  className: string;
   genericParameters: TypeSignatureKt[] = [];
   isNullable = false;
 
-  constructor(className: string) {
-
-    this.className = className;
-  }
+  constructor(public className: string) { }
 
   addGenericParameter(typeClassName: string): void {
 
@@ -47,13 +43,10 @@ export class TypeSignatureKt {
 export class ParameterKt {
 
   annotations: AnnotationKt[] = [];
-  name: string;
   type: TypeSignatureKt;
   defaultValue = '';
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 
   addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}): void {
 
@@ -65,12 +58,8 @@ export class ParameterKt {
 }
 
 export class ArgumentKt {
-  name: string;
-  value: string;
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string, public value: string) { }
 
 }
 
@@ -91,22 +80,16 @@ export interface FileMemberKt {
 
 export class AnnotationParameterKt {
 
-  name: string;
   valueFactory: (fileKt: FileKt) => string;
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 }
 
 export class AnnotationKt {
 
-  className: string;
   parameters: AnnotationParameterKt[] = [];
 
-  constructor(className: string) {
-    this.className = className;
-  }
+  constructor(public className: string) { }
 
   addParameter(name: string, valueFactory: (fileKt: FileKt) => string): void {
 
@@ -131,11 +114,7 @@ export interface ExtendsOrImplementsKt {
 
 export class ImplementsKt implements ExtendsOrImplementsKt {
 
-  type: TypeSignatureKt;
-
-  constructor(type: TypeSignatureKt) {
-    this.type = type;
-  }
+  constructor(public type: TypeSignatureKt) { }
 }
 
 export class ExtendsKt extends ImplementsKt {
@@ -145,8 +124,7 @@ export class ExtendsKt extends ImplementsKt {
 
   addArgument(name: string, value: string): void {
 
-    const argumentKt = new ArgumentKt(name);
-    argumentKt.value = value;
+    const argumentKt = new ArgumentKt(name, value);
     this.arguments.push(argumentKt);
   }
 
@@ -199,14 +177,11 @@ export class CompanionObjectKt {
 }
 
 export abstract class AbstractClassKt {
-  name: string;
   primaryConstructor: PrimaryConstructorKt;
   extendsClasses: ExtendsOrImplementsKt[] = [];
   members: ClassMemberKt[] = [];
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 
   setPrimaryConstructor(callback: (constructorKt: PrimaryConstructorKt) => void): void {
 
@@ -289,16 +264,13 @@ export class PropertyKt implements ClassMemberKt {
 
   overrides = false;
   visibility: VisibilityKt = VisibilityKt.Public;
-  name: string;
   isMutable = false;
   type: TypeSignatureKt;
   defaultValueFactory: (fileKt: FileKt) => string;
   wrapAssignment = false;
   getterBodyFactory: (fileKt: FileKt) => string;
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 
   setDefaultValue(valueFactory: (fileKt: FileKt) => string): void {
     this.defaultValueFactory = valueFactory;
@@ -316,23 +288,16 @@ export class PropertyKt implements ClassMemberKt {
 
 export class InitBlockKt implements ClassMemberKt {
 
-  bodyFactory: (fileKt: FileKt) => string;
-
-  constructor(bodyFactory: (fileKt: FileKt) => string) {
-    this.bodyFactory = bodyFactory;
-  }
+  constructor(public bodyFactory: (fileKt: FileKt) => string) { }
 }
 
 export class FunctionSignatureKt {
 
   annotations: AnnotationKt[] = [];
-  name: string;
   parameters: ParameterKt[] = [];
   returnType: TypeSignatureKt;
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 
   addAnnotation(name: string, callback: (annotationKt: AnnotationKt) => void = () => {}): void {
 
@@ -409,12 +374,9 @@ export class ExtensionFunctionKt extends FunctionKt implements FileMemberKt {
 export class InterfaceKt implements FileMemberKt {
 
   annotations: AnnotationKt[] = [];
-  name: string;
   members: FunctionSignatureKt[] = [];
 
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public name: string) { }
 
   addAnnotation(className: string,
                 callback: (annotationKt: AnnotationKt) => void = () => {}): void {
@@ -444,9 +406,9 @@ export class FileKt {
 
   importMapping: {[key: string]: string; } = {};
   licenseHeader = '';
-  fileName: string;
-  packageName: string;
   members: FileMemberKt[] = [];
+
+  constructor(public packageName: string, public fileName: string) { }
 
   tryImport(type: string): string {
 
@@ -469,12 +431,6 @@ export class FileKt {
     }
     this.importMapping[type] = shortName;
     return shortName;
-  }
-
-  constructor(packageName: string, fileName: string) {
-
-    this.packageName = packageName;
-    this.fileName = fileName;
   }
 
   addInterface(name: string, callback: (interfaceKt: InterfaceKt) => any): void {
