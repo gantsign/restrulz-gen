@@ -339,7 +339,7 @@ describe('KotlinValidatorGenerator', () => {
 
   });
 
-  class TestGeneratorContext implements GeneratorContext {
+  class MockGeneratorContext implements GeneratorContext {
     outputPaths: String[] = [];
     contents: String[] = [];
 
@@ -357,7 +357,7 @@ describe('KotlinValidatorGenerator', () => {
 
   describe('generateValidatorFile()', () => {
     it('should write validator file', () => {
-      const testContext = new TestGeneratorContext();
+      const testContext = new MockGeneratorContext();
 
       const integerType = new IntegerType();
       integerType.name = 'person-age';
@@ -409,7 +409,7 @@ object PersonAgeValidator : ShortValidator(
   describe('generateValidatorFiles()', () => {
 
     it('should filter out non-validating types', () => {
-      const testContext = new TestGeneratorContext();
+      const testContext = new MockGeneratorContext();
 
       const nonValidatingSpec = new Specification();
       nonValidatingSpec.name = 'testing';
@@ -424,7 +424,7 @@ object PersonAgeValidator : ShortValidator(
     });
 
     it('should support multiple validators', () => {
-      const testContext = new TestGeneratorContext();
+      const testContext = new MockGeneratorContext();
 
       const validatingSpec = new Specification();
       validatingSpec.name = 'testing';
@@ -684,7 +684,7 @@ object OrgNameValidator : StringValidator(
   describe('generateFiles()', () => {
 
     it('should filter out non-validating types', () => {
-      const testContext = new TestGeneratorContext();
+      const testContext = new MockGeneratorContext();
 
       const nonValidatingSpec = new Specification();
       nonValidatingSpec.name = 'testing';
@@ -699,7 +699,7 @@ object OrgNameValidator : StringValidator(
     });
 
     it('should support multiple validators', () => {
-      const testContext = new TestGeneratorContext();
+      const testContext = new MockGeneratorContext();
 
       const validatingSpec = new Specification();
       validatingSpec.name = 'testing';

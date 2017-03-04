@@ -156,7 +156,7 @@ describe('KotlinGenerator', () => {
   describe('writeFile()', () => {
 
     it('should write file', () => {
-      class TestGeneratorContext implements GeneratorContext {
+      class MockGeneratorContext implements GeneratorContext {
         outputPath = '';
         content = '';
 
@@ -178,7 +178,7 @@ describe('KotlinGenerator', () => {
       const fileKt = new FileKt('com.example.package', 'TestClass');
       fileKt.addClass('TestClass', () => {});
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.writeFile(context, fileKt);
 

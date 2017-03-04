@@ -544,7 +544,7 @@ generator.writeEndObject()
     });
   });
 
-  class TestGeneratorContext implements GeneratorContext {
+  class MockGeneratorContext implements GeneratorContext {
     outputPaths: string[] = [];
     contents: string[] = [];
 
@@ -595,7 +595,7 @@ generator.writeEndObject()
       fullSpec.name = 'testing';
       fullSpec.classTypes = [classType1, classType2];
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generateWriterFiles(fullSpec, context);
 
@@ -677,7 +677,7 @@ object DeliveryCustomerWriter : JacksonObjectWriter\<DeliveryCustomer>() {
       fullSpec.name = 'testing';
       fullSpec.classTypes = [classType1, classType2];
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generateFactoryFiles(fullSpec, context);
 
@@ -759,7 +759,7 @@ object DeliveryCustomerWriterFactory : JsonObjectWriterFactory\<DeliveryCustomer
       fullSpec.name = 'testing';
       fullSpec.classTypes = [classType1, classType2];
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generateFiles(fullSpec, context);
 

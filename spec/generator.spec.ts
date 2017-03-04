@@ -26,7 +26,7 @@ import {
 } from '../src/index'
 const jsyaml: any = require('js-yaml');
 
-class TestGenerator implements Generator {
+class MockGenerator implements Generator {
   licenseHeader = '';
 
   context: GeneratorContext;
@@ -52,7 +52,7 @@ describe('GeneratorContext', () => {
   const processor = new SchemaProcessor();
   processor.schemaFiles = ['spec/data/schema.json'];
   processor.outputDirectory = 'tmp/output';
-  const generator = new TestGenerator();
+  const generator = new MockGenerator();
   processor.generators.push(generator);
   processor.execute();
 

@@ -21,7 +21,7 @@ import {
   Specification
 } from '../src/index'
 
-class TestGenerator implements Generator {
+class MockGenerator implements Generator {
   licenseHeader = '';
 
   spec: Specification | null;
@@ -45,10 +45,10 @@ const processor = new SchemaProcessor();
 processor.schemaFiles = ['spec/data/schema.json'];
 processor.outputDirectory = 'tmp/output';
 
-const generator1 = new TestGenerator();
+const generator1 = new MockGenerator();
 processor.generators.push(generator1);
 
-const generator2 = new TestGenerator();
+const generator2 = new MockGenerator();
 processor.generators.push(generator2);
 
 processor.execute();

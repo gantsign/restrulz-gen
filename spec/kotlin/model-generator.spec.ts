@@ -834,7 +834,7 @@ return TestClass(
 
   });
 
-  class TestGeneratorContext implements GeneratorContext {
+  class MockGeneratorContext implements GeneratorContext {
     outputPaths: string[] = [];
     contents: string[] = [];
 
@@ -856,7 +856,7 @@ return TestClass(
 
     it('should add functions', () => {
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generatePackageFile(spec, context);
 
@@ -898,7 +898,7 @@ internal fun List\<String>.blankToEmpty(): List\<String> {
       completeSpec.name = 'testing';
       completeSpec.classTypes = [classType];
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generateModelFiles(completeSpec, context);
 
@@ -950,7 +950,7 @@ class TestClass(
       completeSpec.name = 'testing';
       completeSpec.classTypes = [classType];
 
-      const context = new TestGeneratorContext();
+      const context = new MockGeneratorContext();
 
       generator.generateFiles(completeSpec, context);
 
