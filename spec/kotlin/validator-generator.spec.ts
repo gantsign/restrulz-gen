@@ -27,6 +27,7 @@ import {ExtendsKt, FileKt, ObjectKt} from '../../src/kotlin/lang';
 import {GeneratorContext} from '../../src/generator';
 import {KotlinValidatorGenerator} from '../../src/kotlin/validator-generator';
 import {KotlinModelGenerator} from '../../src/kotlin/model-generator';
+import {KotlinJsonReaderGenerator} from '../../src/kotlin/json-reader-generator';
 
 describe('KotlinValidatorGenerator', () => {
 
@@ -623,6 +624,116 @@ object OrgNameValidator : StringValidator(
 
   });
 
+  describe('getStringForValidateProperty()', () => {
+
+    it('should support simple strings', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const stringType = new StringType();
+      stringType.name = 'string-type';
+      property.type = stringType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('StringTypeValidator.validateValue(value, parser)');
+    });
+
+    it('should support empty strings', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const stringType = new StringType();
+      stringType.name = 'string-type';
+      property.type = stringType;
+      property.allowEmpty = true;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('StringTypeValidator.validateValueOrEmpty(value, parser)');
+    });
+
+    it('should support simple integers', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const integerType = new IntegerType();
+      integerType.name = 'integer-type';
+      property.type = integerType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('IntegerTypeValidator.validateValue(value, parser)');
+    });
+
+    it('should support nullable integers', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const integerType = new IntegerType();
+      integerType.name = 'integer-type';
+      property.type = integerType;
+      property.allowNull = true;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('IntegerTypeValidator.validateValueOrNull(value, parser)');
+    });
+
+    it('should support boolean', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const booleanType = new BooleanType();
+      booleanType.name = 'boolean-type';
+      property.type = booleanType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('');
+    });
+
+    it('should support classes', () => {
+
+      const property = new Property();
+      property.name = 'test-property';
+
+      const classType = new ClassType();
+      classType.name = 'class-type';
+      property.type = classType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.getStringForValidateProperty(spec, fileKt, property))
+          .toBe('');
+    });
+
+    it('should throw error for unsupported type', () => {
+
+      class UnsupportedTypeTest {}
+      const unsupportedType = new UnsupportedTypeTest();
+
+      const property = new Property();
+      property.name = 'test-property';
+      property.type = <StringType>unsupportedType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(() => generator.getStringForValidateProperty(spec, fileKt, property))
+          .toThrowError('Unsupported type: UnsupportedTypeTest');
+    });
+  });
+
   describe('init()', () => {
 
     it('should modify KotlinModelGenerator', () => {
@@ -670,6 +781,18 @@ object OrgNameValidator : StringValidator(
 
       expect(modelGenerator.generatePropertyAssignmentValue(fileKt, spec, integerProperty))
           .toBe('PersonAgeValidator.requireValidValue("age", age)');
+    });
+
+    it('should modify KotlinJsonReaderGenerator', () => {
+
+      const readerGenerator = new KotlinJsonReaderGenerator();
+      const readerGetStringForValidateProperty = readerGenerator.getStringForValidateProperty;
+
+      generator.init([readerGenerator]);
+
+      // tslint:disable-next-line:triple-equals
+      expect(readerGetStringForValidateProperty != readerGenerator.getStringForValidateProperty)
+          .toBeTruthy();
     });
 
     it('should ignore other validators', () => {

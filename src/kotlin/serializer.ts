@@ -40,8 +40,11 @@ import {
   PrimaryConstructorKt,
   PropertyKt,
   TextKt,
+  TryBlockKt,
   TypeSignatureKt,
-  VisibilityKt
+  VisibilityKt,
+  WhenKt,
+  WhileBlockKt
 } from './lang';
 
 function shortNameFor(type: string): string {
@@ -525,24 +528,118 @@ export class KotlinSerializer {
   }
 
   public serializeIfBlock(fileKt: FileKt, ifBlockKt: IfBlockKt): string {
+
+      const {body, elseBlock} = ifBlockKt;
+
       let result = `if (${ifBlockKt.conditionFactory(fileKt)}) {\n`;
-      result += this.indent(this.serializeBody(fileKt, ifBlockKt.body));
-      result += '}\n';
+      result += this.indent(this.serializeBody(fileKt, body));
+      result += '}';
+
+      if (elseBlock) {
+        result += ' else {\n';
+        result += this.indent(this.serializeBody(fileKt, elseBlock));
+        result += '}';
+      }
+      result += '\n';
       return result;
   }
 
-  public serializeBodyContent(fileKt: FileKt, content: BodyContentKt): string {
-    if (content instanceof TextKt) {
-      return content.text;
-    } if (content instanceof LineKt) {
-      return `${content.text}\n`;
-    } if (content instanceof DynamicLineKt) {
-      return `${content.contentFactory(fileKt)}\n`;
-    } if (content instanceof IfBlockKt) {
-      return this.serializeIfBlock(fileKt, content);
-    } else {
-      throw new Error(`Unsupported BodyContentKt type: ${content.constructor.name}`);
+  public serializeWhileBlock(fileKt: FileKt, whileBlockKt: WhileBlockKt): string {
+
+    let result = `while (${whileBlockKt.conditionFactory(fileKt)}) {\n`;
+    result += this.indent(this.serializeBody(fileKt, whileBlockKt.body));
+    result += '}\n';
+    return result;
+  }
+
+  public serializeWhen(fileKt: FileKt, whenKt: WhenKt): string {
+
+    const {argument, cases, elseBlock} = whenKt;
+
+    let result = `when (${whenKt.argument}) {\n`;
+    result += '\n';
+
+    const indent = this.indent;
+
+    let body = '';
+
+    for (let branch of cases) {
+      body += `${branch.argument(fileKt)} -> {\n`;
+      body += indent(this.serializeBody(fileKt, branch.body));
+      body += '}\n';
     }
+
+    if (elseBlock) {
+      body += `else -> {\n`;
+      body += indent(this.serializeBody(fileKt, elseBlock));
+      body += '}\n';
+    }
+
+    result += indent(body);
+
+    result += '}\n';
+    return result;
+  }
+
+  public serializeTryBlock(fileKt: FileKt, tryBlockKt: TryBlockKt): string {
+
+    const {body, catchBlock} = tryBlockKt;
+
+    if (!catchBlock) {
+      throw new Error('Catch block is required');
+    }
+
+    let result = `try {\n`;
+    result += this.indent(this.serializeBody(fileKt, body));
+    result += '}';
+
+    const exception = fileKt.tryImport(catchBlock.exceptionClass);
+    result += ` catch (${catchBlock.name}: ${exception}) {\n`;
+    result += this.indent(this.serializeBody(fileKt, catchBlock.body));
+    result += '}';
+
+    result += '\n';
+    return result;
+  }
+
+  public serializeBodyContent(fileKt: FileKt, content: BodyContentKt): string {
+
+    if (content instanceof TextKt) {
+
+      return content.text;
+    }
+
+    if (content instanceof LineKt) {
+
+      return `${content.text}\n`;
+    }
+
+    if (content instanceof DynamicLineKt) {
+
+      return `${content.contentFactory(fileKt)}\n`;
+    }
+
+    if (content instanceof IfBlockKt) {
+
+      return this.serializeIfBlock(fileKt, content);
+    }
+
+    if (content instanceof WhileBlockKt) {
+
+      return this.serializeWhileBlock(fileKt, content);
+    }
+
+    if (content instanceof WhenKt) {
+
+      return this.serializeWhen(fileKt, content);
+    }
+
+    if (content instanceof TryBlockKt) {
+
+      return this.serializeTryBlock(fileKt, content);
+    }
+
+    throw new Error(`Unsupported BodyContentKt type: ${content.constructor.name}`);
   }
 
   public serializeBody(fileKt: FileKt, body: BodyKt): string {

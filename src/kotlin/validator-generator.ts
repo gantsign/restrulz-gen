@@ -27,6 +27,7 @@ import {FileKt} from './lang';
 import {KotlinGenerator} from './generator';
 import {KotlinModelGenerator} from './model-generator';
 import {kebabToCamel} from '../util/kebab';
+import {KotlinJsonReaderGenerator} from './json-reader-generator';
 
 export class KotlinValidatorGenerator extends KotlinGenerator {
 
@@ -146,20 +147,50 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     const expression = modelGeneratePropertyAssignmentValue(fileKt, spec, property);
 
     if (type instanceof StringType || type instanceof IntegerType) {
+
       const validatorType = fileKt.tryImport(this.getQualifiedValidatorClass(spec, type));
 
-      let result = `${validatorType}.`;
+      let result = `${validatorType}.requireValidValue`;
       if (allowEmpty) {
-        result += 'requireValidValueOrEmpty';
+        result += 'OrEmpty';
       } else if (allowNull) {
-        result += 'requireValidValueOrNull';
-      } else {
-        result += 'requireValidValue';
+        result += 'OrNull';
       }
       result += `(${this.toKotlinString(kebabToCamel(property.name))}, ${expression})`;
       return result;
+
     } else if (type instanceof BooleanType || type instanceof ClassType) {
+
       return expression;
+
+    } else {
+      throw new Error(`Unsupported type: ${type.constructor.name}`);
+    }
+  }
+
+  public getStringForValidateProperty(spec: Specification,
+                                      fileKt: FileKt,
+                                      property: Property): string {
+
+    const {type, allowEmpty, allowNull} = property;
+
+    if (type instanceof StringType || type instanceof IntegerType) {
+
+      const validatorType = fileKt.tryImport(this.getQualifiedValidatorClass(spec, type));
+
+      let result = `${validatorType}.validateValue`;
+      if (allowEmpty) {
+        result += 'OrEmpty';
+      } else if (allowNull) {
+        result += 'OrNull';
+      }
+      result += '(value, parser)';
+      return result;
+
+    } else if (type instanceof BooleanType || type instanceof ClassType) {
+
+      return '';
+
     } else {
       throw new Error(`Unsupported type: ${type.constructor.name}`);
     }
@@ -183,6 +214,9 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
                                                      property: Property) =>
             this.generatePropertyAssignmentValue(
                 fileKt, spec, property, modelGeneratePropertyAssignmentValue);
+      } else if (KotlinJsonReaderGenerator.assignableFrom(generator)) {
+
+        generator.getStringForValidateProperty = this.getStringForValidateProperty;
       }
     })
   }
@@ -195,5 +229,6 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     super();
     this.needsProcessing = this.needsProcessing.bind(this);
     this.generatePropertyAssignmentValue = this.generatePropertyAssignmentValue.bind(this);
+    this.getStringForValidateProperty = this.getStringForValidateProperty.bind(this);
   }
 }

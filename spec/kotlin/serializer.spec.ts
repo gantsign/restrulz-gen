@@ -40,8 +40,12 @@ import {
   PrimaryConstructorKt,
   PropertyKt,
   TextKt,
+  TryBlockKt,
   TypeSignatureKt,
-  VisibilityKt
+  VisibilityKt,
+  WhenCaseKt,
+  WhenKt,
+  WhileBlockKt
 } from '../../src/kotlin/lang';
 
 function createFile() {
@@ -1138,6 +1142,131 @@ if (true) {
 `);
     });
 
+    it('should render if with else', () => {
+      const fileKt = createFile();
+      const ifBlockKt = new IfBlockKt(() => 'true');
+      ifBlockKt.body.writeLn('throw RuntimeException()');
+      ifBlockKt.setElse(elseBlockKt => {
+        elseBlockKt.writeLn('return true');
+      });
+
+      expect(serializer.serializeIfBlock(fileKt, ifBlockKt))
+          .toBe(`\
+if (true) {
+    throw RuntimeException()
+} else {
+    return true
+}
+`);
+    });
+
+  });
+
+  describe('serializeWhileBlock()', () => {
+
+    it('should render while block', () => {
+      const fileKt = createFile();
+      const whileBlockKt = new WhileBlockKt(() => 'true');
+      whileBlockKt.body.writeLn('throw RuntimeException()');
+
+      expect(serializer.serializeWhileBlock(fileKt, whileBlockKt))
+          .toBe(`\
+while (true) {
+    throw RuntimeException()
+}
+`);
+    });
+
+  });
+
+  describe('serializeWhen()', () => {
+
+    it('should render when statement', () => {
+      const fileKt = createFile();
+      const whenKt = new WhenKt('test1');
+
+      whenKt.addCase(() => '"test2"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test3"');
+      });
+      whenKt.addCase(() => '"test4"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test5"');
+      });
+      whenKt.setElse(elseBodyKt => {
+        elseBodyKt.writeLn('throw RuntimeException()');
+      });
+
+      expect(serializer.serializeWhen(fileKt, whenKt))
+          .toBe(`\
+when (test1) {
+
+    "test2" -> {
+        return "test3"
+    }
+    "test4" -> {
+        return "test5"
+    }
+    else -> {
+        throw RuntimeException()
+    }
+}
+`);
+    });
+
+    it('should render when without else', () => {
+      const fileKt = createFile();
+      const whenKt = new WhenKt('test1');
+
+      whenKt.addCase(() => '"test2"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test3"');
+      });
+      whenKt.addCase(() => '"test4"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test5"');
+      });
+
+      expect(serializer.serializeWhen(fileKt, whenKt))
+          .toBe(`\
+when (test1) {
+
+    "test2" -> {
+        return "test3"
+    }
+    "test4" -> {
+        return "test5"
+    }
+}
+`);
+    });
+
+  });
+
+  describe('serializeTryBlock()', () => {
+
+    it('should render try-catch', () => {
+      const fileKt = createFile();
+      const tryBlockKt = new TryBlockKt();
+      tryBlockKt.body.writeLn('return true');
+      tryBlockKt.setCatch('e', 'kotlin.RuntimeException', catchBlockKt => {
+        catchBlockKt.writeLn('return false')
+      });
+
+      expect(serializer.serializeTryBlock(fileKt, tryBlockKt))
+          .toBe(`\
+try {
+    return true
+} catch (e: RuntimeException) {
+    return false
+}
+`);
+    });
+
+    it('should throw error without catch-block', () => {
+      const fileKt = createFile();
+      const tryBlockKt = new TryBlockKt();
+      tryBlockKt.body.writeLn('return true');
+
+      expect(() => serializer.serializeTryBlock(fileKt, tryBlockKt))
+          .toThrowError('Catch block is required');
+    });
   });
 
   describe('serializeBodyContent()', () => {
@@ -1175,6 +1304,68 @@ if (true) {
           .toBe(`\
 if (true) {
     throw RuntimeException()
+}
+`);
+    });
+
+    it('should render while block', () => {
+      const fileKt = createFile();
+      const whileBlockKt = new WhileBlockKt(() => 'true');
+      whileBlockKt.body.writeLn('throw RuntimeException()');
+
+      expect(serializer.serializeBodyContent(fileKt, whileBlockKt))
+          .toBe(`\
+while (true) {
+    throw RuntimeException()
+}
+`);
+    });
+
+    it('should render when statement', () => {
+      const fileKt = createFile();
+      const whenKt = new WhenKt('test1');
+
+      whenKt.addCase(() => '"test2"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test3"');
+      });
+      whenKt.addCase(() => '"test4"', caseBodyKt => {
+        caseBodyKt.writeLn('return "test5"');
+      });
+      whenKt.setElse(elseBodyKt => {
+        elseBodyKt.writeLn('throw RuntimeException()');
+      });
+
+      expect(serializer.serializeBodyContent(fileKt, whenKt))
+          .toBe(`\
+when (test1) {
+
+    "test2" -> {
+        return "test3"
+    }
+    "test4" -> {
+        return "test5"
+    }
+    else -> {
+        throw RuntimeException()
+    }
+}
+`);
+    });
+
+    it('should render try-catch', () => {
+      const fileKt = createFile();
+      const tryBlockKt = new TryBlockKt();
+      tryBlockKt.body.writeLn('return true');
+      tryBlockKt.setCatch('e', 'kotlin.RuntimeException', catchBlockKt => {
+        catchBlockKt.writeLn('return false')
+      });
+
+      expect(serializer.serializeBodyContent(fileKt, tryBlockKt))
+          .toBe(`\
+try {
+    return true
+} catch (e: RuntimeException) {
+    return false
 }
 `);
     });

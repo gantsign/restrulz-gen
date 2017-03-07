@@ -87,8 +87,69 @@ export class DynamicLineKt implements BodyContentKt {
 
 export class IfBlockKt implements BodyContentKt {
   body: BodyKt = new BodyKt();
+  elseBlock: BodyKt;
 
   constructor(public conditionFactory: (fileKt: FileKt) => string) {}
+
+  setElse(callback: (bodyKt: BodyKt) => void): void {
+    const bodyKt = new BodyKt();
+    callback(bodyKt);
+    this.elseBlock = bodyKt;
+  }
+}
+
+export class WhileBlockKt implements BodyContentKt {
+  body: BodyKt = new BodyKt();
+
+  constructor(public conditionFactory: (fileKt: FileKt) => string) {}
+}
+
+export class WhenCaseKt {
+  argument: (fileKt: FileKt) => string;
+  body: BodyKt = new BodyKt();
+
+  constructor(argument: (fileKt: FileKt) => string) {
+    this.argument = argument;
+  }
+}
+
+export class WhenKt implements BodyContentKt {
+  argument: string;
+  cases: WhenCaseKt[] = [];
+  elseBlock: BodyKt;
+
+  constructor(argument: string) {
+    this.argument = argument;
+  }
+
+  addCase(argument: (fileKt: FileKt) => string, callback: (body: BodyKt) => void): void {
+    const whenCaseKt = new WhenCaseKt(argument);
+    callback(whenCaseKt.body);
+    this.cases.push(whenCaseKt);
+  }
+
+  setElse(callback: (bodyKt: BodyKt) => void): void {
+    const bodyKt = new BodyKt();
+    callback(bodyKt);
+    this.elseBlock = bodyKt;
+  }
+}
+
+export class CatchBlockKt {
+  body: BodyKt = new BodyKt();
+
+  constructor(public name: string, public exceptionClass: string) {}
+}
+
+export class TryBlockKt implements BodyContentKt {
+  body: BodyKt = new BodyKt();
+  catchBlock: CatchBlockKt;
+
+  setCatch(name: string, exceptionClass: string, callback: (bodyKt: BodyKt) => void): void {
+    const catchBlockKt = new CatchBlockKt(name, exceptionClass);
+    callback(catchBlockKt.body);
+    this.catchBlock = catchBlockKt;
+  }
 }
 
 export class BodyKt implements BodyContentKt {
@@ -115,6 +176,29 @@ export class BodyKt implements BodyContentKt {
 
     this.content.push(ifBlockKt);
     return ifBlockKt;
+  }
+
+  writeWhen(argument: string, callback: (whenKt: WhenKt) => void): void {
+    const whenKt = new WhenKt(argument);
+    callback(whenKt);
+    this.content.push(whenKt);
+  }
+
+  writeWhile(conditionFactory: (fileKt: FileKt) => string,
+             callback: (bodyKt: BodyKt) => void): void {
+
+    const whileBlockKt = new WhileBlockKt(conditionFactory);
+    callback(whileBlockKt.body);
+
+    this.content.push(whileBlockKt);
+  }
+
+  writeTry(callback: (bodyKt: BodyKt) => void): TryBlockKt {
+    const tryBlockKt = new TryBlockKt();
+    callback(tryBlockKt.body);
+
+    this.content.push(tryBlockKt);
+    return tryBlockKt;
   }
 }
 
