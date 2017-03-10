@@ -215,7 +215,9 @@ export class KotlinSerializer {
   protected serializeFunctionSignatureCommon(fileKt: FileKt,
                                              functionSignatureKt: FunctionSignatureKt): string {
 
-    const {annotations, name, parameters, returnType} = functionSignatureKt;
+    const {annotations, name, parameters, returnType, alwaysWrapParameters,
+        wrapAfterParameters} = functionSignatureKt;
+
     const indent = this.indent;
 
     let result = '';
@@ -243,13 +245,23 @@ export class KotlinSerializer {
     result += `${name}(`;
 
     if (parameters.length > 0) {
-      result += '\n';
+      if (alwaysWrapParameters || parameters.length > 1) {
+        result += '\n';
+      }
       for (let i = 0; i < parameters.length; i++) {
         const param = parameters[i];
         if (i > 0) {
           result += ',\n';
         }
-        result += indent(indent(this.serializeParameterKt(fileKt, param)))
+        const paramString = this.serializeParameterKt(fileKt, param);
+        if (alwaysWrapParameters || parameters.length > 1) {
+          result += indent(indent(paramString));
+        } else {
+          result += paramString;
+        }
+      }
+      if (wrapAfterParameters) {
+        result += '\n';
       }
     }
     result += ')';
@@ -300,7 +312,7 @@ export class KotlinSerializer {
     if (!constructorKt) {
       return '';
     }
-    const {visibility, parameters} = constructorKt;
+    const {visibility, parameters, alwaysWrapParameters} = constructorKt;
 
     let result = '';
     if (visibility !== VisibilityKt.Public) {
@@ -309,13 +321,21 @@ export class KotlinSerializer {
 
     const indent = this.indent;
     if (parameters.length > 0) {
-      result += '(\n';
+      result += '(';
+      if (alwaysWrapParameters || parameters.length > 1) {
+        result += '\n';
+      }
       for (let i = 0; i < parameters.length; i++) {
         const param = parameters[i];
         if (i > 0) {
           result += ',\n';
         }
-        result += indent(indent(this.serializeParameterKt(fileKt, param)));
+        const paramString = this.serializeParameterKt(fileKt, param);
+        if (alwaysWrapParameters || parameters.length > 1) {
+          result += indent(indent(paramString));
+        } else {
+          result += paramString;
+        }
       }
       result += ')';
     } else if (visibility !== VisibilityKt.Public) {

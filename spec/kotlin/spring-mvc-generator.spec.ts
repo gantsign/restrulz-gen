@@ -1218,8 +1218,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -1300,8 +1299,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -1526,8 +1524,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -1734,8 +1731,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -1907,8 +1903,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -1940,7 +1935,8 @@ interface DeliveryAddressApi {
     @RequestMapping(method = arrayOf(GET))
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
-            @RequestBody primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+            @RequestBody primaryAddress: DeliveryAddress
+    ): Single\<GetDeliveryAddressResponse>
 }
 `);
 
@@ -2023,8 +2019,7 @@ class GetDeliveryAddressResponse private constructor(
 
     companion object {
 
-        fun partialContent(
-                value: DeliveryAddress): GetDeliveryAddressResponse {
+        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
 
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON_UTF8;
@@ -2056,7 +2051,8 @@ interface DeliveryAddressApi {
     @RequestMapping(method = arrayOf(GET))
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
-            @RequestBody primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+            @RequestBody primaryAddress: DeliveryAddress
+    ): Single\<GetDeliveryAddressResponse>
 }
 `);
 

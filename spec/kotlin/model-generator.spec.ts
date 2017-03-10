@@ -441,6 +441,40 @@ describe('KotlinModelGenerator', () => {
 
   describe('addCopyFunction()', () => {
 
+    it('should support single property', () => {
+
+      const fileKt = new FileKt('com.example.package', 'TestClass');
+      const classKt = new ClassKt('TestClass');
+
+      const stringType = new StringType();
+
+      const property1 = new Property();
+      property1.name = 'test-property1';
+      property1.type = stringType;
+
+      const classType = new ClassType();
+      classType.name = 'test-class';
+
+      generator.addCopyFunction(classKt, spec, classType, [property1]);
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!FunctionKt.assignableFrom(functionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(1);
+
+      const parameterKt1 = functionKt.parameters[0];
+      expect(parameterKt1.name).toBe('testProperty1');
+      expect(parameterKt1.type.className).toBe('kotlin.String');
+      expect(parameterKt1.defaultValue).toBe('this.testProperty1');
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe('\nreturn TestClass(testProperty1 = testProperty1)\n');
+    });
+
     it('should support multiple properties', () => {
 
       const fileKt = new FileKt('com.example.package', 'TestClass');
@@ -480,7 +514,7 @@ describe('KotlinModelGenerator', () => {
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -507,7 +541,7 @@ return TestClass(
       expect(functionKt.parameters.length).toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('return TestClass()\n');
+          .toBe('\nreturn TestClass()\n');
     });
   });
 
@@ -601,7 +635,7 @@ return TestClass(
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -639,7 +673,7 @@ return TestClass(
       expect(functionKt.parameters.length).toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('return TestClass()\n');
+          .toBe('\nreturn TestClass()\n');
     });
   });
 
@@ -734,7 +768,7 @@ return TestClass(
       expect(parameterKt2.type.className).toBe('kotlin.String');
       expect(parameterKt2.defaultValue).toBe('this.testProperty2');
 
-      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`\
+      expect(serializer.serializeBody(fileKt, functionKt.body)).toBe(`
 return TestClass(
         testProperty1 = testProperty1,
         testProperty2 = testProperty2)
@@ -922,6 +956,7 @@ class TestClass(
     fun copy(
             testProperty1: String = this.testProperty1,
             testProperty2: String = this.testProperty2): TestClass {
+
         return TestClass(
                 testProperty1 = testProperty1,
                 testProperty2 = testProperty2)
@@ -987,6 +1022,7 @@ class TestClass(
     fun copy(
             testProperty1: String = this.testProperty1,
             testProperty2: String = this.testProperty2): TestClass {
+
         return TestClass(
                 testProperty1 = testProperty1,
                 testProperty2 = testProperty2)

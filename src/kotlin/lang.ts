@@ -276,6 +276,7 @@ export class PrimaryConstructorKt {
 
   visibility: VisibilityKt = VisibilityKt.Public;
   parameters: ParameterKt[] = [];
+  alwaysWrapParameters = false;
 
   addParameter(name: string,
                typeClassName: string,
@@ -439,6 +440,8 @@ export class FunctionSignatureKt {
   annotations: AnnotationKt[] = [];
   parameters: ParameterKt[] = [];
   returnType: TypeSignatureKt;
+  alwaysWrapParameters = false;
+  wrapAfterParameters = false;
 
   constructor(public name: string) { }
 

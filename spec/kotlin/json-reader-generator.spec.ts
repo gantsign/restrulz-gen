@@ -1087,8 +1087,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(
-            parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
@@ -1301,8 +1300,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(
-            parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
@@ -1549,8 +1547,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(
-            parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
@@ -1676,8 +1673,7 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
     private val log: Logger = LoggerFactory.getLogger(PostalAddressReader::class.java)
     private val addressLine1Index: Int = 0
 
-    override fun readObject(
-            parser: ValidationHandlingJsonParser): PostalAddress? {
+    override fun readObject(parser: ValidationHandlingJsonParser): PostalAddress? {
 
         val startObject = parser.currentToken()
 
@@ -1863,8 +1859,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
     private val log: Logger = LoggerFactory.getLogger(DeliveryAddressReader::class.java)
     private val addressLine1Index: Int = 0
 
-    override fun readObject(
-            parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 

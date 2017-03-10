@@ -151,14 +151,19 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
       const indent = this.indent;
 
+      bodyKt.writeLn('');
       bodyKt.write(`return ${className}(`);
       if (properties.length > 0) {
-        bodyKt.writeLn('');
-        bodyKt.write(indent(indent(
-            properties
-                .map(prop => kebabToCamel(prop.name))
-                .map(propName => `${propName} = ${propName}`)
-                .join(',\n'))));
+        const args = properties
+            .map(prop => kebabToCamel(prop.name))
+            .map(propName => `${propName} = ${propName}`)
+            .join(',\n');
+        if (properties.length > 1) {
+          bodyKt.writeLn('');
+          bodyKt.write(indent(indent(args)));
+        } else {
+          bodyKt.write(args);
+        }
       }
       bodyKt.writeLn(')');
     });

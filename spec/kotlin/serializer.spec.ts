@@ -390,6 +390,37 @@ fun test1()
 `);
     });
 
+    it('should support single parameter', () => {
+      const fileKt = createFile();
+      const functionKt = new FunctionSignatureKt('test1');
+      functionKt.addParameter('param1', 'kotlin.String');
+
+      expect(serializer.serializeFunctionSignature(fileKt, functionKt))
+          .toBe('fun test1(param1: String)\n');
+    });
+
+    it('should support always wrap parameter', () => {
+      const fileKt = createFile();
+      const functionKt = new FunctionSignatureKt('test1');
+      functionKt.alwaysWrapParameters = true;
+      functionKt.addParameter('param1', 'kotlin.String');
+
+      expect(serializer.serializeFunctionSignature(fileKt, functionKt))
+          .toBe(`fun test1(
+        param1: String)
+`);
+    });
+
+    it('should support wrap after parameters', () => {
+      const fileKt = createFile();
+      const functionKt = new FunctionSignatureKt('test1');
+      functionKt.wrapAfterParameters = true;
+      functionKt.addParameter('param1', 'kotlin.String');
+
+      expect(serializer.serializeFunctionSignature(fileKt, functionKt))
+          .toBe('fun test1(param1: String\n)\n');
+    });
+
     it('should support parameters', () => {
       const fileKt = createFile();
       const functionKt = new FunctionSignatureKt('test1');
@@ -633,6 +664,26 @@ fun test1() {
           .toBe(' private constructor()');
     });
 
+    it('should support single constructor parameter', () => {
+      const fileKt = createFile();
+      const constructorKt = new PrimaryConstructorKt();
+      constructorKt.addParameter('name1', 'kotlin.String');
+
+      expect(serializer.serializePrimaryConstructor(fileKt, constructorKt))
+          .toBe('(name1: String)');
+    });
+
+    it('should support always wrap parameter', () => {
+      const fileKt = createFile();
+      const constructorKt = new PrimaryConstructorKt();
+      constructorKt.alwaysWrapParameters = true;
+      constructorKt.addParameter('name1', 'kotlin.String');
+
+      expect(serializer.serializePrimaryConstructor(fileKt, constructorKt))
+          .toBe(`(
+        name1: String)`);
+    });
+
     it('should support constructor parameters', () => {
       const fileKt = createFile();
       const constructorKt = new PrimaryConstructorKt();
@@ -779,8 +830,7 @@ companion object {
 
       expect(serializer.serializeClass(fileKt, classKt))
           .toBe(`\
-data class TestClass(
-        val test1: String)
+data class TestClass(val test1: String)
 `);
     });
 

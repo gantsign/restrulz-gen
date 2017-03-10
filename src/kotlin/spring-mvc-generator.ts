@@ -168,6 +168,9 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       parameters.forEach(param =>
           this.addFunctionSignatureParameter(functionSignature, spec, param));
 
+      functionSignature.alwaysWrapParameters = true;
+      functionSignature.wrapAfterParameters = true;
+
       functionSignature.setReturnType('io.reactivex.Single', returnType => {
 
         returnType.addGenericParameter(this.getQualifiedResponseClass(spec, pathScope, handler));
@@ -314,6 +317,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
       classKt.setPrimaryConstructor(constructorKt => {
 
         constructorKt.visibility = VisibilityKt.Private;
+        constructorKt.alwaysWrapParameters = true;
 
         const propertyName = 'responseEntity';
         const propertyType = 'org.springframework.http.ResponseEntity';
