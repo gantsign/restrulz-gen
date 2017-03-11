@@ -18,10 +18,8 @@ import {
   BodyParameterReference,
   ClassType,
   getHttpMethod,
-  getHttpStatus,
   HttpMethod,
   HttpMethodHandler,
-  HttpStatus,
   IntegerType,
   parseSpecification,
   PathParameter,
@@ -36,28 +34,6 @@ const spec = parseSpecification('spec/data/schema.json');
 const {name: specName, title, description, version, simpleTypes, classTypes, responses, pathScopes} = spec;
 
 describe('restrulz specification', () => {
-
-  describe('getHttpStatus', () => {
-    it('should support OK', () => {
-      expect(getHttpStatus(200)).toEqual(HttpStatus.OK);
-    });
-
-    it('should support CREATED', () => {
-      expect(getHttpStatus(201)).toEqual(HttpStatus.CREATED);
-    });
-
-    it('should support ACCEPTED', () => {
-      expect(getHttpStatus(202)).toEqual(HttpStatus.ACCEPTED);
-    });
-
-    it('should support PARTIAL_CONTENT', () => {
-      expect(getHttpStatus(206)).toEqual(HttpStatus.PARTIAL_CONTENT);
-    });
-
-    it('should throw an error for unsupported statuses', () => {
-      expect(() => getHttpStatus(-1)).toThrowError()
-    });
-  });
 
   describe('getHttpMethod', () => {
     it('should support GET', () => {

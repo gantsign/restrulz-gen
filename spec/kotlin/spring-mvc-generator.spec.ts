@@ -505,9 +505,99 @@ describe('KotlinSpringMvcGenerator', () => {
           .toBe('accepted');
     });
 
+    it('should support NO_CONTENT', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.NO_CONTENT))
+          .toBe('noContent');
+    });
+
     it('should support PARTIAL_CONTENT', () => {
       expect(generator.toFactoryFunctionName(HttpStatus.PARTIAL_CONTENT))
           .toBe('partialContent');
+    });
+
+    it('should support MOVED_PERMANENTLY', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.MOVED_PERMANENTLY))
+          .toBe('movedPermanently');
+    });
+
+    it('should support SEE_OTHER', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.SEE_OTHER))
+          .toBe('seeOther');
+    });
+
+    it('should support NOT_MODIFIED', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.NOT_MODIFIED))
+          .toBe('notModified');
+    });
+
+    it('should support TEMPORARY_REDIRECT', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.TEMPORARY_REDIRECT))
+          .toBe('temporaryRedirect');
+    });
+
+    it('should support PERMANENT_REDIRECT', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.PERMANENT_REDIRECT))
+          .toBe('permanentRedirect');
+    });
+
+    it('should support BAD_REQUEST', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.BAD_REQUEST))
+          .toBe('badRequest');
+    });
+
+    it('should support UNAUTHORIZED', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.UNAUTHORIZED))
+          .toBe('unauthorized');
+    });
+
+    it('should support FORBIDDEN', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.FORBIDDEN))
+          .toBe('forbidden');
+    });
+
+    it('should support NOT_FOUND', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.NOT_FOUND))
+          .toBe('notFound');
+    });
+
+    it('should support NOT_ACCEPTABLE', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.NOT_ACCEPTABLE))
+          .toBe('notAcceptable');
+    });
+
+    it('should support CONFLICT', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.CONFLICT))
+          .toBe('conflict');
+    });
+
+    it('should support GONE', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.GONE))
+          .toBe('gone');
+    });
+
+    it('should support TOO_MANY_REQUESTS', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.TOO_MANY_REQUESTS))
+          .toBe('tooManyRequests');
+    });
+
+    it('should support NOT_IMPLEMENTED', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.NOT_IMPLEMENTED))
+          .toBe('notImplemented');
+    });
+
+    it('should support BAD_GATEWAY', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.BAD_GATEWAY))
+          .toBe('badGateway');
+    });
+
+    it('should support SERVICE_UNAVAILABLE', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.SERVICE_UNAVAILABLE))
+          .toBe('serviceUnavailable');
+    });
+
+    it('should support GATEWAY_TIME_OUT', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.GATEWAY_TIME_OUT))
+          .toBe('gatewayTimeOut');
     });
 
     it('should throw error for unsupported status', () => {

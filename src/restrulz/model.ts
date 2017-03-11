@@ -22,22 +22,25 @@ export enum HttpStatus {
   OK = 200,
   CREATED = 201,
   ACCEPTED = 202,
-  PARTIAL_CONTENT = 206
-}
-
-export function getHttpStatus(code: number): HttpStatus {
-  switch (code) {
-    case HttpStatus.OK:
-      return code;
-    case HttpStatus.CREATED:
-      return code;
-    case HttpStatus.ACCEPTED:
-      return code;
-    case HttpStatus.PARTIAL_CONTENT:
-      return code;
-    default:
-      throw Error(`Unsupported HTTP status: ${code}`);
-  }
+  NO_CONTENT = 204,
+  PARTIAL_CONTENT = 206,
+  MOVED_PERMANENTLY = 301,
+  SEE_OTHER = 303,
+  NOT_MODIFIED = 304,
+  TEMPORARY_REDIRECT = 307,
+  PERMANENT_REDIRECT = 308,
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  NOT_ACCEPTABLE = 406,
+  CONFLICT = 409,
+  GONE = 410,
+  TOO_MANY_REQUESTS = 429,
+  NOT_IMPLEMENTED = 501,
+  BAD_GATEWAY = 502,
+  SERVICE_UNAVAILABLE = 503,
+  GATEWAY_TIME_OUT = 504
 }
 
 export enum HttpMethod {
@@ -306,7 +309,7 @@ class SpecificationBuilder extends Specification {
 
     const dest = new Response();
     dest.name = name;
-    dest.status = getHttpStatus(status);
+    dest.status = status;
     dest.bodyTypeRef = this.getClassType(bodyTypeRef);
     dest.isArray = array;
     return dest;

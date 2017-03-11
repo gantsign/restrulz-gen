@@ -193,8 +193,62 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       case HttpStatus.ACCEPTED:
         return 'accepted';
 
+      case HttpStatus.NO_CONTENT:
+        return 'noContent';
+
       case HttpStatus.PARTIAL_CONTENT:
         return 'partialContent';
+
+      case HttpStatus.MOVED_PERMANENTLY:
+        return 'movedPermanently';
+
+      case HttpStatus.SEE_OTHER:
+        return 'seeOther';
+
+      case HttpStatus.NOT_MODIFIED:
+        return 'notModified';
+
+      case HttpStatus.TEMPORARY_REDIRECT:
+        return 'temporaryRedirect';
+
+      case HttpStatus.PERMANENT_REDIRECT:
+        return 'permanentRedirect';
+
+      case HttpStatus.BAD_REQUEST:
+        return 'badRequest';
+
+      case HttpStatus.UNAUTHORIZED:
+        return 'unauthorized';
+
+      case HttpStatus.FORBIDDEN:
+        return 'forbidden';
+
+      case HttpStatus.NOT_FOUND:
+        return 'notFound';
+
+      case HttpStatus.NOT_ACCEPTABLE:
+        return 'notAcceptable';
+
+      case HttpStatus.CONFLICT:
+        return 'conflict';
+
+      case HttpStatus.GONE:
+        return 'gone';
+
+      case HttpStatus.TOO_MANY_REQUESTS:
+        return 'tooManyRequests';
+
+      case HttpStatus.NOT_IMPLEMENTED:
+        return 'notImplemented';
+
+      case HttpStatus.BAD_GATEWAY:
+        return 'badGateway';
+
+      case HttpStatus.SERVICE_UNAVAILABLE:
+        return 'serviceUnavailable';
+
+      case HttpStatus.GATEWAY_TIME_OUT:
+        return 'gatewayTimeOut';
 
       default:
         throw new Error(`Unexpected HTTP status: ${status}`);
