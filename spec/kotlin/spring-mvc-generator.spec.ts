@@ -580,6 +580,11 @@ describe('KotlinSpringMvcGenerator', () => {
           .toBe('tooManyRequests');
     });
 
+    it('should support INTERNAL_SERVER_ERROR', () => {
+      expect(generator.toFactoryFunctionName(HttpStatus.INTERNAL_SERVER_ERROR))
+          .toBe('internalServerError');
+    });
+
     it('should support NOT_IMPLEMENTED', () => {
       expect(generator.toFactoryFunctionName(HttpStatus.NOT_IMPLEMENTED))
           .toBe('notImplemented');
@@ -697,6 +702,11 @@ describe('KotlinSpringMvcGenerator', () => {
     it('should support TOO_MANY_REQUESTS', () => {
       expect(generator.toSpringHttpStatusValue(HttpStatus.TOO_MANY_REQUESTS))
           .toBe('TOO_MANY_REQUESTS');
+    });
+
+    it('should support INTERNAL_SERVER_ERROR', () => {
+      expect(generator.toSpringHttpStatusValue(HttpStatus.INTERNAL_SERVER_ERROR))
+          .toBe('INTERNAL_SERVER_ERROR');
     });
 
     it('should support NOT_IMPLEMENTED', () => {

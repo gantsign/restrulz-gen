@@ -238,6 +238,9 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       case HttpStatus.TOO_MANY_REQUESTS:
         return 'tooManyRequests';
 
+      case HttpStatus.INTERNAL_SERVER_ERROR:
+        return 'internalServerError';
+
       case HttpStatus.NOT_IMPLEMENTED:
         return 'notImplemented';
 
@@ -313,6 +316,9 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
       case HttpStatus.TOO_MANY_REQUESTS:
         return 'TOO_MANY_REQUESTS';
+
+      case HttpStatus.INTERNAL_SERVER_ERROR:
+        return 'INTERNAL_SERVER_ERROR';
 
       case HttpStatus.NOT_IMPLEMENTED:
         return 'NOT_IMPLEMENTED';
