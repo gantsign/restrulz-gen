@@ -141,7 +141,7 @@
               "value-ref": "id"
             }
           ],
-          "response-ref": "get-person-success"
+          "response-refs": ["get-person-success"]
         },
         {
           "kind": "http-method",
@@ -159,7 +159,7 @@
               "type-ref": "person"
             }
           ],
-          "response-ref": "update-person-success"
+          "response-refs": ["update-person-success"]
         }
       ]
     },
@@ -188,7 +188,7 @@
               "value-ref": "age"
             }
           ],
-          "response-ref": "get-person-array-success"
+          "response-refs": ["get-person-array-success"]
         }
       ]
     },
@@ -217,7 +217,7 @@
               "value-ref": "employed"
             }
           ],
-          "response-ref": "get-person-array-success"
+          "response-refs": ["get-person-array-success"]
         }
       ]
     }

@@ -106,7 +106,7 @@
               "value-ref": "id"
             }
           ],
-          "response-ref": "get-person-success"
+          "response-refs": ["get-person-success"]
         },
         {
           "kind": "http-method",
@@ -124,7 +124,7 @@
               "type-ref": "person"
             }
           ],
-          "response-ref": "add-person-success"
+          "response-refs": ["add-person-success"]
         },
         {
           "kind": "http-method",
@@ -142,7 +142,7 @@
               "type-ref": "person"
             }
           ],
-          "response-ref": "update-person-success"
+          "response-refs": ["update-person-success"]
         },
         {
           "kind": "http-method",
@@ -155,7 +155,7 @@
               "value-ref": "id"
             }
           ],
-          "response-ref": "delete-person-success"
+          "response-refs": ["delete-person-success"]
         }
       ]
     }

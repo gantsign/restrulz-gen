@@ -581,9 +581,9 @@ describe('KotlinSpringMvcGenerator', () => {
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
-      generator.addFactoryFunctionForArray(companionObjectKt, spec, pathScope, handler);
+      generator.addFactoryFunctionForArray(companionObjectKt, spec, pathScope, handler, response);
 
       expect(companionObjectKt.members.length)
           .toBe(1);
@@ -648,9 +648,9 @@ return GetDeliveryAddressResponse(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
-      generator.addFactoryFunctionForObject(companionObjectKt, spec, pathScope, handler);
+      generator.addFactoryFunctionForObject(companionObjectKt, spec, pathScope, handler, response);
 
       expect(companionObjectKt.members.length)
           .toBe(1);
@@ -713,7 +713,7 @@ return GetDeliveryAddressResponse(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       generator.addResponseKotlinClass(fileKt, spec, pathScope, handler);
 
@@ -862,7 +862,7 @@ return GetDeliveryAddressResponse(
       response.bodyTypeRef = classType;
       response.isArray = true;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       generator.addResponseKotlinClass(fileKt, spec, pathScope, handler);
 
@@ -1013,7 +1013,7 @@ return GetDeliveryAddressResponse(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const fileKt = generator.toResponseKotlinFile(spec, pathScope, handler);
 
@@ -1186,7 +1186,7 @@ return GetDeliveryAddressResponse(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 
@@ -1265,7 +1265,7 @@ class GetDeliveryAddressResponse private constructor(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 
@@ -1457,7 +1457,7 @@ class GetDeliveryAddressResponse private constructor(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 
@@ -1660,7 +1660,7 @@ class GetDeliveryAddressResponse private constructor(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 
@@ -1867,7 +1867,7 @@ class GetDeliveryAddressResponse private constructor(
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 
@@ -1983,7 +1983,7 @@ interface DeliveryAddressApi {
       response.status = HttpStatus.PARTIAL_CONTENT;
       response.bodyTypeRef = classType;
 
-      handler.responseRef = response;
+      handler.responseRefs = [response];
 
       const context = new MockGeneratorContext();
 

@@ -22,6 +22,7 @@ import {
   Mapping,
   PathParameterReference,
   PathScope,
+  Response,
   Specification
 } from '../restrulz/model';
 import {GeneratorContext} from '../generator';
@@ -225,9 +226,10 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
   public addFactoryFunctionForArray(companionObjectKt: CompanionObjectKt,
                                     spec: Specification,
                                     pathScope: PathScope,
-                                    handler: HttpMethodHandler) {
+                                    handler: HttpMethodHandler,
+                                    response: Response) {
 
-    const {status, bodyTypeRef} = handler.responseRef;
+    const {status, bodyTypeRef} = response;
 
     const entityType = this.getQualifiedModelClass(spec, bodyTypeRef);
     const springHttpStatusValue = this.toSpringHttpStatusValue(status);
@@ -270,9 +272,10 @@ typedList, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
   public addFactoryFunctionForObject(companionObjectKt: CompanionObjectKt,
                                      spec: Specification,
                                      pathScope: PathScope,
-                                     handler: HttpMethodHandler) {
+                                     handler: HttpMethodHandler,
+                                     response: Response) {
 
-    const {status, bodyTypeRef} = handler.responseRef;
+    const {status, bodyTypeRef} = response;
 
     const entityType = this.getQualifiedModelClass(spec, bodyTypeRef);
     const springHttpStatusValue = this.toSpringHttpStatusValue(status);
@@ -352,12 +355,17 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
       classKt.setCompanionObject(companionObjectKt => {
 
-        if (handler.responseRef.isArray) {
+        for (let responseRef of handler.responseRefs) {
 
-          this.addFactoryFunctionForArray(companionObjectKt, spec, pathScope, handler);
+          if (responseRef.isArray) {
 
-        } else {
-          this.addFactoryFunctionForObject(companionObjectKt, spec, pathScope, handler);
+            this.addFactoryFunctionForArray(
+                companionObjectKt, spec, pathScope, handler, responseRef);
+
+          } else {
+            this.addFactoryFunctionForObject(
+                companionObjectKt, spec, pathScope, handler, responseRef);
+          }
         }
       });
     });

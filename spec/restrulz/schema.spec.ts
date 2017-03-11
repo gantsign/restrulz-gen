@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,11 +282,11 @@ describe('restrulz schema definition', () => {
             fail(`Unexpected kind: ${mapping1.kind}`);
             return;
           }
-          const {method, name, parameters, responseRef} = mapping1;
+          const {method, name, parameters, responseRefs} = mapping1;
           expect(method).toEqual('GET');
           expect(name).toEqual('get-person');
           expect(parameters.length).toEqual(1);
-          expect(responseRef).toEqual('get-person-success');
+          expect(responseRefs).toEqual(['get-person-success']);
         });
 
         if (mapping1.kind !== 'http-method') {
@@ -313,11 +313,11 @@ describe('restrulz schema definition', () => {
             fail(`Unexpected kind: ${mapping2.kind}`);
             return;
           }
-          const {method, name, parameters, responseRef} = mapping2;
+          const {method, name, parameters, responseRefs} = mapping2;
           expect(method).toEqual('PUT');
           expect(name).toEqual('update-person');
           expect(parameters.length).toEqual(2);
-          expect(responseRef).toEqual('update-person-success');
+          expect(responseRefs).toEqual(['update-person-success']);
         });
 
         if (mapping2.kind !== 'http-method') {

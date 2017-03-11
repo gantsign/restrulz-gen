@@ -140,7 +140,7 @@ export class HttpMethodHandler implements Mapping {
   method: HttpMethod;
   name: string;
   parameters: HandlerParameter[];
-  responseRef: Response;
+  responseRefs: Response[];
 }
 
 export class PathScope {
@@ -376,14 +376,15 @@ class SpecificationBuilder extends Specification {
   };
 
   toHttpMethodHandler = (httpMethodHandler: schema.HttpMethodHandler, pathScope: PathScope): HttpMethodHandler => {
-    const {name, method, parameters, responseRef} = httpMethodHandler;
+    const {name, method, parameters, responseRefs} = httpMethodHandler;
 
     const dest = new HttpMethodHandler();
     dest.name = name;
     dest.method = getHttpMethod(method);
     dest.parameters = parameters
-        .map((parameter) => this.toParameter(parameter, pathScope));
-    dest.responseRef = this.getResponse(responseRef);
+        .map(parameter => this.toParameter(parameter, pathScope));
+    dest.responseRefs = responseRefs
+        .map(responseRef => this.getResponse(responseRef));
     return dest;
   };
 

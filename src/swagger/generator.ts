@@ -143,7 +143,7 @@ export class SwaggerGenerator implements Generator {
     const dest = new SwaggerOperation();
     dest.operationId = handler.name;
     dest.parameters = handler.parameters.map(this.toSwaggerParameter);
-    dest.responses = this.toSwaggerResponses([handler.responseRef]);
+    dest.responses = this.toSwaggerResponses(handler.responseRefs);
     return dest;
   }
 

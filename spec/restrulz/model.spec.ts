@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -506,11 +506,11 @@ describe('restrulz specification', () => {
             fail(`Unexpected class: ${typeof mapping1}`);
             return;
           }
-          const {method, name, parameters, responseRef} = mapping1 as HttpMethodHandler;
+          const {method, name, parameters, responseRefs} = mapping1 as HttpMethodHandler;
           expect(method).toEqual(HttpMethod.GET);
           expect(name).toEqual('get-person');
           expect(parameters.length).toEqual(1);
-          expect(responseRef).toEqual(spec.getResponse('get-person-success'));
+          expect(responseRefs).toEqual([spec.getResponse('get-person-success')]);
         });
 
         if (!(mapping1 instanceof HttpMethodHandler)) {
@@ -539,11 +539,11 @@ describe('restrulz specification', () => {
             fail(`Unexpected class: ${typeof mapping2}`);
             return;
           }
-          const {method, name, parameters, responseRef} = mapping2 as HttpMethodHandler;
+          const {method, name, parameters, responseRefs} = mapping2 as HttpMethodHandler;
           expect(method).toEqual(HttpMethod.PUT);
           expect(name).toEqual('update-person');
           expect(parameters.length).toEqual(2);
-          expect(responseRef).toEqual(spec.getResponse('update-person-success'));
+          expect(responseRefs).toEqual([spec.getResponse('update-person-success')]);
         });
 
         if (!(mapping2 instanceof HttpMethodHandler)) {
