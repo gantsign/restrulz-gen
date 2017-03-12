@@ -1,6 +1,6 @@
 {
   "name": "@gantsign/restrulz-gen",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "REST API code generator.",
   "main": "dist/index.js",
   "files": [
