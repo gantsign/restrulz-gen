@@ -256,6 +256,12 @@ export class Specification {
     throw new Error(`Response not found: ${name}`);
   };
 
+  constructor() {
+    this.getSimpleType = this.getSimpleType.bind(this);
+    this.getClassType = this.getClassType.bind(this);
+    this.getType = this.getType.bind(this);
+    this.getResponse = this.getResponse.bind(this);
+  }
 }
 
 //noinspection UnterminatedStatementJS
@@ -304,9 +310,8 @@ class SpecificationBuilder extends Specification {
 
     const property = new Property();
     property.name = name;
-    this.deferredTyping.push(() => {
-      property.type = this.getType(typeRef);
-    });
+    this.deferredTyping.push(() =>
+      property.type = this.getType(typeRef));
     property.allowEmpty = allowEmpty === true;
     property.allowNull = allowNull === true;
     property.isArray = array === true;
@@ -409,7 +414,7 @@ class SpecificationBuilder extends Specification {
     handler.parameters = parameters
         .map(parameter => this.toParameter(parameter, pathScope));
     handler.responseRefs = responseRefs
-        .map(responseRef => this.getResponse(responseRef));
+        .map(this.getResponse);
     return handler;
   };
 
