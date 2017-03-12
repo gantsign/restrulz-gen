@@ -21,15 +21,13 @@ import {
   HttpMethod,
   HttpMethodHandler,
   IntegerType,
-  PathElement,
-  PathParameter,
   PathParameterReference,
-  PathScope,
   Property,
   Response,
+  RootPathScope,
   Specification,
-  StaticPathElement,
-  StringType
+  StringType,
+  SubPathScope
 } from '../restrulz/model';
 import {
   SwaggerBodyParameter,
@@ -147,50 +145,114 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
-  public toPathString(pathElements: PathElement[]): string {
-    let path = '';
-    pathElements.forEach(pathElement => {
-      if (pathElement instanceof StaticPathElement) {
-        path += `/${pathElement.value}`;
-      } else if (pathElement instanceof PathParameter) {
-        path += `/{${pathElement.name}}`
+  public subPathToSwaggerPaths(path: string,
+                               subPathScope: SubPathScope): {[path: string]: SwaggerPath} {
+
+    const dest: {[path: string]: SwaggerPath} = {};
+
+    const location = `${path}${subPathScope.getPathAsString()}`;
+
+    const swaggerPath = new SwaggerPath();
+
+    let hasMethod = false;
+
+    subPathScope.mappings.forEach(mapping => {
+
+      if (mapping instanceof HttpMethodHandler) {
+
+        const operation = this.toSwaggerOperation(mapping);
+
+        switch (mapping.method) {
+          case HttpMethod.GET:
+            swaggerPath.get = operation;
+            hasMethod = true;
+            break;
+          case HttpMethod.PUT:
+            swaggerPath.put = operation;
+            hasMethod = true;
+            break;
+          case HttpMethod.POST:
+            swaggerPath.post = operation;
+            hasMethod = true;
+            break;
+          case HttpMethod.DELETE:
+            swaggerPath.delete = operation;
+            hasMethod = true;
+            break;
+          default:
+            throw new Error(`Unsupported method: ${mapping.method}`);
+        }
+      } else if (mapping instanceof SubPathScope) {
+
+        const mappingPaths = this.subPathToSwaggerPaths(location, mapping);
+
+        for (const mappingPath in mappingPaths) {
+          if (mappingPaths.hasOwnProperty(mappingPath)) {
+            dest[mappingPath] = mappingPaths[mappingPath];
+          }
+        }
       } else {
-        throw new Error(`Unsupported path element: ${typeof pathElement}`);
+        throw new Error(`Unsupported mapping: ${mapping.constructor.name}`);
       }
     });
-    return path;
+    if (hasMethod) {
+      dest[location] = swaggerPath;
+    }
+    return dest;
   }
 
-  public toSwaggerPaths(pathScopes: PathScope[]): {[path: string]: SwaggerPath} {
+  public toSwaggerPaths(pathScopes: RootPathScope[]): {[path: string]: SwaggerPath} {
+
     const dest: {[path: string]: SwaggerPath} = {};
+
     pathScopes.forEach(pathScope => {
-      const location = this.toPathString(pathScope.path);
+
+      const location = pathScope.getPathAsString();
       const path = new SwaggerPath();
+      let hasMethod = false;
+
       pathScope.mappings.forEach(mapping => {
+
         if (mapping instanceof HttpMethodHandler) {
+
           const operation = this.toSwaggerOperation(mapping);
 
           switch (mapping.method) {
             case HttpMethod.GET:
               path.get = operation;
+              hasMethod = true;
               break;
             case HttpMethod.PUT:
               path.put = operation;
+              hasMethod = true;
               break;
             case HttpMethod.POST:
               path.post = operation;
+              hasMethod = true;
               break;
             case HttpMethod.DELETE:
               path.delete = operation;
+              hasMethod = true;
               break;
             default:
-              throw new Error(`Unsupported methos: ${mapping.method}`);
+              throw new Error(`Unsupported method: ${mapping.method}`);
+          }
+        } else if (mapping instanceof SubPathScope) {
+
+          const mappingPaths = this.subPathToSwaggerPaths(location, mapping);
+
+          for (const mappingPath in mappingPaths) {
+            if (mappingPaths.hasOwnProperty(mappingPath)) {
+              dest[mappingPath] = mappingPaths[mappingPath];
+            }
           }
         } else {
-          throw new Error(`Unsupported mapping: ${typeof mapping}`);
+          throw new Error(`Unsupported mapping: ${mapping.constructor.name}`);
         }
       });
-      dest[location] = path;
+      if (hasMethod) {
+        dest[location] = path;
+      }
     });
     return dest;
   }

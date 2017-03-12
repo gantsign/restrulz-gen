@@ -85,7 +85,13 @@ export interface HttpMethodHandlerJs {
   responseRefs: string[];
 }
 
-export type MappingJs = HttpMethodHandlerJs;
+export interface SubPathScopeJs {
+  kind: 'path';
+  path: PathElementJs[];
+  mappings: MappingJs[];
+}
+
+export type MappingJs = HttpMethodHandlerJs | SubPathScopeJs;
 
 export interface PathScopeJs {
   name: string;

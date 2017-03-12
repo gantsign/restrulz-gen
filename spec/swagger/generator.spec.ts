@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 GantSign Ltd. All Rights Reserved.
+ * Copyright 2016-2017 GantSign Ltd. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,17 @@
 
 import {SchemaProcessor} from '../../src/generator';
 import {SwaggerGenerator, SwaggerFormat} from '../../src/swagger/generator';
-import {Specification} from '../../src/restrulz/model';
+import {
+  ClassType,
+  HttpMethod,
+  HttpMethodHandler,
+  HttpStatus,
+  Response,
+  RootPathScope,
+  Specification,
+  StaticPathElement,
+  SubPathScope
+} from '../../src/restrulz/model';
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
 
@@ -85,4 +95,627 @@ describe('SwaggerGenerator', () => {
       expect(actual).toEqual(expected);
     });
   });
+
+  describe('subPathToSwaggerPaths()', () => {
+
+    it('should support GET', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.GET;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [requestHandler];
+      subPathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope);
+
+      const swaggerPath = swaggerPaths['/test1/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test1/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.get;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "get".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support PUT', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.PUT;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [requestHandler];
+      subPathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope);
+
+      const swaggerPath = swaggerPaths['/test1/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test1/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.put;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "put".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support POST', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.POST;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [requestHandler];
+      subPathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope);
+
+      const swaggerPath = swaggerPaths['/test1/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test1/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.post;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "post".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support DELETE', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.DELETE;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [requestHandler];
+      subPathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope);
+
+      const swaggerPath = swaggerPaths['/test1/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test1/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.delete;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "delete".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should throw error for unsupported HTTP method', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = -1;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [requestHandler];
+      subPathScope.path = [staticPathElement];
+
+      expect(() => swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope))
+          .toThrowError('Unsupported method: -1');
+    });
+
+    it('should support nested sub paths', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement1 = new StaticPathElement();
+      staticPathElement1.value = 'test2';
+
+      const staticPathElement2 = new StaticPathElement();
+      staticPathElement2.value = 'test3';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.DELETE;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const nestedPathScope = new SubPathScope();
+      nestedPathScope.mappings = [requestHandler];
+      nestedPathScope.path = [staticPathElement2];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [nestedPathScope];
+      subPathScope.path = [staticPathElement1];
+
+      const swaggerPaths = swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope);
+
+      const swaggerPath = swaggerPaths['/test1/test2/test3'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test1/test2/test3".');
+        return;
+      }
+
+      const operation = swaggerPath.delete;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "delete".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should throw error for unsupported mapping', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      class UnsupportedTypeTest {}
+      const unsupportedType = new UnsupportedTypeTest();
+
+      const subPathScope = new SubPathScope();
+      subPathScope.mappings = [unsupportedType];
+      subPathScope.path = [staticPathElement];
+
+      expect(() => swaggerGenerator.subPathToSwaggerPaths('/test1', subPathScope))
+          .toThrowError('Unsupported mapping: UnsupportedTypeTest');
+    });
+
+  });
+
+  describe('toSwaggerPaths()', () => {
+
+    it('should support GET', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.GET;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [requestHandler];
+      pathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.toSwaggerPaths([pathScope]);
+
+      const swaggerPath = swaggerPaths['/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.get;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "get".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support PUT', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.PUT;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [requestHandler];
+      pathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.toSwaggerPaths([pathScope]);
+
+      const swaggerPath = swaggerPaths['/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.put;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "put".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support POST', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.POST;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [requestHandler];
+      pathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.toSwaggerPaths([pathScope]);
+
+      const swaggerPath = swaggerPaths['/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.post;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "post".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should support DELETE', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.DELETE;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [requestHandler];
+      pathScope.path = [staticPathElement];
+
+      const swaggerPaths = swaggerGenerator.toSwaggerPaths([pathScope]);
+
+      const swaggerPath = swaggerPaths['/test2'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test2".');
+        return;
+      }
+
+      const operation = swaggerPath.delete;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "delete".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should throw error for unsupported HTTP method', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = -1;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [requestHandler];
+      pathScope.path = [staticPathElement];
+
+      expect(() => swaggerGenerator.toSwaggerPaths([pathScope]))
+          .toThrowError('Unsupported method: -1');
+    });
+
+    it('should support nested sub paths', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement1 = new StaticPathElement();
+      staticPathElement1.value = 'test2';
+
+      const staticPathElement2 = new StaticPathElement();
+      staticPathElement2.value = 'test3';
+
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const response = new Response();
+      response.name = 'get-person-success';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      const requestHandler = new HttpMethodHandler();
+      requestHandler.method = HttpMethod.DELETE;
+      requestHandler.name = 'get-person';
+      requestHandler.parameters = [];
+      requestHandler.responseRefs = [response];
+
+      const nestedPathScope = new SubPathScope();
+      nestedPathScope.mappings = [requestHandler];
+      nestedPathScope.path = [staticPathElement2];
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [nestedPathScope];
+      pathScope.path = [staticPathElement1];
+
+      const swaggerPaths = swaggerGenerator.toSwaggerPaths([pathScope]);
+
+      const swaggerPath = swaggerPaths['/test2/test3'];
+      if (!swaggerPath) {
+        fail('Expected swaggerPaths to contain "/test2/test3".');
+        return;
+      }
+
+      const operation = swaggerPath.delete;
+      if (!operation) {
+        fail('Expected swaggerPath to contain "delete".');
+        return;
+      }
+
+      expect(operation.operationId).toBe('get-person');
+
+      const swaggerResponse = operation.responses['206'];
+      expect(swaggerResponse.description).toBe('get-person-success');
+
+      const schema = swaggerResponse.schema;
+      if (!schema) {
+        fail('Expected swaggerResponse to contain "schema".');
+        return;
+      }
+      expect(schema.$ref).toBe('#/definitions/person')
+    });
+
+    it('should throw error for unsupported mapping', () => {
+      const swaggerGenerator = new SwaggerGenerator();
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test2';
+
+      class UnsupportedTypeTest {}
+      const unsupportedType = new UnsupportedTypeTest();
+
+      const pathScope = new RootPathScope();
+      pathScope.mappings = [unsupportedType];
+      pathScope.path = [staticPathElement];
+
+      expect(() => swaggerGenerator.toSwaggerPaths([pathScope]))
+          .toThrowError('Unsupported mapping: UnsupportedTypeTest');
+    });
+
+  });
+
 });

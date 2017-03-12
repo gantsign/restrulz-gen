@@ -21,9 +21,10 @@ import {
   HttpStatus,
   Mapping,
   PathParameterReference,
-  PathScope,
   Response,
-  Specification
+  RootPathScope,
+  Specification,
+  SubPathScope
 } from '../restrulz/model';
 import {GeneratorContext} from '../generator';
 import {
@@ -45,12 +46,12 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
   }
 
   //noinspection JSMethodCanBeStatic
-  public getControllerApiClassName(pathScope: PathScope): string {
+  public getControllerApiClassName(pathScope: RootPathScope): string {
 
     return `${this.toKotlinClassName(pathScope.name)}Api`;
   }
 
-  public getResponsePackageName(spec: Specification, pathScope: PathScope): string {
+  public getResponsePackageName(spec: Specification, pathScope: RootPathScope): string {
 
     const responsePackageName = kebabToCamel(pathScope.name).toLowerCase();
     return `${this.getControllerApiPackageName(spec)}.${responsePackageName}`;
@@ -63,7 +64,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
   }
 
   public getQualifiedResponseClass(spec: Specification,
-                                   pathScope: PathScope,
+                                   pathScope: RootPathScope,
                                    handler: HttpMethodHandler): string {
 
     const packageName = this.getResponsePackageName(spec, pathScope);
@@ -146,7 +147,8 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addControllerApiHttpMethodHandlerFunction(interfaceKt: InterfaceKt,
                                                    spec: Specification,
-                                                   pathScope: PathScope,
+                                                   path: string,
+                                                   pathScope: RootPathScope,
                                                    handler: HttpMethodHandler) {
 
     const {parameters} = handler;
@@ -156,6 +158,14 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       functionSignature.addAnnotation(
           'org.springframework.web.bind.annotation.RequestMapping',
           annotationKt => {
+
+            if (path !== '/' && path !== '') {
+              annotationKt.addParameter('path', fileKt => {
+
+                const arrayOf = fileKt.tryImport('kotlin.arrayOf');
+                return `${arrayOf}(${this.toKotlinString(path)})`;
+              });
+            }
 
             annotationKt.addParameter('method', fileKt => {
 
@@ -339,7 +349,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFactoryFunctionForArray(companionObjectKt: CompanionObjectKt,
                                     spec: Specification,
-                                    pathScope: PathScope,
+                                    pathScope: RootPathScope,
                                     handler: HttpMethodHandler,
                                     response: Response) {
 
@@ -385,7 +395,7 @@ typedList, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
   public addFactoryFunctionForObject(companionObjectKt: CompanionObjectKt,
                                      spec: Specification,
-                                     pathScope: PathScope,
+                                     pathScope: RootPathScope,
                                      handler: HttpMethodHandler,
                                      response: Response) {
 
@@ -426,7 +436,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
   public addResponseKotlinClass(fileKt: FileKt,
                                 spec: Specification,
-                                pathScope: PathScope,
+                                pathScope: RootPathScope,
                                 handler: HttpMethodHandler) {
 
     fileKt.addClass(this.getResponseClassName(handler), classKt => {
@@ -486,7 +496,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
   }
 
   public toResponseKotlinFile(spec: Specification,
-                              pathScope: PathScope,
+                              pathScope: RootPathScope,
                               handler: HttpMethodHandler): FileKt {
 
     const className = this.getResponseClassName(handler);
@@ -497,7 +507,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
   }
 
   public generateResponseFile(spec: Specification,
-                              pathScope: PathScope,
+                              pathScope: RootPathScope,
                               handler: HttpMethodHandler,
                               context: GeneratorContext): void {
 
@@ -506,15 +516,23 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
   public addControllerApiFunction(interfaceKt: InterfaceKt,
                                   spec: Specification,
-                                  pathScope: PathScope,
+                                  path: string,
+                                  pathScope: RootPathScope,
                                   mapping: Mapping,
                                   context: GeneratorContext) {
 
     if (mapping instanceof HttpMethodHandler) {
 
       this.generateResponseFile(spec, pathScope, mapping, context);
-      this.addControllerApiHttpMethodHandlerFunction(interfaceKt, spec, pathScope, mapping);
+      this.addControllerApiHttpMethodHandlerFunction(interfaceKt, spec, path, pathScope, mapping);
 
+    } else if (mapping instanceof SubPathScope) {
+
+      const newPath = path + mapping.getPathAsString();
+
+      mapping.mappings.forEach(
+          subMapping => this.addControllerApiFunction(
+              interfaceKt, spec, newPath, pathScope, subMapping, context));
     } else {
       throw new Error(`Unsupported Mapping type: ${mapping.constructor.name}`);
     }
@@ -522,27 +540,30 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
   public addControllerApiKotlinInterface(fileKt: FileKt,
                                          spec: Specification,
-                                         pathScope: PathScope,
+                                         pathScope: RootPathScope,
                                          context: GeneratorContext) {
     const {mappings} = pathScope;
+    const path = pathScope.getPathAsString();
 
     fileKt.addInterface(this.getControllerApiClassName(pathScope), interfaceKt => {
 
-      interfaceKt.addAnnotation(
-          'org.springframework.web.bind.annotation.RequestMapping',
-          annotationKt => {
+      if (path !== '/' && path !== '') {
+        interfaceKt.addAnnotation(
+            'org.springframework.web.bind.annotation.RequestMapping',
+            annotationKt => {
 
-            const path = pathScope.getPathAsString();
-            annotationKt.addSimpleParameter('value', this.toKotlinString(path));
-          });
+              annotationKt.addSimpleParameter('value', this.toKotlinString(path));
+            });
+      }
 
       mappings.forEach(
-          mapping => this.addControllerApiFunction(interfaceKt, spec, pathScope, mapping, context));
+          mapping => this.addControllerApiFunction(
+              interfaceKt, spec, '', pathScope, mapping, context));
     });
   }
 
   public toControllerApiKotlinFile(spec: Specification,
-                                   pathScope: PathScope,
+                                   pathScope: RootPathScope,
                                    context: GeneratorContext): FileKt {
 
     const className = this.getControllerApiClassName(pathScope);

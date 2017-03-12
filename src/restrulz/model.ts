@@ -32,7 +32,8 @@ import {
   SimpleTypeJs,
   SpecificationJs,
   StaticPathElementJs,
-  StringTypeJs
+  StringTypeJs,
+  SubPathScopeJs
 } from './schema';
 
 export enum HttpStatus {
@@ -164,8 +165,8 @@ export class HttpMethodHandler implements Mapping {
   responseRefs: Response[];
 }
 
-export class PathScope {
-  name: string;
+export abstract class PathScope {
+  parent: PathScope | null;
   path: PathElement[];
   mappings: Mapping[];
 
@@ -178,6 +179,9 @@ export class PathScope {
     });
     if (param && param instanceof PathParameter) {
       return param;
+    }
+    if (this.parent) {
+      return this.parent.getPathParameter(name);
     }
     throw new Error(`Path parameter not found: ${name}`);
   };
@@ -197,6 +201,12 @@ export class PathScope {
   }
 }
 
+export class RootPathScope extends PathScope {
+  name: string;
+}
+
+export class SubPathScope extends PathScope { }
+
 export class Specification {
   name: string;
 
@@ -212,7 +222,7 @@ export class Specification {
 
   responses: Response[];
 
-  pathScopes: PathScope[];
+  pathScopes: RootPathScope[];
 
   getSimpleType(name: string): SimpleType {
     if (name === 'boolean') {
@@ -265,7 +275,7 @@ export class Specification {
 }
 
 //noinspection UnterminatedStatementJS
-class SpecificationBuilder extends Specification {
+export class SpecificationBuilder extends Specification {
 
   deferredTyping: (() => void)[] = [];
 
@@ -418,21 +428,34 @@ class SpecificationBuilder extends Specification {
     return handler;
   };
 
+  toSubPathScope(subPathScope: SubPathScopeJs): SubPathScope {
+    const {path, mappings} = subPathScope;
+
+    const dest = new SubPathScope();
+    dest.path = path
+        .map(this.toPathElement);
+    dest.mappings = mappings
+        .map(mapping => this.toMapping(mapping, dest));
+    return dest;
+  };
+
   toMapping(mappingJs: MappingJs, pathScope: PathScope): Mapping {
     const {kind} = mappingJs;
 
     switch (mappingJs.kind) {
       case 'http-method':
         return this.toHttpMethodHandler(mappingJs, pathScope);
+      case 'path':
+        return this.toSubPathScope(mappingJs);
       default:
         throw Error(`Unsupported mapping: ${kind}`);
     }
   };
 
-  toPathScope(pathScopeJs: PathScopeJs): PathScope {
+  toPathScope(pathScopeJs: PathScopeJs): RootPathScope {
     const {name, path, mappings} = pathScopeJs;
 
-    const pathScope = new PathScope();
+    const pathScope = new RootPathScope();
     pathScope.name = name;
     pathScope.path = path
         .map(this.toPathElement);

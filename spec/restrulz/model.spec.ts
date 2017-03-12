@@ -20,14 +20,18 @@ import {
   getHttpMethod,
   HttpMethod,
   HttpMethodHandler,
+  HttpStatus,
   IntegerType,
   parseSpecification,
   PathParameter,
   PathParameterReference,
-  PathScope,
+  RootPathScope,
+  SpecificationBuilder,
   StringType,
-  StaticPathElement
+  StaticPathElement,
+  SubPathScope
 } from '../../src/restrulz/model';
+import {HttpMethodHandlerJs, SubPathScopeJs} from '../../src/restrulz/schema';
 
 const spec = parseSpecification('spec/data/schema.json');
 
@@ -154,11 +158,26 @@ describe('restrulz specification', () => {
   describe('pathScope.getPathParameter', () => {
     const [pathScope] = spec.pathScopes;
 
-    it('should return defined path-path', () => {
+    it('should return defined path-param', () => {
       const param = pathScope.getPathParameter('id');
       expect(param).toBeDefined();
       const {name} = param;
       expect(name).toEqual('id');
+    });
+
+    it('should return path-param from parent', () => {
+      const pathParam = new PathParameter();
+      pathParam.name = 'id';
+
+      const rootPathScope = new RootPathScope();
+      rootPathScope.path = [pathParam];
+
+      const subPathScope = new SubPathScope();
+      subPathScope.parent = rootPathScope;
+      subPathScope.path = [];
+
+      const param = subPathScope.getPathParameter('id');
+      expect(param.name).toEqual('id');
     });
 
     it('should throw an error for undefined path param', () => {
@@ -167,10 +186,9 @@ describe('restrulz specification', () => {
   });
 
   describe('pathScope.getPathAsString', () => {
-    const [pathScope] = spec.pathScopes;
 
     it('should support static path element', () => {
-      const staticPathScope = new PathScope();
+      const staticPathScope = new RootPathScope();
       const staticPathElement = new StaticPathElement();
       staticPathElement.value = 'test1';
       staticPathScope.path = [staticPathElement];
@@ -179,7 +197,7 @@ describe('restrulz specification', () => {
     });
 
     it('should support path parameters', () => {
-      const paramPathScope = new PathScope();
+      const paramPathScope = new RootPathScope();
       const pathParameter = new PathParameter();
       pathParameter.name = 'test2';
       paramPathScope.path = [pathParameter];
@@ -189,7 +207,7 @@ describe('restrulz specification', () => {
 
     it('should throw error for unsupported parameter type', () => {
       class UnsupportedTypeTest {}
-      const paramPathScope = new PathScope();
+      const paramPathScope = new RootPathScope();
       const pathParameter = new UnsupportedTypeTest();
       paramPathScope.path = [<StaticPathElement>pathParameter];
 
@@ -198,7 +216,7 @@ describe('restrulz specification', () => {
     });
 
     it('should support multiple parameters', () => {
-      const multiplePathScope = new PathScope();
+      const multiplePathScope = new RootPathScope();
       const staticPathElement = new StaticPathElement();
       staticPathElement.value = 'test1';
       const pathParameter = new PathParameter();
@@ -555,4 +573,173 @@ describe('restrulz specification', () => {
       });
     });
   });
+
+  describe('SpecificationBuilder.toSubPathScope()', () => {
+
+    it('should support http-method', () => {
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const builder = new SpecificationBuilder();
+      builder.responses = [{
+        name: 'get-person-success',
+        status: HttpStatus.PARTIAL_CONTENT,
+        bodyTypeRef: classType,
+        isArray: false
+      }];
+
+      const subPathScope = builder.toSubPathScope({
+        kind: 'path',
+        path: [{
+          kind: 'static',
+          value: 'test1'
+        }],
+        mappings: [{
+          kind: 'http-method',
+          method: 'GET',
+          name: 'get-person',
+          parameters: [],
+          responseRefs: ['get-person-success']
+        }]
+      });
+
+      expect(subPathScope.path.length).toBe(1);
+
+      const staticPathElement = subPathScope.path[0];
+      if (!(staticPathElement instanceof StaticPathElement)) {
+        fail(`Expected StaticPathElement but was ${staticPathElement.constructor.name}`);
+        return;
+      }
+
+      expect(staticPathElement.value).toBe('test1');
+
+      expect(subPathScope.mappings.length).toBe(1);
+
+      const handler = subPathScope.mappings[0];
+      if (!(handler instanceof HttpMethodHandler)) {
+        fail(`Expected HttpMethodHandler but was ${handler.constructor.name}`);
+        return;
+      }
+
+      expect(handler.name).toBe('get-person');
+      expect(handler.method).toBe(HttpMethod.GET);
+
+      expect(handler.responseRefs.length).toBe(1);
+
+      const responseRef = handler.responseRefs[0];
+      expect(responseRef.name).toBe('get-person-success');
+    });
+  });
+
+  describe('SpecificationBuilder.toMapping()', () => {
+
+    it('should support http-method', () => {
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const builder = new SpecificationBuilder();
+      builder.responses = [{
+        name: 'get-person-success',
+        status: HttpStatus.PARTIAL_CONTENT,
+        bodyTypeRef: classType,
+        isArray: false
+      }];
+
+      const handlerJs = <HttpMethodHandlerJs>{
+        kind: 'http-method',
+        method: 'GET',
+        name: 'get-person',
+        parameters: [],
+        responseRefs: ['get-person-success']
+      };
+
+      const pathElement = new StaticPathElement();
+      pathElement.value = 'test1';
+
+      const rootPathScope = new RootPathScope();
+      rootPathScope.path = [pathElement];
+
+      const handler = builder.toMapping(handlerJs, rootPathScope);
+      if (!(handler instanceof HttpMethodHandler)) {
+        fail(`Expected HttpMethodHandler but was ${handler.constructor.name}`);
+        return;
+      }
+
+      expect(handler.name).toBe('get-person');
+      expect(handler.method).toBe(HttpMethod.GET);
+
+      expect(handler.responseRefs.length).toBe(1);
+
+      const responseRef = handler.responseRefs[0];
+      expect(responseRef.name).toBe('get-person-success');
+    });
+
+    it('should support sub path scope', () => {
+      const classType = new ClassType();
+      classType.name = 'person';
+
+      const builder = new SpecificationBuilder();
+      builder.responses = [{
+        name: 'get-person-success',
+        status: HttpStatus.PARTIAL_CONTENT,
+        bodyTypeRef: classType,
+        isArray: false
+      }];
+
+      const handlerJs = <HttpMethodHandlerJs>{
+        kind: 'http-method',
+        method: 'GET',
+        name: 'get-person',
+        parameters: [],
+        responseRefs: ['get-person-success']
+      };
+
+      const subPathScopeJs = <SubPathScopeJs>{
+        kind: 'path',
+        path: [{
+          kind: 'static',
+          value: 'test2'
+        }],
+        mappings: [handlerJs]
+      };
+
+      const pathElement = new StaticPathElement();
+      pathElement.value = 'test1';
+
+      const rootPathScope = new RootPathScope();
+      rootPathScope.path = [pathElement];
+
+      const subPathScope = builder.toMapping(subPathScopeJs, rootPathScope);
+      if (!(subPathScope instanceof SubPathScope)) {
+        fail(`Expected SubPathScope but was ${subPathScope.constructor.name}`);
+        return;
+      }
+
+      expect(subPathScope.path.length).toBe(1);
+      const subPathElement = subPathScope.path[0];
+      if (!(subPathElement instanceof StaticPathElement)) {
+        fail(`Expected SubPathScope but was ${subPathElement.constructor.name}`);
+        return;
+      }
+      expect(subPathElement.value).toBe('test2');
+
+      expect(subPathScope.mappings.length).toBe(1);
+
+      const handler = subPathScope.mappings[0];
+      if (!(handler instanceof HttpMethodHandler)) {
+        fail(`Expected HttpMethodHandler but was ${handler.constructor.name}`);
+        return;
+      }
+
+      expect(handler.name).toBe('get-person');
+      expect(handler.method).toBe(HttpMethod.GET);
+
+      expect(handler.responseRefs.length).toBe(1);
+
+      const responseRef = handler.responseRefs[0];
+      expect(responseRef.name).toBe('get-person-success');
+    });
+
+  });
+
 });
