@@ -82,7 +82,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
     const kotlinType = fileKt.tryImport(this.toKotlinType(spec, type));
     if (isArray) {
       const list = fileKt.tryImport('kotlin.collections.List');
-      result += `${list}<${kotlinType}>`;
+      result += `${list}<${kotlinType}>?`;
     } else {
       result += kotlinType;
     }
@@ -379,7 +379,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
     const propertyName = kebabToCamel(name);
     const indent = this.indent;
 
-    bodyKt.writeIf(() => `!fieldNamesPresent.get(${propertyName}Index`, ifBodyKt => {
+    bodyKt.writeIf(() => `!fieldNamesPresent.get(${propertyName}Index)`, ifBodyKt => {
 
       if (allowNull || allowEmpty) {
 
@@ -405,15 +405,18 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
     const className = this.getQualifiedModelClass(spec, classType);
     const shortClassName = fileKt.tryImport(className);
     const indent = this.indent;
+    const listOf = fileKt.tryImport('kotlin.collections.listOf');
 
     let result = `return ${shortClassName}(\n`;
     result += indent(indent(properties
         .map(prop => {
-          const {name, type, allowNull} = prop;
+          const {name, type, allowNull, isArray} = prop;
           const propertyName = kebabToCamel(name);
 
           let propString = `${propertyName} = ${propertyName}Value`;
-          if (!((type instanceof StringType) || allowNull)) {
+          if (isArray) {
+            propString += ` ?: ${listOf}()`;
+          } else if (!((type instanceof StringType) || allowNull)) {
             propString += '!!'
           }
           return propString;

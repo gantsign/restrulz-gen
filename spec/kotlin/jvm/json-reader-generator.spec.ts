@@ -163,7 +163,7 @@ describe('KotlinJsonReaderGenerator', () => {
       property.isArray = true;
 
       expect(generator.getStringForPropertiesWithDefaultValues(spec, fileKt, property))
-          .toBe('var addressLine1Value: List\<String> = listOf()\n');
+          .toBe('var addressLine1Value: List\<String>? = listOf()\n');
     });
 
     it('should support simple boolean', () => {
@@ -182,7 +182,7 @@ describe('KotlinJsonReaderGenerator', () => {
       property.isArray = true;
 
       expect(generator.getStringForPropertiesWithDefaultValues(spec, fileKt, property))
-          .toBe('var deliverySlotAvailableValue: List\<Boolean> = listOf()\n');
+          .toBe('var deliverySlotAvailableValue: List\<Boolean>? = listOf()\n');
     });
   });
 
@@ -818,7 +818,7 @@ when (fieldName) {
 
       expect(serializer.serializeBody(fileKt, bodyKt))
           .toBe(`\
-if (!fieldNamesPresent.get(addressLine1Index) {
+if (!fieldNamesPresent.get(addressLine1Index)) {
     parser.handleValidationFailure("Expected field name: address-line1")
 }
 `);
@@ -838,7 +838,7 @@ if (!fieldNamesPresent.get(addressLine1Index) {
 
       expect(serializer.serializeBody(fileKt, bodyKt))
           .toBe(`\
-if (!fieldNamesPresent.get(addressLine1Index) {
+if (!fieldNamesPresent.get(addressLine1Index)) {
     if (log.isTraceEnabled) {
         val location = parser.tokenLocation
         log.trace("[{}:{}] Missing field: address-line1",
@@ -862,7 +862,7 @@ if (!fieldNamesPresent.get(addressLine1Index) {
 
       expect(serializer.serializeBody(fileKt, bodyKt))
           .toBe(`\
-if (!fieldNamesPresent.get(zipCodeIndex) {
+if (!fieldNamesPresent.get(zipCodeIndex)) {
     if (log.isTraceEnabled) {
         val location = parser.tokenLocation
         log.trace("[{}:{}] Missing field: zip-code",
@@ -927,6 +927,25 @@ return DeliveryAddress(
           .toBe(`\
 return DeliveryAddress(
         zipCodeExtra = zipCodeExtraValue)
+`);
+    });
+
+    it('should support string arrays', () => {
+      const fileKt = new FileKt('com.example.package', 'AddressReader');
+
+      const property1 = new Property();
+      property1.name = 'address-lines';
+      property1.type = new StringType();
+      property1.isArray = true;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+      classType.properties = [property1];
+
+      expect(generator.getStringForNewInstance(spec, fileKt, classType))
+          .toBe(`\
+return DeliveryAddress(
+        addressLines = addressLinesValue ?: listOf())
 `);
     });
 
@@ -1176,10 +1195,10 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                 }
             }
         }
-        if (!fieldNamesPresent.get(addressLine1Index) {
+        if (!fieldNamesPresent.get(addressLine1Index)) {
             parser.handleValidationFailure("Expected field name: address-line1")
         }
-        if (!fieldNamesPresent.get(addressLine2Index) {
+        if (!fieldNamesPresent.get(addressLine2Index)) {
             parser.handleValidationFailure("Expected field name: address-line2")
         }
 
@@ -1389,10 +1408,10 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                 }
             }
         }
-        if (!fieldNamesPresent.get(addressLine1Index) {
+        if (!fieldNamesPresent.get(addressLine1Index)) {
             parser.handleValidationFailure("Expected field name: address-line1")
         }
-        if (!fieldNamesPresent.get(addressLine2Index) {
+        if (!fieldNamesPresent.get(addressLine2Index)) {
             parser.handleValidationFailure("Expected field name: address-line2")
         }
 
@@ -1636,10 +1655,10 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
                 }
             }
         }
-        if (!fieldNamesPresent.get(addressLine1Index) {
+        if (!fieldNamesPresent.get(addressLine1Index)) {
             parser.handleValidationFailure("Expected field name: address-line1")
         }
-        if (!fieldNamesPresent.get(addressLine2Index) {
+        if (!fieldNamesPresent.get(addressLine2Index)) {
             parser.handleValidationFailure("Expected field name: address-line2")
         }
 
@@ -1738,7 +1757,7 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
                 }
             }
         }
-        if (!fieldNamesPresent.get(addressLine1Index) {
+        if (!fieldNamesPresent.get(addressLine1Index)) {
             parser.handleValidationFailure("Expected field name: address-line1")
         }
 
@@ -1924,7 +1943,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
                 }
             }
         }
-        if (!fieldNamesPresent.get(addressLine1Index) {
+        if (!fieldNamesPresent.get(addressLine1Index)) {
             parser.handleValidationFailure("Expected field name: address-line1")
         }
 
