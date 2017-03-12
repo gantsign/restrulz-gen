@@ -11,30 +11,30 @@ A code/documentation generator for REST services defined using the
 # Goals
 
 * Generate Swagger specifications
-* Generate client&server API code
+* Generate client & server API code
 * Extendable using object-oriented and functional programming techniques
 * Separation of concerns
-    * e.g. object models, parsing&serialization, API generation should all have
-      separate generators and you should be able to mix and match
+    * e.g. object models, parsing & serialization, API generation should all
+      have separate generators and you should be able to mix and match
       implementations
 * Polyglot output
     * e.g. you may want to use Kotlin data classes for defining your object
       model but Java interfaces for your controller API
-* Low level code generation for parsing&serialization
-    * This will be more performant and allow parsing&serialization to be
+* Low level code generation for parsing & serialization
+    * This will be more performant and allow parsing & serialization to be
       debugged more easily and code coverage reports to be generated
 * Easily integrated into builds for non JVM languages
 * Integrated parsing & schema validation for more helpful schema validation
   messages (e.g. they can report where in the input the error occurred)
 * Null safety
-    * omitted strings are converted to empty strings during parsing&serialization
-    * omitted arrays are converted to empty arrays during parsing&serialization
+    * omitted strings are converted to empty strings during parsing
+    * omitted arrays are converted to empty arrays during parsing
 * Blank string safety
-    * blank strings are converted to empty strings during parsing&serialization
+    * blank strings are converted to empty strings during parsing
 * Generated parsing code will terminate if input exceeds the range specified in
-  the specification, to protect against DDOS attacks
+  the specification, to protect against DOS attacks
 * Support for wrapping simple types as objects for static typing
-* Support for mutible&immutable models
+* Support for mutible & immutable models
 * Support for passing through unknown properties
     * For forwards compatibility it can sometimes be useful to pass through
       JSON properties that were unknown at build time
@@ -68,23 +68,13 @@ A code/documentation generator for REST services defined using the
 * NPM provides an easy way of distributing and installing custom generators
 * Node+NPM are easier to integrate into another build systems than Java+Maven
 
-# Progress
-
-- [x] Generator API
-- [x] Restrulz schema parsing (this project consumes the schema once the xtext
-      Maven plugin has been used to transform the Restrulz DSL into Restrulz
-      JSON)
-- [x] Swagger specification generator
-- [ ] Model generator
-- [ ] Parser & schema validator generator
-- [ ] Serializer generator
-- [ ] Controller API generator
-- [ ] Client API generator
-
 # Related projects
 
 * [Restrulz](https://github.com/gantsign/restrulz) the language grammar, DSL
   parser and IDE plugins
+
+* [Restrulz JVM](https://github.com/gantsign/restrulz-jvm) JVM libraries
+  required by code generated for the JVM
 
 * [Restrulz Demo](https://github.com/gantsign/restrulz-demo) see Restrulz and
   Restrulz generator in action
