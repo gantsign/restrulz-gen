@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/// <reference path="../../typings/globals/jasmine/index.d.ts" />
+/// <reference path="../../../typings/globals/jasmine/index.d.ts" />
 import {
   ClassType,
   IntegerType,
@@ -21,7 +21,7 @@ import {
   Specification,
   StringType,
   BooleanType
-} from '../../src/restrulz/model';
+} from '../../../src/restrulz/model';
 import {
   FileKt,
   FunctionKt,
@@ -29,10 +29,10 @@ import {
   ObjectKt,
   ExtendsKt,
   ImplementsKt
-} from '../../src/kotlin/lang';
-import {GeneratorContext} from '../../src/generator';
-import {KotlinJsonWriterGenerator} from '../../src/kotlin/json-writer-generator';
-import {KotlinSerializer} from '../../src/kotlin/serializer';
+} from '../../../src/kotlin/lang';
+import {GeneratorContext} from '../../../src/generator';
+import {KotlinJsonWriterGenerator} from '../../../src/kotlin/jvm/json-writer-generator';
+import {KotlinSerializer} from '../../../src/kotlin/serializer';
 
 describe('KotlinJsonWriterGenerator', () => {
 

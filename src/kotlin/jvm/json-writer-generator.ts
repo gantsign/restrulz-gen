@@ -20,11 +20,11 @@ import {
   Property,
   Specification,
   StringType
-} from '../restrulz/model';
-import {GeneratorContext} from '../generator';
-import {FileKt} from './lang';
-import {KotlinGenerator} from './generator';
-import {kebabToCamel} from '../util/kebab';
+} from '../../restrulz/model';
+import {GeneratorContext} from '../../generator';
+import {FileKt} from '../lang';
+import {KotlinGenerator} from '../generator';
+import {kebabToCamel} from '../../util/kebab';
 
 export class KotlinJsonWriterGenerator extends KotlinGenerator {
 

@@ -20,17 +20,17 @@ import {
   Property,
   Specification,
   StringType
-} from '../restrulz/model';
-import {Generator, GeneratorContext} from '../generator';
+} from '../../restrulz/model';
+import {Generator, GeneratorContext} from '../../generator';
 import {
   BodyKt,
   FileKt,
   ObjectKt,
   VisibilityKt,
   WhenKt
-} from './lang';
-import {KotlinGenerator} from './generator';
-import {kebabToCamel} from '../util/kebab';
+} from '../lang';
+import {KotlinGenerator} from '../generator';
+import {kebabToCamel} from '../../util/kebab';
 
 export class KotlinJsonReaderGenerator extends KotlinGenerator {
 

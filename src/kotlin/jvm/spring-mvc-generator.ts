@@ -25,17 +25,17 @@ import {
   RootPathScope,
   Specification,
   SubPathScope
-} from '../restrulz/model';
-import {GeneratorContext} from '../generator';
+} from '../../restrulz/model';
+import {GeneratorContext} from '../../generator';
 import {
   CompanionObjectKt,
   FileKt,
   FunctionSignatureKt,
   InterfaceKt,
   VisibilityKt
-} from './lang';
-import {KotlinGenerator} from './generator';
-import {kebabToCamel} from '../util/kebab';
+} from '../lang';
+import {KotlinGenerator} from '../generator';
+import {kebabToCamel} from '../../util/kebab';
 
 export class KotlinSpringMvcGenerator extends KotlinGenerator {
 

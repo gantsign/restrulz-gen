@@ -21,12 +21,12 @@ import {
   SimpleType,
   Specification,
   StringType
-} from '../restrulz/model';
-import {Generator, GeneratorContext} from '../generator';
-import {FileKt} from './lang';
-import {KotlinGenerator} from './generator';
-import {KotlinModelGenerator} from './model-generator';
-import {kebabToCamel} from '../util/kebab';
+} from '../../restrulz/model';
+import {Generator, GeneratorContext} from '../../generator';
+import {FileKt} from '../lang';
+import {KotlinGenerator} from '../generator';
+import {KotlinModelGenerator} from '../model-generator';
+import {kebabToCamel} from '../../util/kebab';
 import {KotlinJsonReaderGenerator} from './json-reader-generator';
 
 export class KotlinValidatorGenerator extends KotlinGenerator {

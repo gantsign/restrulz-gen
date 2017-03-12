@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/// <reference path="../../typings/globals/jasmine/index.d.ts" />
+/// <reference path="../../../typings/globals/jasmine/index.d.ts" />
 import {
   BodyParameterReference,
   ClassType,
@@ -29,7 +29,7 @@ import {
   StaticPathElement,
   StringType,
   SubPathScope
-} from '../../src/restrulz/model';
+} from '../../../src/restrulz/model';
 import {
   AnnotationParameterKt,
   ClassKt,
@@ -42,10 +42,10 @@ import {
   InterfaceKt,
   PrimaryConstructorKt,
   VisibilityKt
-} from '../../src/kotlin/lang';
-import {GeneratorContext} from '../../src/generator';
-import {KotlinSerializer} from '../../src/kotlin/serializer';
-import {KotlinSpringMvcGenerator} from '../../src/kotlin/spring-mvc-generator';
+} from '../../../src/kotlin/lang';
+import {GeneratorContext} from '../../../src/generator';
+import {KotlinSerializer} from '../../../src/kotlin/serializer';
+import {KotlinSpringMvcGenerator} from '../../../src/kotlin/jvm/spring-mvc-generator';
 
 describe('KotlinSpringMvcGenerator', () => {
 

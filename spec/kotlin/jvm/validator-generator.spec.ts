@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/// <reference path="../../typings/globals/jasmine/index.d.ts" />
+/// <reference path="../../../typings/globals/jasmine/index.d.ts" />
 
 import {
   BooleanType,
@@ -22,12 +22,12 @@ import {
   Property,
   Specification,
   StringType
-} from '../../src/restrulz/model';
-import {ExtendsKt, FileKt, ObjectKt} from '../../src/kotlin/lang';
-import {GeneratorContext} from '../../src/generator';
-import {KotlinValidatorGenerator} from '../../src/kotlin/validator-generator';
-import {KotlinModelGenerator} from '../../src/kotlin/model-generator';
-import {KotlinJsonReaderGenerator} from '../../src/kotlin/json-reader-generator';
+} from '../../../src/restrulz/model';
+import {ExtendsKt, FileKt, ObjectKt} from '../../../src/kotlin/lang';
+import {GeneratorContext} from '../../../src/generator';
+import {KotlinValidatorGenerator} from '../../../src/kotlin/jvm/validator-generator';
+import {KotlinModelGenerator} from '../../../src/kotlin/model-generator';
+import {KotlinJsonReaderGenerator} from '../../../src/kotlin/jvm/json-reader-generator';
 
 describe('KotlinValidatorGenerator', () => {
 
