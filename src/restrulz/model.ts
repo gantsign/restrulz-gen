@@ -264,176 +264,176 @@ class SpecificationBuilder extends Specification {
   deferredTyping: (() => void)[] = [];
 
   //noinspection JSMethodCanBeStatic
-  toStringType(stringType: StringTypeJs): StringType {
-    const {name, pattern, minLength, maxLength} = stringType;
+  toStringType(stringTypeJs: StringTypeJs): StringType {
+    const {name, pattern, minLength, maxLength} = stringTypeJs;
 
-    const dest = new StringType();
-    dest.name = name;
-    dest.pattern = pattern;
-    dest.minLength = minLength;
-    dest.maxLength = maxLength;
-    return dest;
+    const stringType = new StringType();
+    stringType.name = name;
+    stringType.pattern = pattern;
+    stringType.minLength = minLength;
+    stringType.maxLength = maxLength;
+    return stringType;
   }
 
   //noinspection JSMethodCanBeStatic
-  toIntegerType(integerType: IntegerTypeJs): IntegerType {
-    const {name, minimum, maximum} = integerType;
+  toIntegerType(integerTypeJs: IntegerTypeJs): IntegerType {
+    const {name, minimum, maximum} = integerTypeJs;
 
-    const dest = new IntegerType();
-    dest.name = name;
-    dest.minimum = minimum;
-    dest.maximum = maximum;
-    return dest;
+    const integerType = new IntegerType();
+    integerType.name = name;
+    integerType.minimum = minimum;
+    integerType.maximum = maximum;
+    return integerType;
   }
 
-  toSimpleType(simpleType: SimpleTypeJs): SimpleType {
-    const {kind} = simpleType;
+  toSimpleType(simpleTypeJs: SimpleTypeJs): SimpleType {
+    const {kind} = simpleTypeJs;
 
     switch (kind) {
       case 'string':
-        return this.toStringType(simpleType as StringTypeJs);
+        return this.toStringType(simpleTypeJs as StringTypeJs);
       case 'integer':
-        return this.toIntegerType(simpleType as IntegerTypeJs);
+        return this.toIntegerType(simpleTypeJs as IntegerTypeJs);
       default:
         throw Error(`Unexpected simpleType: ${kind}`);
     }
   };
 
-  toProperty(property: PropertyJs): Property {
-    const {name, typeRef, allowEmpty, allowNull, array} = property;
+  toProperty(propertyJs: PropertyJs): Property {
+    const {name, typeRef, allowEmpty, allowNull, array} = propertyJs;
 
-    const dest = new Property();
-    dest.name = name;
+    const property = new Property();
+    property.name = name;
     this.deferredTyping.push(() => {
-      dest.type = this.getType(typeRef);
+      property.type = this.getType(typeRef);
     });
-    dest.allowEmpty = allowEmpty === true;
-    dest.allowNull = allowNull === true;
-    dest.isArray = array === true;
-    return dest;
+    property.allowEmpty = allowEmpty === true;
+    property.allowNull = allowNull === true;
+    property.isArray = array === true;
+    return property;
   };
 
-  toClassType(classType: ClassTypeJs): ClassType {
-    const {name, properties} = classType;
+  toClassType(classTypeJs: ClassTypeJs): ClassType {
+    const {name, properties} = classTypeJs;
 
-    const dest = new ClassType();
-    dest.name = name;
-    dest.properties = properties.map(this.toProperty);
-    return dest;
+    const classType = new ClassType();
+    classType.name = name;
+    classType.properties = properties.map(this.toProperty);
+    return classType;
   };
 
-  toResponse(response: ResponseJs): Response {
-    const {name, status, bodyTypeRef, array} = response;
+  toResponse(responseJs: ResponseJs): Response {
+    const {name, status, bodyTypeRef, array} = responseJs;
 
-    const dest = new Response();
-    dest.name = name;
-    dest.status = status;
-    dest.bodyTypeRef = this.getClassType(bodyTypeRef);
-    dest.isArray = array;
-    return dest;
+    const response = new Response();
+    response.name = name;
+    response.status = status;
+    response.bodyTypeRef = this.getClassType(bodyTypeRef);
+    response.isArray = array;
+    return response;
   };
 
   //noinspection JSMethodCanBeStatic
-  toStaticPathElement(pathElement: StaticPathElementJs): StaticPathElement {
-    const {value} = pathElement;
+  toStaticPathElement(pathElementJs: StaticPathElementJs): StaticPathElement {
+    const {value} = pathElementJs;
 
-    const dest = new StaticPathElement();
-    dest.value = value;
-    return dest;
+    const pathElement = new StaticPathElement();
+    pathElement.value = value;
+    return pathElement;
   }
 
-  toPathParameter(pathParam: PathParamJs): PathParameter {
-    const {name, typeRef} = pathParam;
+  toPathParameter(pathParamJs: PathParamJs): PathParameter {
+    const {name, typeRef} = pathParamJs;
 
-    const dest = new PathParameter();
-    dest.name = name;
-    dest.typeRef = this.getSimpleType(typeRef);
-    return dest;
+    const pathParameter = new PathParameter();
+    pathParameter.name = name;
+    pathParameter.typeRef = this.getSimpleType(typeRef);
+    return pathParameter;
   };
 
-  toPathElement(pathElement: PathElementJs): PathElement {
-    const {kind} = pathElement;
+  toPathElement(pathElementJs: PathElementJs): PathElement {
+    const {kind} = pathElementJs;
 
-    switch (pathElement.kind) {
+    switch (pathElementJs.kind) {
       case 'static':
-        return this.toStaticPathElement(pathElement);
+        return this.toStaticPathElement(pathElementJs);
       case 'path-param':
-        return this.toPathParameter(pathElement);
+        return this.toPathParameter(pathElementJs);
       default:
         throw new Error(`Unsupported path element type: ${kind}`);
     }
   };
 
   //noinspection JSMethodCanBeStatic
-  toPathParameterReference(pathParamRef: PathParamRefJs,
+  toPathParameterReference(pathParamRefJs: PathParamRefJs,
                            pathScope: PathScope): PathParameterReference {
 
-    const {name, valueRef} = pathParamRef;
+    const {name, valueRef} = pathParamRefJs;
 
-    const dest = new PathParameterReference();
-    dest.name = name;
-    dest.value = pathScope.getPathParameter(valueRef);
-    return dest;
+    const pathParameterReference = new PathParameterReference();
+    pathParameterReference.name = name;
+    pathParameterReference.value = pathScope.getPathParameter(valueRef);
+    return pathParameterReference;
   }
 
-  toBodyParameterReference(bodyParamRef: BodyParamRefJs): BodyParameterReference {
-    const {name, typeRef} = bodyParamRef;
+  toBodyParameterReference(bodyParamRefJs: BodyParamRefJs): BodyParameterReference {
+    const {name, typeRef} = bodyParamRefJs;
 
-    const dest = new BodyParameterReference();
-    dest.name = name;
-    dest.typeRef = this.getClassType(typeRef);
-    return dest;
+    const bodyParameterReference = new BodyParameterReference();
+    bodyParameterReference.name = name;
+    bodyParameterReference.typeRef = this.getClassType(typeRef);
+    return bodyParameterReference;
   };
 
-  toParameter(parameter: ParamRefJs, pathScope: PathScope): HandlerParameter {
-    const {kind} = parameter;
+  toParameter(paramRefJs: ParamRefJs, pathScope: PathScope): HandlerParameter {
+    const {kind} = paramRefJs;
 
-    switch (parameter.kind) {
+    switch (paramRefJs.kind) {
       case 'path-param-ref':
-        return this.toPathParameterReference(parameter, pathScope);
+        return this.toPathParameterReference(paramRefJs, pathScope);
       case 'body-param-ref':
-        return this.toBodyParameterReference(parameter);
+        return this.toBodyParameterReference(paramRefJs);
       default:
         throw new Error(`Unsupported parameter type: ${kind}`);
     }
   };
 
-  toHttpMethodHandler(httpMethodHandler: HttpMethodHandlerJs,
+  toHttpMethodHandler(httpMethodHandlerJs: HttpMethodHandlerJs,
                       pathScope: PathScope): HttpMethodHandler {
 
-    const {name, method, parameters, responseRefs} = httpMethodHandler;
+    const {name, method, parameters, responseRefs} = httpMethodHandlerJs;
 
-    const dest = new HttpMethodHandler();
-    dest.name = name;
-    dest.method = getHttpMethod(method);
-    dest.parameters = parameters
+    const handler = new HttpMethodHandler();
+    handler.name = name;
+    handler.method = getHttpMethod(method);
+    handler.parameters = parameters
         .map(parameter => this.toParameter(parameter, pathScope));
-    dest.responseRefs = responseRefs
+    handler.responseRefs = responseRefs
         .map(responseRef => this.getResponse(responseRef));
-    return dest;
+    return handler;
   };
 
-  toMapping(mapping: MappingJs, pathScope: PathScope): Mapping {
-    const {kind} = mapping;
+  toMapping(mappingJs: MappingJs, pathScope: PathScope): Mapping {
+    const {kind} = mappingJs;
 
-    switch (mapping.kind) {
+    switch (mappingJs.kind) {
       case 'http-method':
-        return this.toHttpMethodHandler(mapping, pathScope);
+        return this.toHttpMethodHandler(mappingJs, pathScope);
       default:
         throw Error(`Unsupported mapping: ${kind}`);
     }
   };
 
-  toPathScope(pathScope: PathScopeJs): PathScope {
-    const {name, path, mappings} = pathScope;
+  toPathScope(pathScopeJs: PathScopeJs): PathScope {
+    const {name, path, mappings} = pathScopeJs;
 
-    const dest = new PathScope();
-    dest.name = name;
-    dest.path = path
+    const pathScope = new PathScope();
+    pathScope.name = name;
+    pathScope.path = path
         .map(this.toPathElement);
-    dest.mappings = mappings
-        .map(mapping => this.toMapping(mapping, dest));
-    return dest;
+    pathScope.mappings = mappings
+        .map(mapping => this.toMapping(mapping, pathScope));
+    return pathScope;
   };
 
   toSpecification(): Specification {
@@ -453,10 +453,10 @@ class SpecificationBuilder extends Specification {
     return spec;
   };
 
-  buildSpecification(schema: SpecificationJs): Specification {
+  buildSpecification(specificationJs: SpecificationJs): Specification {
     const {
         name, title, description, version, simpleTypes, classTypes, responses, pathScopes
-    } = schema;
+    } = specificationJs;
 
     this.name = name;
     this.title = title;
@@ -499,6 +499,6 @@ class SpecificationBuilder extends Specification {
 
 export function parseSpecification(filePath: string): Specification {
   const json = fs.readFileSync(filePath, 'utf8');
-  const jsonSchema: SpecificationJs = JSON.parse(json, kebabToCamelReviver);
-  return new SpecificationBuilder().buildSpecification(jsonSchema);
+  const specificationJs: SpecificationJs = JSON.parse(json, kebabToCamelReviver);
+  return new SpecificationBuilder().buildSpecification(specificationJs);
 }
