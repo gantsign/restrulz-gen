@@ -48,7 +48,7 @@ describe('SwaggerGenerator', () => {
 
     class FixedNameSwaggerGenerator extends SwaggerGenerator {
       //noinspection JSMethodCanBeStatic
-      protected getSwaggerOutputPath(spec: Specification): string {
+      getSwaggerOutputPath(spec: Specification): string {
         return 'people.swagger2.yml';
       }
     }

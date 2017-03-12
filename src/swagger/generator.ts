@@ -54,7 +54,7 @@ export class SwaggerGenerator implements Generator {
   format = SwaggerFormat.YAML;
 
   //noinspection JSUnusedLocalSymbols,JSMethodCanBeStatic
-  protected toSwaggerInfo(spec: Specification): SwaggerInfo {
+  public toSwaggerInfo(spec: Specification): SwaggerInfo {
     const {name, title, description, version} = spec;
     const dest = new SwaggerInfo();
 
@@ -67,13 +67,13 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected toSwaggerSchema(classType: ClassType): SwaggerSchema {
+  public toSwaggerSchema(classType: ClassType): SwaggerSchema {
     const dest = new SwaggerSchema();
     dest.$ref = `#/definitions/${classType.name}`;
     return dest;
   }
 
-  protected toSwaggerParameter(handlerParam: HandlerParameter): SwaggerParameter {
+  public toSwaggerParameter(handlerParam: HandlerParameter): SwaggerParameter {
     if (handlerParam instanceof PathParameterReference) {
       const {name, value: param} = handlerParam;
       const dest = new SwaggerPathParameter();
@@ -116,7 +116,7 @@ export class SwaggerGenerator implements Generator {
     }
   }
 
-  protected toSwaggerResponse(response: Response): SwaggerResponse {
+  public toSwaggerResponse(response: Response): SwaggerResponse {
     const dest = new SwaggerResponse();
     dest.description = response.name;
     if (response.isArray) {
@@ -131,7 +131,7 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
-  protected toSwaggerResponses(responses: Response[]): {[statusCode: string]: SwaggerResponse} {
+  public toSwaggerResponses(responses: Response[]): {[statusCode: string]: SwaggerResponse} {
     const dest: {[statusCode: string]: SwaggerResponse} = {};
     responses.forEach((response) => {
       dest[response.status] = this.toSwaggerResponse(response);
@@ -139,7 +139,7 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
-  protected toSwaggerOperation(handler: HttpMethodHandler): SwaggerOperation {
+  public toSwaggerOperation(handler: HttpMethodHandler): SwaggerOperation {
     const dest = new SwaggerOperation();
     dest.operationId = handler.name;
     dest.parameters = handler.parameters.map(this.toSwaggerParameter);
@@ -147,7 +147,7 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
-  protected toPathString(pathElements: PathElement[]): string {
+  public toPathString(pathElements: PathElement[]): string {
     let path = '';
     pathElements.forEach((pathElement) => {
       if (pathElement instanceof StaticPathElement) {
@@ -161,7 +161,7 @@ export class SwaggerGenerator implements Generator {
     return path;
   }
 
-  protected toSwaggerPaths(pathScopes: PathScope[]): {[path: string]: SwaggerPath} {
+  public toSwaggerPaths(pathScopes: PathScope[]): {[path: string]: SwaggerPath} {
     const dest: {[path: string]: SwaggerPath} = {};
     pathScopes.forEach((pathScope) => {
       const location = this.toPathString(pathScope.path);
@@ -196,7 +196,7 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected setSwaggerSchemaProperties(swaggerSchema: SwaggerSchema, property: Property): void {
+  public setSwaggerSchemaProperties(swaggerSchema: SwaggerSchema, property: Property): void {
     const {type} = property;
     if (type instanceof StringType) {
       const {pattern, minLength, maxLength} = type;
@@ -227,7 +227,7 @@ export class SwaggerGenerator implements Generator {
     }
   }
 
-  protected toSwaggerProperties(properties: Property[]): {[propertyName: string]: SwaggerSchema} {
+  public toSwaggerProperties(properties: Property[]): {[propertyName: string]: SwaggerSchema} {
     const dest: {[propertyName: string]: SwaggerSchema} = {};
     properties.forEach((property) => {
       const {name} = property;
@@ -248,13 +248,13 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected getRequiredProperties(properties: Property[]): string[] {
+  public getRequiredProperties(properties: Property[]): string[] {
     return properties
         .filter(property => !(property.allowEmpty || property.allowNull))
         .map(property => property.name)
   }
 
-  protected toSwaggerDefinitions(classTypes: ClassType[]): {[definitionsName: string]: SwaggerSchema} {
+  public toSwaggerDefinitions(classTypes: ClassType[]): {[definitionsName: string]: SwaggerSchema} {
     const dest: {[definitionsName: string]: SwaggerSchema} = {};
     classTypes.forEach((classType) => {
       const {name, properties} = classType;
@@ -268,7 +268,7 @@ export class SwaggerGenerator implements Generator {
     return dest;
   }
 
-  protected toSwaggerSpecification(spec: Specification): SwaggerSpecification {
+  public toSwaggerSpecification(spec: Specification): SwaggerSpecification {
     const {pathScopes, classTypes} = spec;
 
     const dest = new SwaggerSpecification();
@@ -280,7 +280,7 @@ export class SwaggerGenerator implements Generator {
   }
 
   //noinspection JSMethodCanBeStatic
-  protected getSwaggerOutputPath(spec: Specification): string {
+  public getSwaggerOutputPath(spec: Specification): string {
     const extension = this.format === SwaggerFormat.JSON ? 'json' : 'yml';
     return `${spec.name}.swagger.${extension}`;
   }
