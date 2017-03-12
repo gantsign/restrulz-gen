@@ -133,7 +133,7 @@ export class SwaggerGenerator implements Generator {
 
   public toSwaggerResponses(responses: Response[]): {[statusCode: string]: SwaggerResponse} {
     const dest: {[statusCode: string]: SwaggerResponse} = {};
-    responses.forEach((response) => {
+    responses.forEach(response => {
       dest[response.status] = this.toSwaggerResponse(response);
     });
     return dest;
@@ -149,7 +149,7 @@ export class SwaggerGenerator implements Generator {
 
   public toPathString(pathElements: PathElement[]): string {
     let path = '';
-    pathElements.forEach((pathElement) => {
+    pathElements.forEach(pathElement => {
       if (pathElement instanceof StaticPathElement) {
         path += `/${pathElement.value}`;
       } else if (pathElement instanceof PathParameter) {
@@ -163,10 +163,10 @@ export class SwaggerGenerator implements Generator {
 
   public toSwaggerPaths(pathScopes: PathScope[]): {[path: string]: SwaggerPath} {
     const dest: {[path: string]: SwaggerPath} = {};
-    pathScopes.forEach((pathScope) => {
+    pathScopes.forEach(pathScope => {
       const location = this.toPathString(pathScope.path);
       const path = new SwaggerPath();
-      pathScope.mappings.forEach((mapping) => {
+      pathScope.mappings.forEach(mapping => {
         if (mapping instanceof HttpMethodHandler) {
           const operation = this.toSwaggerOperation(mapping);
 
@@ -229,7 +229,7 @@ export class SwaggerGenerator implements Generator {
 
   public toSwaggerProperties(properties: Property[]): {[propertyName: string]: SwaggerSchema} {
     const dest: {[propertyName: string]: SwaggerSchema} = {};
-    properties.forEach((property) => {
+    properties.forEach(property => {
       const {name} = property;
       const swaggerProperty = new SwaggerSchema();
       if (property.isArray) {
@@ -256,7 +256,7 @@ export class SwaggerGenerator implements Generator {
 
   public toSwaggerDefinitions(classTypes: ClassType[]): {[definitionsName: string]: SwaggerSchema} {
     const dest: {[definitionsName: string]: SwaggerSchema} = {};
-    classTypes.forEach((classType) => {
+    classTypes.forEach(classType => {
       const {name, properties} = classType;
       const definition = new SwaggerSchema();
       definition.type = 'object';

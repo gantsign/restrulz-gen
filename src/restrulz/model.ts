@@ -170,7 +170,7 @@ export class PathScope {
   mappings: Mapping[];
 
   getPathParameter = (name: string): PathParameter => {
-    const param = this.path.find((element) => {
+    const param = this.path.find(element => {
       if (!(element instanceof PathParameter)) {
         return false;
       }
@@ -218,7 +218,7 @@ export class Specification {
     if (name === 'boolean') {
       return BOOLEAN_TYPE;
     }
-    const type = this.simpleTypes.find((value) => value.name === name);
+    const type = this.simpleTypes.find(value => value.name === name);
     if (type) {
       return type;
     }
@@ -226,7 +226,7 @@ export class Specification {
   };
 
   getClassType = (name: string): ClassType => {
-    const type = this.classTypes.find((value) => value.name === name);
+    const type = this.classTypes.find(value => value.name === name);
     if (type) {
       return type;
     }
@@ -237,11 +237,11 @@ export class Specification {
     if (name === 'boolean') {
       return BOOLEAN_TYPE;
     }
-    let type: Type | undefined = this.simpleTypes.find((value) => value.name === name);
+    let type: Type | undefined = this.simpleTypes.find(value => value.name === name);
     if (type) {
       return type;
     }
-    type = this.classTypes.find((value) => value.name === name);
+    type = this.classTypes.find(value => value.name === name);
     if (type) {
       return type;
     }
@@ -249,7 +249,7 @@ export class Specification {
   };
 
   getResponse = (name: string): Response => {
-    const response = this.responses.find((value) => value.name === name);
+    const response = this.responses.find(value => value.name === name);
     if (response) {
       return response;
     }
@@ -432,7 +432,7 @@ class SpecificationBuilder extends Specification {
     dest.path = path
         .map(this.toPathElement);
     dest.mappings = mappings
-        .map((mapping) => this.toMapping(mapping, dest));
+        .map(mapping => this.toMapping(mapping, dest));
     return dest;
   };
 
@@ -464,7 +464,7 @@ class SpecificationBuilder extends Specification {
     this.simpleTypes = simpleTypes.map(this.toSimpleType);
 
     this.classTypes = classTypes.map(this.toClassType);
-    this.deferredTyping.forEach((callback) => callback());
+    this.deferredTyping.forEach(callback => callback());
 
     this.responses = responses.map(this.toResponse);
     this.pathScopes = pathScopes.map(this.toPathScope);

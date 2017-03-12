@@ -89,11 +89,11 @@ export class SchemaProcessor {
   generators: Generator[] = [];
 
   execute(): void {
-    this.generators.forEach((generator) => {
+    this.generators.forEach(generator => {
       generator.init(this.generators);
     });
-    this.generators.forEach((generator) => {
-      this.schemaFiles.forEach((schemaFile) => {
+    this.generators.forEach(generator => {
+      this.schemaFiles.forEach(schemaFile => {
         const context = new GeneratorContextImpl();
         context.schemaFile = schemaFile;
         context.outputDirectory = this.outputDirectory;
