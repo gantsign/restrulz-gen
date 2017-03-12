@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface StringType {
+export interface StringTypeJs {
   name: string;
   kind: 'string';
   pattern: string;
@@ -21,16 +21,16 @@ export interface StringType {
   maxLength: number;
 }
 
-export interface IntegerType {
+export interface IntegerTypeJs {
   name: string;
   kind: 'integer';
   minimum: number;
   maximum: number;
 }
 
-export type SimpleType = StringType | IntegerType;
+export type SimpleTypeJs = StringTypeJs | IntegerTypeJs;
 
-export interface Property {
+export interface PropertyJs {
   name: string;
   typeRef: string;
   allowEmpty: boolean | undefined;
@@ -38,68 +38,68 @@ export interface Property {
   array: boolean;
 }
 
-export interface ClassType {
+export interface ClassTypeJs {
   name: string;
-  properties: Property[];
+  properties: PropertyJs[];
 }
 
-export interface Response {
+export interface ResponseJs {
   name: string;
   status: number;
   bodyTypeRef: string;
   array: boolean;
 }
 
-export interface StaticPathElement {
+export interface StaticPathElementJs {
   kind: 'static';
   value: string;
 }
 
-export interface PathParam {
+export interface PathParamJs {
   kind: 'path-param';
   name: string;
   typeRef: string;
 }
 
-export type PathElement = StaticPathElement | PathParam;
+export type PathElementJs = StaticPathElementJs | PathParamJs;
 
-export interface PathParamRef {
+export interface PathParamRefJs {
   kind: 'path-param-ref';
   name: string;
   valueRef: string;
 }
 
-export interface BodyParamRef {
+export interface BodyParamRefJs {
   kind: 'body-param-ref';
   name: string;
   typeRef: string;
 }
 
-export type ParamRef = PathParamRef | BodyParamRef;
+export type ParamRefJs = PathParamRefJs | BodyParamRefJs;
 
-export interface HttpMethodHandler {
+export interface HttpMethodHandlerJs {
   kind: 'http-method';
   method: string;
   name: string;
-  parameters: ParamRef[];
+  parameters: ParamRefJs[];
   responseRefs: string[];
 }
 
-export type Mapping = HttpMethodHandler;
+export type MappingJs = HttpMethodHandlerJs;
 
-export interface PathScope {
+export interface PathScopeJs {
   name: string;
-  path: PathElement[];
-  mappings: Mapping[];
+  path: PathElementJs[];
+  mappings: MappingJs[];
 }
 
-export interface Specification {
+export interface SpecificationJs {
   name: string
   title: string
   description: string
   version: string
-  simpleTypes: SimpleType[];
-  classTypes: ClassType[];
-  responses: Response[];
-  pathScopes: PathScope[];
+  simpleTypes: SimpleTypeJs[];
+  classTypes: ClassTypeJs[];
+  responses: ResponseJs[];
+  pathScopes: PathScopeJs[];
 }

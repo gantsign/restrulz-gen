@@ -17,7 +17,11 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import * as fs from 'fs';
 import * as kebab from '../../src/util/kebab';
-import {IntegerType, Specification, StringType} from '../../src/restrulz/schema';
+import {
+  IntegerTypeJs,
+  SpecificationJs,
+  StringTypeJs
+} from '../../src/restrulz/schema';
 
 /*
  * Since we're testing the the schema definition is correct it only makes sense to test against a
@@ -25,7 +29,7 @@ import {IntegerType, Specification, StringType} from '../../src/restrulz/schema'
  * JSON.
  */
 const json = fs.readFileSync('spec/data/schema.json', 'utf8');
-const schema: Specification = JSON.parse(json, kebab.kebabToCamelReviver);
+const schema: SpecificationJs = JSON.parse(json, kebab.kebabToCamelReviver);
 
 const {name: specName, title, description, version, simpleTypes, classTypes, responses, pathScopes} = schema;
 
@@ -61,7 +65,7 @@ describe('restrulz schema definition', () => {
 
     describe('simple-type 1', () => {
       it('should match expected', () => {
-        const {name, kind, pattern, minLength, maxLength} = simpleType1 as StringType;
+        const {name, kind, pattern, minLength, maxLength} = simpleType1 as StringTypeJs;
         expect(name).toEqual('name');
         expect(kind).toEqual('string');
         expect(pattern).toEqual('^[\\p{Alpha}\']+$');
@@ -72,7 +76,7 @@ describe('restrulz schema definition', () => {
 
     describe('simple-type 2', () => {
       it('should match expected', () => {
-        const {name, kind, pattern, minLength, maxLength} = simpleType2 as StringType;
+        const {name, kind, pattern, minLength, maxLength} = simpleType2 as StringTypeJs;
         expect(name).toEqual('uuid');
         expect(kind).toEqual('string');
         expect(pattern).toEqual('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
@@ -83,7 +87,7 @@ describe('restrulz schema definition', () => {
 
     describe('simple-type 3', () => {
       it('should match expected', () => {
-        const {name, kind, minimum, maximum} = simpleType3 as IntegerType;
+        const {name, kind, minimum, maximum} = simpleType3 as IntegerTypeJs;
         expect(name).toEqual('age');
         expect(kind).toEqual('integer');
         expect(minimum).toEqual(0);
@@ -93,7 +97,7 @@ describe('restrulz schema definition', () => {
 
     describe('simple-type 4', () => {
       it('should match expected', () => {
-        const {name, kind, minimum, maximum} = simpleType4 as IntegerType;
+        const {name, kind, minimum, maximum} = simpleType4 as IntegerTypeJs;
         expect(name).toEqual('months-employed');
         expect(kind).toEqual('integer');
         expect(minimum).toEqual(0);

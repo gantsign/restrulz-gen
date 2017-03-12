@@ -16,7 +16,24 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import * as fs from 'fs';
 import {kebabToCamelReviver} from '../util/kebab';
-import * as schema from './schema';
+import {
+  BodyParamRefJs,
+  ClassTypeJs,
+  HttpMethodHandlerJs,
+  IntegerTypeJs,
+  MappingJs,
+  ParamRefJs,
+  PathElementJs,
+  PathParamJs,
+  PathParamRefJs,
+  PathScopeJs,
+  PropertyJs,
+  ResponseJs,
+  SimpleTypeJs,
+  SpecificationJs,
+  StaticPathElementJs,
+  StringTypeJs
+} from './schema';
 
 export enum HttpStatus {
   OK = 200,
@@ -247,7 +264,7 @@ class SpecificationBuilder extends Specification {
   deferredTyping: (() => void)[] = [];
 
   //noinspection JSMethodCanBeStatic
-  toStringType(stringType: schema.StringType): StringType {
+  toStringType(stringType: StringTypeJs): StringType {
     const {name, pattern, minLength, maxLength} = stringType;
 
     const dest = new StringType();
@@ -259,7 +276,7 @@ class SpecificationBuilder extends Specification {
   }
 
   //noinspection JSMethodCanBeStatic
-  toIntegerType(integerType: schema.IntegerType): IntegerType {
+  toIntegerType(integerType: IntegerTypeJs): IntegerType {
     const {name, minimum, maximum} = integerType;
 
     const dest = new IntegerType();
@@ -269,20 +286,20 @@ class SpecificationBuilder extends Specification {
     return dest;
   }
 
-  toSimpleType = (simpleType: schema.SimpleType): SimpleType => {
+  toSimpleType = (simpleType: SimpleTypeJs): SimpleType => {
     const {kind} = simpleType;
 
     switch (kind) {
       case 'string':
-        return this.toStringType(simpleType as schema.StringType);
+        return this.toStringType(simpleType as StringTypeJs);
       case 'integer':
-        return this.toIntegerType(simpleType as schema.IntegerType);
+        return this.toIntegerType(simpleType as IntegerTypeJs);
       default:
         throw Error(`Unexpected simpleType: ${kind}`);
     }
   };
 
-  toProperty = (property: schema.Property): Property => {
+  toProperty = (property: PropertyJs): Property => {
     const {name, typeRef, allowEmpty, allowNull, array} = property;
 
     const dest = new Property();
@@ -296,7 +313,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   };
 
-  toClassType = (classType: schema.ClassType): ClassType => {
+  toClassType = (classType: ClassTypeJs): ClassType => {
     const {name, properties} = classType;
 
     const dest = new ClassType();
@@ -305,7 +322,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   };
 
-  toResponse = (response: schema.Response): Response => {
+  toResponse = (response: ResponseJs): Response => {
     const {name, status, bodyTypeRef, array} = response;
 
     const dest = new Response();
@@ -317,7 +334,7 @@ class SpecificationBuilder extends Specification {
   };
 
   //noinspection JSMethodCanBeStatic
-  toStaticPathElement(pathElement: schema.StaticPathElement): StaticPathElement {
+  toStaticPathElement(pathElement: StaticPathElementJs): StaticPathElement {
     const {value} = pathElement;
 
     const dest = new StaticPathElement();
@@ -325,7 +342,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   }
 
-  toPathParameter = (pathParam: schema.PathParam): PathParameter => {
+  toPathParameter = (pathParam: PathParamJs): PathParameter => {
     const {name, typeRef} = pathParam;
 
     const dest = new PathParameter();
@@ -334,7 +351,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   };
 
-  toPathElement = (pathElement: schema.PathElement): PathElement => {
+  toPathElement = (pathElement: PathElementJs): PathElement => {
     const {kind} = pathElement;
 
     switch (pathElement.kind) {
@@ -348,7 +365,9 @@ class SpecificationBuilder extends Specification {
   };
 
   //noinspection JSMethodCanBeStatic
-  toPathParameterReference(pathParamRef: schema.PathParamRef, pathScope: PathScope): PathParameterReference {
+  toPathParameterReference(pathParamRef: PathParamRefJs,
+                           pathScope: PathScope): PathParameterReference {
+
     const {name, valueRef} = pathParamRef;
 
     const dest = new PathParameterReference();
@@ -357,7 +376,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   }
 
-  toBodyParameterReference = (bodyParamRef: schema.BodyParamRef): BodyParameterReference => {
+  toBodyParameterReference = (bodyParamRef: BodyParamRefJs): BodyParameterReference => {
     const {name, typeRef} = bodyParamRef;
 
     const dest = new BodyParameterReference();
@@ -366,7 +385,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   };
 
-  toParameter = (parameter: schema.ParamRef, pathScope: PathScope): HandlerParameter => {
+  toParameter = (parameter: ParamRefJs, pathScope: PathScope): HandlerParameter => {
     const {kind} = parameter;
 
     switch (parameter.kind) {
@@ -379,7 +398,9 @@ class SpecificationBuilder extends Specification {
     }
   };
 
-  toHttpMethodHandler = (httpMethodHandler: schema.HttpMethodHandler, pathScope: PathScope): HttpMethodHandler => {
+  toHttpMethodHandler = (httpMethodHandler: HttpMethodHandlerJs,
+                         pathScope: PathScope): HttpMethodHandler => {
+
     const {name, method, parameters, responseRefs} = httpMethodHandler;
 
     const dest = new HttpMethodHandler();
@@ -392,7 +413,7 @@ class SpecificationBuilder extends Specification {
     return dest;
   };
 
-  toMapping = (mapping: schema.Mapping, pathScope: PathScope): Mapping => {
+  toMapping = (mapping: MappingJs, pathScope: PathScope): Mapping => {
     const {kind} = mapping;
 
     switch (mapping.kind) {
@@ -403,7 +424,7 @@ class SpecificationBuilder extends Specification {
     }
   };
 
-  toPathScope = (pathScope: schema.PathScope): PathScope => {
+  toPathScope = (pathScope: PathScopeJs): PathScope => {
     const {name, path, mappings} = pathScope;
 
     const dest = new PathScope();
@@ -416,7 +437,8 @@ class SpecificationBuilder extends Specification {
   };
 
   toSpecification = () => {
-    const {name, title, description, version, simpleTypes, classTypes, responses, pathScopes} = this;
+    const {name, title, description, version, simpleTypes, classTypes, responses,
+        pathScopes} = this;
 
     const spec = new Specification();
     spec.name = name;
@@ -430,8 +452,9 @@ class SpecificationBuilder extends Specification {
     return spec;
   };
 
-  buildSpecification = (schema: schema.Specification): Specification => {
-    const {name, title, description, version, simpleTypes, classTypes, responses, pathScopes} = schema;
+  buildSpecification = (schema: SpecificationJs): Specification => {
+    const {name, title, description, version, simpleTypes, classTypes, responses,
+        pathScopes} = schema;
 
     this.name = name;
     this.title = title;
@@ -452,6 +475,6 @@ class SpecificationBuilder extends Specification {
 
 export function parseSpecification(filePath: string): Specification {
   const json = fs.readFileSync(filePath, 'utf8');
-  const jsonSchema: schema.Specification = JSON.parse(json, kebabToCamelReviver);
+  const jsonSchema: SpecificationJs = JSON.parse(json, kebabToCamelReviver);
   return new SpecificationBuilder().buildSpecification(jsonSchema);
 }
