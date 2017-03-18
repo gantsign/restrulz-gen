@@ -157,45 +157,45 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
-  describe('getSpringHttpMethod()', () => {
+  describe('getSpringHttpMethodAnnotation()', () => {
 
     it('should support GET', () => {
       const handler = new HttpMethodHandler();
       handler.method = HttpMethod.GET;
 
-      expect(generator.getSpringHttpMethod(handler))
-          .toBe('org.springframework.web.bind.annotation.RequestMethod.GET');
+      expect(generator.getSpringHttpMethodAnnotation(handler))
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
     });
 
     it('should support PUT', () => {
       const handler = new HttpMethodHandler();
       handler.method = HttpMethod.PUT;
 
-      expect(generator.getSpringHttpMethod(handler))
-          .toBe('org.springframework.web.bind.annotation.RequestMethod.PUT');
+      expect(generator.getSpringHttpMethodAnnotation(handler))
+          .toBe('org.springframework.web.bind.annotation.PutMapping');
     });
 
     it('should support POST', () => {
       const handler = new HttpMethodHandler();
       handler.method = HttpMethod.POST;
 
-      expect(generator.getSpringHttpMethod(handler))
-          .toBe('org.springframework.web.bind.annotation.RequestMethod.POST');
+      expect(generator.getSpringHttpMethodAnnotation(handler))
+          .toBe('org.springframework.web.bind.annotation.PostMapping');
     });
 
     it('should support DELETE', () => {
       const handler = new HttpMethodHandler();
       handler.method = HttpMethod.DELETE;
 
-      expect(generator.getSpringHttpMethod(handler))
-          .toBe('org.springframework.web.bind.annotation.RequestMethod.DELETE');
+      expect(generator.getSpringHttpMethodAnnotation(handler))
+          .toBe('org.springframework.web.bind.annotation.DeleteMapping');
     });
 
     it('should throw error for unsupported method', () => {
       const handler = new HttpMethodHandler();
       handler.method = -1;
 
-      expect(() => generator.getSpringHttpMethod(handler))
+      expect(() => generator.getSpringHttpMethodAnnotation(handler))
           .toThrowError('Unsupported HTTP method: -1');
     });
   });
@@ -469,24 +469,10 @@ describe('KotlinSpringMvcGenerator', () => {
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(1);
-
-      const funcAnnaParam = funcAnna.parameters[0];
-
-      expect(funcAnnaParam.name)
-          .toBe('method');
-
-      expect(funcAnnaParam.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
+          .toBe(0);
     });
 
     it('should add path to annotation', () => {
@@ -584,32 +570,18 @@ describe('KotlinSpringMvcGenerator', () => {
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(2);
+          .toBe(1);
 
       const funcAnnaParam1 = funcAnna.parameters[0];
 
       expect(funcAnnaParam1.name)
-          .toBe('path');
+          .toBe('value');
 
       expect(funcAnnaParam1.valueFactory(fileKt))
-          .toBe('arrayOf("/test1")');
-
-      const funcAnnaParam2 = funcAnna.parameters[1];
-
-      expect(funcAnnaParam2.name)
-          .toBe('method');
-
-      expect(funcAnnaParam2.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
+          .toBe('"/test1"');
     });
   });
 
@@ -1690,25 +1662,10 @@ class GetDeliveryAddressResponse private constructor(
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(1);
-
-      const funcAnnaParam = funcAnna.parameters[0];
-
-      expect(funcAnnaParam.name)
-          .toBe('method');
-
-      expect(funcAnnaParam.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
-
+          .toBe(0);
     });
 
     it('should support sub path scope', () => {
@@ -1858,33 +1815,18 @@ class GetDeliveryAddressResponse private constructor(
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(2);
+          .toBe(1);
 
       const funcAnnaParam1 = funcAnna.parameters[0];
 
       expect(funcAnnaParam1.name)
-          .toBe('path');
+          .toBe('value');
 
       expect(funcAnnaParam1.valueFactory(fileKt))
-          .toBe('arrayOf("/test1")');
-
-      const funcAnnaParam2 = funcAnna.parameters[1];
-
-      expect(funcAnnaParam2.name)
-          .toBe('method');
-
-      expect(funcAnnaParam2.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
-
+          .toBe('"/test1"');
     });
 
     it('should throw error for unsupported type', () => {
@@ -2090,25 +2032,10 @@ class GetDeliveryAddressResponse private constructor(
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(1);
-
-      const funcAnnaParam = funcAnna.parameters[0];
-
-      expect(funcAnnaParam.name)
-          .toBe('method');
-
-      expect(funcAnnaParam.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
-
+          .toBe(0);
     });
 
     it('should support empty path', () => {
@@ -2241,25 +2168,10 @@ class GetDeliveryAddressResponse private constructor(
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(1);
-
-      const funcAnnaParam = funcAnna.parameters[0];
-
-      expect(funcAnnaParam.name)
-          .toBe('method');
-
-      expect(funcAnnaParam.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
-
+          .toBe(0);
     });
   });
 
@@ -2447,25 +2359,10 @@ class GetDeliveryAddressResponse private constructor(
       const funcAnna = functionKt.annotations[0];
 
       expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
 
       expect(funcAnna.parameters.length)
-          .toBe(1);
-
-      const funcAnnaParam = funcAnna.parameters[0];
-
-      expect(funcAnnaParam.name)
-          .toBe('method');
-
-      expect(funcAnnaParam.valueFactory(fileKt))
-          .toBe('arrayOf(GET)');
-
-      expect(fileKt.importMapping['kotlin.arrayOf'])
-          .toBe('arrayOf');
-
-      expect(fileKt.importMapping['org.springframework.web.bind.annotation.RequestMethod.GET'])
-          .toBe('GET');
-
+          .toBe(0);
     });
 
   });
@@ -2564,17 +2461,17 @@ class GetDeliveryAddressResponse private constructor(
 package testing.ws.api
 
 import io.reactivex.Single
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import testing.model.DeliveryAddress
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 @RequestMapping("/delivery-address/{primary-id}")
 interface DeliveryAddressApi {
 
-    @RequestMapping(method = arrayOf(GET))
+    @GetMapping
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
             @RequestBody primaryAddress: DeliveryAddress
@@ -2680,17 +2577,17 @@ class GetDeliveryAddressResponse private constructor(
 package testing.ws.api
 
 import io.reactivex.Single
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
 import testing.model.DeliveryAddress
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 @RequestMapping("/delivery-address/{primary-id}")
 interface DeliveryAddressApi {
 
-    @RequestMapping(method = arrayOf(GET))
+    @GetMapping
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
             @RequestBody primaryAddress: DeliveryAddress

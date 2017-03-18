@@ -73,27 +73,31 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
   }
 
   //noinspection JSMethodCanBeStatic
-  public getSpringHttpMethod(handler: HttpMethodHandler): string {
+  public getSpringHttpMethodAnnotation(handler: HttpMethodHandler): string {
 
-    const methodClass = 'org.springframework.web.bind.annotation.RequestMethod';
-
+    let method: string;
     switch (handler.method) {
 
       case HttpMethod.GET:
-        return `${methodClass}.GET`;
+        method = 'Get';
+        break;
 
       case HttpMethod.PUT:
-        return `${methodClass}.PUT`;
+        method = 'Put';
+        break;
 
       case HttpMethod.POST:
-        return `${methodClass}.POST`;
+        method = 'Post';
+        break;
 
       case HttpMethod.DELETE:
-        return `${methodClass}.DELETE`;
+        method = 'Delete';
+        break;
 
       default:
         throw new Error(`Unsupported HTTP method: ${handler.method}`);
     }
+    return `org.springframework.web.bind.annotation.${method}Mapping`;
   }
 
   public addPathParameter(functionSignature: FunctionSignatureKt,
@@ -155,26 +159,14 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
     interfaceKt.addFunctionSignature(kebabToCamel(handler.name), functionSignature => {
 
-      functionSignature.addAnnotation(
-          'org.springframework.web.bind.annotation.RequestMapping',
-          annotationKt => {
+      const methodAnnotation = this.getSpringHttpMethodAnnotation(handler);
 
-            if (path !== '/' && path !== '') {
-              annotationKt.addParameter('path', fileKt => {
+      functionSignature.addAnnotation(methodAnnotation, annotationKt => {
 
-                const arrayOf = fileKt.tryImport('kotlin.arrayOf');
-                return `${arrayOf}(${this.toKotlinString(path)})`;
-              });
-            }
-
-            annotationKt.addParameter('method', fileKt => {
-
-              const arrayOf = fileKt.tryImport('kotlin.arrayOf');
-              const method = fileKt.tryImport(this.getSpringHttpMethod(handler));
-              return `${arrayOf}(${method})`;
-            });
-          });
-
+        if (path !== '/' && path !== '') {
+          annotationKt.addSimpleParameter('value', this.toKotlinString(path));
+        }
+      });
 
       parameters.forEach(param =>
           this.addFunctionSignatureParameter(functionSignature, spec, param));
