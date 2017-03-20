@@ -6,6 +6,6 @@
     "jasmine": "registry:dt/jasmine#2.5.0+20170207112528"
   },
   "dependencies": {
-    "fs-extra": "registry:dt/fs-extra#0.0.0+20170109012028"
+    "fs-extra": "registry:dt/fs-extra#2.0.0+20170306033830"
   }
 }
