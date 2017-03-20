@@ -90,6 +90,68 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
+  describe('getQualifiedApiClass()', () => {
+    const pathScope = new RootPathScope();
+    pathScope.name = 'delivery-address';
+
+    it('should derive default package name from specification', () => {
+
+      expect(generator.getQualifiedApiClass(spec, pathScope))
+          .toBe('testing.ws.api.DeliveryAddressApi');
+    });
+
+    it('should support default package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing'] = 'com.example';
+
+      expect(generatorWithMapping.getQualifiedApiClass(spec, pathScope))
+          .toBe('com.example.ws.api.DeliveryAddressApi');
+    });
+
+    it('should support package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing.ws.api'] = 'com.example.mvc';
+
+      expect(generatorWithMapping.getQualifiedApiClass(spec, pathScope))
+          .toBe('com.example.mvc.DeliveryAddressApi');
+    });
+  });
+
+  describe('getControllerPackageName()', () => {
+
+    it('should derive default package name from specification', () => {
+
+      expect(generator.getControllerPackageName(spec))
+          .toBe('testing.ws.controller');
+    });
+
+    it('should support default package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing'] = 'com.example';
+
+      expect(generatorWithMapping.getControllerPackageName(spec))
+          .toBe('com.example.ws.controller');
+    });
+
+    it('should support package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing.ws.controller'] = 'com.example.mvc';
+
+      expect(generatorWithMapping.getControllerPackageName(spec))
+          .toBe('com.example.mvc');
+    });
+  });
+
+  describe('getControllerClassName()', () => {
+    const pathScope = new RootPathScope();
+    pathScope.name = 'delivery-address';
+
+    it('should convert kebab case to capitalized camel case', () => {
+      expect(generator.getControllerClassName(pathScope))
+          .toBe('DeliveryAddressController');
+    });
+  });
+
   describe('getResponsePackageName()', () => {
     const pathScope = new RootPathScope();
     pathScope.name = 'delivery-address';
@@ -200,7 +262,7 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
-  describe('addPathParameter()', () => {
+  describe('addFunctionSignaturePathParameter()', () => {
 
     it('should support path parameters', () => {
 
@@ -214,7 +276,7 @@ describe('KotlinSpringMvcGenerator', () => {
       parameterRef.name = 'address-id';
       parameterRef.value = pathParameter;
 
-      generator.addPathParameter(functionKt, spec, parameterRef);
+      generator.addFunctionSignaturePathParameter(functionKt, spec, parameterRef);
 
       expect(functionKt.parameters.length).toBe(1);
 
@@ -226,27 +288,12 @@ describe('KotlinSpringMvcGenerator', () => {
       expect(parameterKt.type.className)
           .toBe('kotlin.String');
 
-      expect(parameterKt.annotations.length).toBe(1);
-
-      const annotationKt = parameterKt.annotations[0];
-
-      expect(annotationKt.className)
-          .toBe('org.springframework.web.bind.annotation.PathVariable');
-
-      expect(annotationKt.parameters.length).toBe(1);
-
-      const annotationParam = annotationKt.parameters[0];
-
-      expect(annotationParam.name).toBe('value');
-
-      const fileKt = new FileKt('com.example.package', 'Test');
-      expect(annotationParam.valueFactory(fileKt))
-          .toBe('"primary-id"');
+      expect(parameterKt.annotations.length).toBe(0);
     });
 
   });
 
-  describe('addBodyParameter()', () => {
+  describe('addFunctionSignatureBodyParameter()', () => {
 
     it('should support body parameters', () => {
 
@@ -259,7 +306,7 @@ describe('KotlinSpringMvcGenerator', () => {
       parameterRef.name = 'primary-address';
       parameterRef.typeRef = classType;
 
-      generator.addBodyParameter(functionKt, spec, parameterRef);
+      generator.addFunctionSignatureBodyParameter(functionKt, spec, parameterRef);
 
       expect(functionKt.parameters.length).toBe(1);
 
@@ -271,14 +318,7 @@ describe('KotlinSpringMvcGenerator', () => {
       expect(parameterKt.type.className)
           .toBe('testing.model.DeliveryAddress');
 
-      expect(parameterKt.annotations.length).toBe(1);
-
-      const annotationKt = parameterKt.annotations[0];
-
-      expect(annotationKt.className)
-          .toBe('org.springframework.web.bind.annotation.RequestBody');
-
-      expect(annotationKt.parameters.length).toBe(0);
+      expect(parameterKt.annotations.length).toBe(0);
     });
 
   });
@@ -309,6 +349,156 @@ describe('KotlinSpringMvcGenerator', () => {
       expect(parameterKt.type.className)
           .toBe('kotlin.String');
 
+      expect(parameterKt.annotations.length).toBe(0);
+    });
+
+    it('should support body parameters', () => {
+
+      const functionKt = new FunctionSignatureKt('test1');
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef = new BodyParameterReference();
+      parameterRef.name = 'primary-address';
+      parameterRef.typeRef = classType;
+
+      generator.addFunctionSignatureParameter(functionKt, spec, parameterRef);
+
+      expect(functionKt.parameters.length).toBe(1);
+
+      const parameterKt = functionKt.parameters[0];
+
+      expect(parameterKt.name)
+          .toBe('primaryAddress');
+
+      expect(parameterKt.type.className)
+          .toBe('testing.model.DeliveryAddress');
+
+      expect(parameterKt.annotations.length).toBe(0);
+    });
+
+    it('should throw error for unsupported type', () => {
+
+      const functionKt = new FunctionSignatureKt('test1');
+
+      class UnsupportedTypeTest {}
+      const unsupportedType = <HandlerParameter>new UnsupportedTypeTest();
+
+      expect(() => generator.addFunctionSignatureParameter(functionKt, spec, unsupportedType))
+          .toThrowError('Unsupported HandlerParameter type: UnsupportedTypeTest');
+    });
+  });
+
+  describe('addFunctionPathParameter()', () => {
+
+    it('should support path parameters', () => {
+
+      const functionKt = new FunctionSignatureKt('test1');
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const parameterRef = new PathParameterReference();
+      parameterRef.name = 'address-id';
+      parameterRef.value = pathParameter;
+
+      generator.addFunctionPathParameter(functionKt, spec, parameterRef);
+
+      expect(functionKt.parameters.length).toBe(1);
+
+      const parameterKt = functionKt.parameters[0];
+
+      expect(parameterKt.name)
+          .toBe('addressId');
+
+      expect(parameterKt.type.className)
+          .toBe('kotlin.String');
+
+      expect(parameterKt.annotations.length).toBe(1);
+
+      const annotationKt = parameterKt.annotations[0];
+
+      expect(annotationKt.className)
+          .toBe('org.springframework.web.bind.annotation.PathVariable');
+
+      expect(annotationKt.parameters.length).toBe(1);
+
+      const annotationParam = annotationKt.parameters[0];
+
+      expect(annotationParam.name).toBe('value');
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+      expect(annotationParam.valueFactory(fileKt))
+          .toBe('"primary-id"');
+    });
+
+  });
+
+  describe('addFunctionBodyParameter()', () => {
+
+    it('should support body parameters', () => {
+
+      const functionKt = new FunctionSignatureKt('test1');
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef = new BodyParameterReference();
+      parameterRef.name = 'primary-address';
+      parameterRef.typeRef = classType;
+
+      generator.addFunctionBodyParameter(functionKt, spec, parameterRef);
+
+      expect(functionKt.parameters.length).toBe(1);
+
+      const parameterKt = functionKt.parameters[0];
+
+      expect(parameterKt.name)
+          .toBe('primaryAddress');
+
+      expect(parameterKt.type.className)
+          .toBe('testing.model.DeliveryAddress');
+
+      expect(parameterKt.annotations.length).toBe(1);
+
+      const annotationKt = parameterKt.annotations[0];
+
+      expect(annotationKt.className)
+          .toBe('org.springframework.web.bind.annotation.RequestBody');
+
+      expect(annotationKt.parameters.length).toBe(0);
+    });
+
+  });
+
+  describe('addFunctionParameter()', () => {
+
+    it('should support path parameters', () => {
+
+      const functionKt = new FunctionSignatureKt('test1');
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const parameterRef = new PathParameterReference();
+      parameterRef.name = 'address-id';
+      parameterRef.value = pathParameter;
+
+      generator.addFunctionParameter(functionKt, spec, parameterRef);
+
+      expect(functionKt.parameters.length).toBe(1);
+
+      const parameterKt = functionKt.parameters[0];
+
+      expect(parameterKt.name)
+          .toBe('addressId');
+
+      expect(parameterKt.type.className)
+          .toBe('kotlin.String');
+
       expect(parameterKt.annotations.length).toBe(1);
 
       const annotationKt = parameterKt.annotations[0];
@@ -338,7 +528,7 @@ describe('KotlinSpringMvcGenerator', () => {
       parameterRef.name = 'primary-address';
       parameterRef.typeRef = classType;
 
-      generator.addFunctionSignatureParameter(functionKt, spec, parameterRef);
+      generator.addFunctionParameter(functionKt, spec, parameterRef);
 
       expect(functionKt.parameters.length).toBe(1);
 
@@ -367,7 +557,7 @@ describe('KotlinSpringMvcGenerator', () => {
       class UnsupportedTypeTest {}
       const unsupportedType = <HandlerParameter>new UnsupportedTypeTest();
 
-      expect(() => generator.addFunctionSignatureParameter(functionKt, spec, unsupportedType))
+      expect(() => generator.addFunctionParameter(functionKt, spec, unsupportedType))
           .toThrowError('Unsupported HandlerParameter type: UnsupportedTypeTest');
     });
   });
@@ -409,6 +599,80 @@ describe('KotlinSpringMvcGenerator', () => {
       const functionKt = interfaceKt.members[0];
       if (!(<any>functionKt instanceof FunctionSignatureKt)) {
         fail(`Expected FunctionSignatureKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(2);
+
+      const returnType = functionKt.returnType;
+
+      expect(returnType.className)
+          .toBe('io.reactivex.Single');
+
+      expect(returnType.genericParameters.length)
+          .toBe(1);
+
+      expect(returnType.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressResponse');
+
+      const funParam1 = functionKt.parameters[0];
+
+      expect(funParam1.name)
+          .toBe('addressId');
+
+      expect(funParam1.annotations.length)
+          .toBe(0);
+
+      const funParam2 = functionKt.parameters[1];
+
+      expect(funParam2.name)
+          .toBe('primaryAddress');
+
+      expect(funParam2.annotations.length)
+          .toBe(0);
+
+      expect(functionKt.annotations.length)
+          .toBe(0);
+    });
+  });
+
+  describe('addControllerHttpMethodHandlerFunction()', () => {
+
+    it('should add function', () => {
+
+      const classKt = new ClassKt('TestApi');
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      generator.addControllerHttpMethodHandlerFunction(
+          classKt, spec, '', pathScope, handler);
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
         return;
       }
 
@@ -473,11 +737,18 @@ describe('KotlinSpringMvcGenerator', () => {
 
       expect(funcAnna.parameters.length)
           .toBe(0);
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe(`
+impl.getDeliveryAddress(
+        addressId,
+        primaryAddress)
+`);
     });
 
     it('should add path to annotation', () => {
 
-      const interfaceKt = new InterfaceKt('TestApi');
+      const classKt = new ClassKt('TestApi');
 
       const pathScope = new RootPathScope();
       pathScope.name = 'delivery-address';
@@ -503,13 +774,13 @@ describe('KotlinSpringMvcGenerator', () => {
 
       handler.parameters = [parameterRef1, parameterRef2];
 
-      generator.addControllerApiHttpMethodHandlerFunction(
-          interfaceKt, spec, '/test1', pathScope, handler);
+      generator.addControllerHttpMethodHandlerFunction(
+          classKt, spec, '/test1', pathScope, handler);
 
-      expect(interfaceKt.members.length).toBe(1);
-      const functionKt = interfaceKt.members[0];
-      if (!(<any>functionKt instanceof FunctionSignatureKt)) {
-        fail(`Expected FunctionSignatureKt but was ${functionKt.constructor.name}`);
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
         return;
       }
 
@@ -582,6 +853,14 @@ describe('KotlinSpringMvcGenerator', () => {
 
       expect(funcAnnaParam1.valueFactory(fileKt))
           .toBe('"/test1"');
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe(`
+impl.getDeliveryAddress(
+        addressId,
+        primaryAddress)
+`);
+
     });
   });
 
@@ -1624,47 +1903,17 @@ class GetDeliveryAddressResponse private constructor(
           .toBe('addressId');
 
       expect(funParam1.annotations.length)
-          .toBe(1);
-
-      const paramAnna1 = funParam1.annotations[0];
-
-      expect(paramAnna1.className)
-          .toBe('org.springframework.web.bind.annotation.PathVariable');
-
-      expect(paramAnna1.parameters.length)
-          .toBe(1);
-
-      const annaParam1 = paramAnna1.parameters[0];
-      expect(annaParam1.name)
-          .toBe('value');
-
-      const fileKt = new FileKt('com.example.package', 'TestApi');
-
-      expect(annaParam1.valueFactory(fileKt))
-          .toBe('"primary-id"');
+          .toBe(0);
 
       const funParam2 = functionKt.parameters[1];
 
       expect(funParam2.name)
           .toBe('primaryAddress');
 
-      const paramAnna2 = funParam2.annotations[0];
-
-      expect(paramAnna2.className)
-          .toBe('org.springframework.web.bind.annotation.RequestBody');
-
-      expect(paramAnna2.parameters.length)
+      expect(funParam2.annotations.length)
           .toBe(0);
 
       expect(functionKt.annotations.length)
-          .toBe(1);
-
-      const funcAnna = functionKt.annotations[0];
-
-      expect(funcAnna.className)
-          .toBe('org.springframework.web.bind.annotation.GetMapping');
-
-      expect(funcAnna.parameters.length)
           .toBe(0);
     });
 
@@ -1777,6 +2026,225 @@ class GetDeliveryAddressResponse private constructor(
           .toBe('addressId');
 
       expect(funParam1.annotations.length)
+          .toBe(0);
+
+      const funParam2 = functionKt.parameters[1];
+
+      expect(funParam2.annotations.length)
+          .toBe(0);
+
+      expect(functionKt.annotations.length)
+          .toBe(0);
+    });
+
+    it('should throw error for unsupported type', () => {
+      class UnsupportedTypeTest {}
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+
+      const unsupportedHandler = new UnsupportedTypeTest();
+
+      const context = new MockGeneratorContext();
+
+      const interfaceKt = new InterfaceKt('DeliveryAddressApi');
+
+      expect(() => generator.addControllerApiFunction(
+          interfaceKt,
+          spec,
+          '',
+          pathScope,
+          <HttpMethodHandler>unsupportedHandler,
+          context
+      )).toThrowError('Unsupported Mapping type: UnsupportedTypeTest');
+    });
+  });
+
+  describe('addControllerFunction()', () => {
+
+    it('should support HttpMethodHandler', () => {
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      const response = new Response();
+      response.name = 'get-address-response';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      handler.responseRefs = [response];
+
+      const classKt = new ClassKt('DeliveryAddressController');
+
+      generator.addControllerFunction(classKt, spec, '', pathScope, handler);
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(2);
+
+      const returnType = functionKt.returnType;
+
+      expect(returnType.className)
+          .toBe('io.reactivex.Single');
+
+      expect(returnType.genericParameters.length)
+          .toBe(1);
+
+      expect(returnType.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressResponse');
+
+      const funParam1 = functionKt.parameters[0];
+
+      expect(funParam1.name)
+          .toBe('addressId');
+
+      expect(funParam1.annotations.length)
+          .toBe(1);
+
+      const paramAnna1 = funParam1.annotations[0];
+
+      expect(paramAnna1.className)
+          .toBe('org.springframework.web.bind.annotation.PathVariable');
+
+      expect(paramAnna1.parameters.length)
+          .toBe(1);
+
+      const annaParam1 = paramAnna1.parameters[0];
+      expect(annaParam1.name)
+          .toBe('value');
+
+      const fileKt = new FileKt('com.example.package', 'TestApi');
+
+      expect(annaParam1.valueFactory(fileKt))
+          .toBe('"primary-id"');
+
+      const funParam2 = functionKt.parameters[1];
+
+      expect(funParam2.name)
+          .toBe('primaryAddress');
+
+      const paramAnna2 = funParam2.annotations[0];
+
+      expect(paramAnna2.className)
+          .toBe('org.springframework.web.bind.annotation.RequestBody');
+
+      expect(paramAnna2.parameters.length)
+          .toBe(0);
+
+      expect(functionKt.annotations.length)
+          .toBe(1);
+
+      const funcAnna = functionKt.annotations[0];
+
+      expect(funcAnna.className)
+          .toBe('org.springframework.web.bind.annotation.GetMapping');
+
+      expect(funcAnna.parameters.length)
+          .toBe(0);
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe(`
+impl.getDeliveryAddress(
+        addressId,
+        primaryAddress)
+`);
+    });
+
+    it('should support sub path scope', () => {
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      const response = new Response();
+      response.name = 'get-address-response';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      handler.responseRefs = [response];
+
+      const subPathScope = new SubPathScope();
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'test1';
+      subPathScope.path = [staticPathElement];
+      subPathScope.mappings = [handler];
+
+      const classKt = new ClassKt('DeliveryAddressController');
+
+      generator.addControllerFunction(classKt, spec, '', pathScope, subPathScope);
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(2);
+
+      const returnType = functionKt.returnType;
+
+      expect(returnType.className)
+          .toBe('io.reactivex.Single');
+
+      expect(returnType.genericParameters.length)
+          .toBe(1);
+
+      expect(returnType.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressResponse');
+
+      const funParam1 = functionKt.parameters[0];
+
+      expect(funParam1.name)
+          .toBe('addressId');
+
+      expect(funParam1.annotations.length)
           .toBe(1);
 
       const paramAnna1 = funParam1.annotations[0];
@@ -1827,6 +2295,13 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(funcAnnaParam1.valueFactory(fileKt))
           .toBe('"/test1"');
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe(`
+impl.getDeliveryAddress(
+        addressId,
+        primaryAddress)
+`);
     });
 
     it('should throw error for unsupported type', () => {
@@ -1837,17 +2312,14 @@ class GetDeliveryAddressResponse private constructor(
 
       const unsupportedHandler = new UnsupportedTypeTest();
 
-      const context = new MockGeneratorContext();
+      const classKt = new ClassKt('DeliveryAddressController');
 
-      const interfaceKt = new InterfaceKt('DeliveryAddressApi');
-
-      expect(() => generator.addControllerApiFunction(
-          interfaceKt,
+      expect(() => generator.addControllerFunction(
+          classKt,
           spec,
           '',
           pathScope,
-          <HttpMethodHandler>unsupportedHandler,
-          context
+          <HttpMethodHandler>unsupportedHandler
       )).toThrowError('Unsupported Mapping type: UnsupportedTypeTest');
     });
   });
@@ -1913,21 +2385,7 @@ class GetDeliveryAddressResponse private constructor(
       }
 
       expect(interfaceKt.annotations.length)
-          .toBe(1);
-
-      expect(interfaceKt.annotations[0].className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
-
-      const intAnnParams: AnnotationParameterKt[] = interfaceKt.annotations[0].parameters;
-
-      expect(intAnnParams.length)
-          .toBe(1);
-
-      expect(intAnnParams[0].name)
-          .toBe('value');
-
-      expect(intAnnParams[0].valueFactory(fileKt))
-          .toBe('"/delivery-address/{primary-id}"');
+          .toBe(0);
 
       expect(interfaceKt.name)
           .toBe('DeliveryAddressApi');
@@ -1996,6 +2454,132 @@ class GetDeliveryAddressResponse private constructor(
           .toBe('addressId');
 
       expect(funParam1.annotations.length)
+          .toBe(0);
+
+      const funParam2 = functionKt.parameters[1];
+
+      expect(funParam2.name)
+          .toBe('primaryAddress');
+
+      expect(funParam2.annotations.length)
+          .toBe(0);
+
+      expect(functionKt.annotations.length)
+          .toBe(0);
+    });
+  });
+
+  describe('addControllerKotlinClass()', () => {
+
+    it('should add interface', () => {
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'delivery-address';
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+      pathScope.path = [staticPathElement, pathParameter];
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      pathScope.mappings = [handler];
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      const response = new Response();
+      response.name = 'get-address-response';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      handler.responseRefs = [response];
+
+      const fileKt = new FileKt('testing.ws.api', 'DeliveryAddressApi');
+
+      const fullSpec = new Specification();
+      fullSpec.name = 'testing';
+      fullSpec.pathScopes = [pathScope];
+
+      generator.addControllerKotlinClass(fileKt, fullSpec, pathScope);
+
+      expect(fileKt.members.length)
+          .toBe(1);
+
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
+        return;
+      }
+
+      expect(classKt.annotations.length)
+          .toBe(2);
+
+      const classAnna1 = classKt.annotations[0];
+
+      expect(classAnna1.className)
+          .toBe('org.springframework.web.bind.annotation.RestController');
+
+      const classAnna2 = classKt.annotations[1];
+
+      expect(classAnna2.className)
+          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+
+      const intAnnParams: AnnotationParameterKt[] = classAnna2.parameters;
+
+      expect(intAnnParams.length)
+          .toBe(1);
+
+      expect(intAnnParams[0].name)
+          .toBe('value');
+
+      expect(intAnnParams[0].valueFactory(fileKt))
+          .toBe('"/delivery-address/{primary-id}"');
+
+      expect(classKt.name)
+          .toBe('DeliveryAddressController');
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(2);
+
+      const returnType = functionKt.returnType;
+
+      expect(returnType.className)
+          .toBe('io.reactivex.Single');
+
+      expect(returnType.genericParameters.length)
+          .toBe(1);
+
+      expect(returnType.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressResponse');
+
+      const funParam1 = functionKt.parameters[0];
+
+      expect(funParam1.name)
+          .toBe('addressId');
+
+      expect(funParam1.annotations.length)
           .toBe(1);
 
       const paramAnna1 = funParam1.annotations[0];
@@ -2036,6 +2620,13 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(funcAnna.parameters.length)
           .toBe(0);
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe(`
+impl.getDeliveryAddress(
+        addressId,
+        primaryAddress)
+`);
     });
 
     it('should support empty path', () => {
@@ -2066,73 +2657,38 @@ class GetDeliveryAddressResponse private constructor(
 
       handler.responseRefs = [response];
 
-      const context = new MockGeneratorContext();
-
       const fileKt = new FileKt('testing.ws.api', 'DeliveryAddressApi');
 
       const fullSpec = new Specification();
       fullSpec.name = 'testing';
       fullSpec.pathScopes = [pathScope];
 
-      generator.addControllerApiKotlinInterface(fileKt, fullSpec, pathScope, context);
+      generator.addControllerKotlinClass(fileKt, fullSpec, pathScope);
 
       expect(fileKt.members.length)
           .toBe(1);
 
-      const interfaceKt = fileKt.members[0];
-      if (!(interfaceKt instanceof InterfaceKt)) {
-        fail(`Expected InterfaceKt but was ${interfaceKt.constructor.name}`);
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
         return;
       }
 
-      expect(interfaceKt.annotations.length)
-          .toBe(0);
-
-      expect(interfaceKt.name)
-          .toBe('DeliveryAddressApi');
-
-      expect(context.outputPaths.length)
+      expect(classKt.annotations.length)
           .toBe(1);
 
-      expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+      const classAnna1 = classKt.annotations[0];
 
-      expect(context.contents[0])
-          .toBe(`\
-package testing.ws.api.deliveryaddress
+      expect(classAnna1.className)
+          .toBe('org.springframework.web.bind.annotation.RestController');
 
-import com.gantsign.restrulz.spring.mvc.ResponseEntityConvertible
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import testing.model.DeliveryAddress
+      expect(classKt.name)
+          .toBe('DeliveryAddressController');
 
-class GetDeliveryAddressResponse private constructor(
-        private val responseEntity: ResponseEntity\<Any?>) : ResponseEntityConvertible\<Any?> {
-
-    override fun toResponseEntity(): ResponseEntity\<Any?> {
-        return responseEntity
-    }
-
-    companion object {
-
-        fun partialContent(value: DeliveryAddress): GetDeliveryAddressResponse {
-
-            val headers = HttpHeaders()
-            headers.contentType = MediaType.APPLICATION_JSON_UTF8;
-
-            return GetDeliveryAddressResponse(
-                ResponseEntity\<Any?>(value, headers, HttpStatus.PARTIAL_CONTENT))
-        }
-    }
-}
-`);
-
-      expect(interfaceKt.members.length).toBe(1);
-      const functionKt = interfaceKt.members[0];
-      if (!(<any>functionKt instanceof FunctionSignatureKt)) {
-        fail(`Expected FunctionSignatureKt but was ${functionKt.constructor.name}`);
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
         return;
       }
 
@@ -2172,6 +2728,9 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(funcAnna.parameters.length)
           .toBe(0);
+
+      expect(serializer.serializeBody(fileKt, functionKt.body))
+          .toBe('\nimpl.getDeliveryAddress(primaryAddress)\n');
     });
   });
 
@@ -2240,21 +2799,7 @@ class GetDeliveryAddressResponse private constructor(
       }
 
       expect(interfaceKt.annotations.length)
-          .toBe(1);
-
-      expect(interfaceKt.annotations[0].className)
-          .toBe('org.springframework.web.bind.annotation.RequestMapping');
-
-      const intAnnParams: AnnotationParameterKt[] = interfaceKt.annotations[0].parameters;
-
-      expect(intAnnParams.length)
-          .toBe(1);
-
-      expect(intAnnParams[0].name)
-          .toBe('value');
-
-      expect(intAnnParams[0].valueFactory(fileKt))
-          .toBe('"/delivery-address/{primary-id}"');
+          .toBe(0);
 
       expect(interfaceKt.name)
           .toBe('DeliveryAddressApi');
@@ -2301,6 +2846,140 @@ class GetDeliveryAddressResponse private constructor(
       const functionKt = interfaceKt.members[0];
       if (!(<any>functionKt instanceof FunctionSignatureKt)) {
         fail(`Expected FunctionSignatureKt but was ${functionKt.constructor.name}`);
+        return;
+      }
+
+      expect(functionKt.parameters.length).toBe(2);
+
+      const returnType = functionKt.returnType;
+
+      expect(returnType.className)
+          .toBe('io.reactivex.Single');
+
+      expect(returnType.genericParameters.length)
+          .toBe(1);
+
+      expect(returnType.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressResponse');
+
+      const funParam1 = functionKt.parameters[0];
+
+      expect(funParam1.name)
+          .toBe('addressId');
+
+      expect(funParam1.annotations.length)
+          .toBe(0);
+
+      const funParam2 = functionKt.parameters[1];
+
+      expect(funParam2.name)
+          .toBe('primaryAddress');
+
+      expect(funParam2.annotations.length)
+          .toBe(0);
+
+      expect(functionKt.annotations.length)
+          .toBe(0);
+    });
+
+  });
+
+
+
+
+  describe('toControllerKotlinFile()', () => {
+
+    it('should create file', () => {
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'delivery-address';
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+      pathScope.path = [staticPathElement, pathParameter];
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      pathScope.mappings = [handler];
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      const response = new Response();
+      response.name = 'get-address-response';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      handler.responseRefs = [response];
+
+      const fullSpec = new Specification();
+      fullSpec.name = 'testing';
+      fullSpec.pathScopes = [pathScope];
+
+      const fileKt = generator.toControllerKotlinFile(fullSpec, pathScope);
+
+      expect(fileKt.packageName)
+          .toBe('testing.ws.controller');
+
+      expect(fileKt.fileName)
+          .toBe('DeliveryAddressController');
+
+      expect(fileKt.members.length)
+          .toBe(1);
+
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
+        return;
+      }
+
+      expect(classKt.annotations.length)
+          .toBe(2);
+
+      const classAnna1 = classKt.annotations[0];
+
+      expect(classAnna1.className)
+          .toBe('org.springframework.web.bind.annotation.RestController');
+
+      const classAnna2 = classKt.annotations[1];
+
+      expect(classAnna2.className)
+          .toBe('org.springframework.web.bind.annotation.RequestMapping');
+
+      const intAnnParams: AnnotationParameterKt[] = classAnna2.parameters;
+
+      expect(intAnnParams.length)
+          .toBe(1);
+
+      expect(intAnnParams[0].name)
+          .toBe('value');
+
+      expect(intAnnParams[0].valueFactory(fileKt))
+          .toBe('"/delivery-address/{primary-id}"');
+
+      expect(classKt.name)
+          .toBe('DeliveryAddressController');
+
+      expect(classKt.members.length).toBe(1);
+      const functionKt = classKt.members[0];
+      if (!(functionKt instanceof FunctionKt)) {
+        fail(`Expected FunctionKt but was ${functionKt.constructor.name}`);
         return;
       }
 
@@ -2461,21 +3140,104 @@ class GetDeliveryAddressResponse private constructor(
 package testing.ws.api
 
 import io.reactivex.Single
+import testing.model.DeliveryAddress
+import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
+
+interface DeliveryAddressApi {
+
+    fun getDeliveryAddress(
+            addressId: String,
+            primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+}
+`);
+
+    });
+
+  });
+
+  describe('generateControllerFiles()', () => {
+
+    it('should generate files', () => {
+
+      const staticPathElement = new StaticPathElement();
+      staticPathElement.value = 'delivery-address';
+
+      const pathParameter = new PathParameter();
+      pathParameter.name = 'primary-id';
+      pathParameter.typeRef = new StringType();
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'delivery-address';
+      pathScope.path = [staticPathElement, pathParameter];
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-delivery-address';
+      handler.method = HttpMethod.GET;
+
+      pathScope.mappings = [handler];
+
+      const parameterRef1 = new PathParameterReference();
+      parameterRef1.name = 'address-id';
+      parameterRef1.value = pathParameter;
+
+      const classType = new ClassType();
+      classType.name = 'delivery-address';
+
+      const parameterRef2 = new BodyParameterReference();
+      parameterRef2.name = 'primary-address';
+      parameterRef2.typeRef = classType;
+
+      handler.parameters = [parameterRef1, parameterRef2];
+
+      const response = new Response();
+      response.name = 'get-address-response';
+      response.status = HttpStatus.PARTIAL_CONTENT;
+      response.bodyTypeRef = classType;
+
+      handler.responseRefs = [response];
+
+      const context = new MockGeneratorContext();
+
+      const fullSpec = new Specification();
+      fullSpec.name = 'testing';
+      fullSpec.pathScopes = [pathScope];
+
+      generator.generateControllerFiles(fullSpec, context);
+
+      expect(context.outputPaths.length)
+          .toBe(1);
+
+      expect(context.outputPaths[0])
+          .toBe('testing/ws/controller/DeliveryAddressController.kt');
+
+      expect(context.contents[0])
+          .toBe(`\
+package testing.ws.controller
+
+import io.reactivex.Single
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import testing.model.DeliveryAddress
+import testing.ws.api.DeliveryAddressApi
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
+@RestController
 @RequestMapping("/delivery-address/{primary-id}")
-interface DeliveryAddressApi {
+class DeliveryAddressController(private val impl: DeliveryAddressApi) {
 
     @GetMapping
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
             @RequestBody primaryAddress: DeliveryAddress
-    ): Single\<GetDeliveryAddressResponse>
+    ): Single\<GetDeliveryAddressResponse> {
+
+        impl.getDeliveryAddress(
+                addressId,
+                primaryAddress)
+    }
 }
 `);
 
@@ -2533,7 +3295,7 @@ interface DeliveryAddressApi {
       generator.generateFiles(fullSpec, context);
 
       expect(context.outputPaths.length)
-          .toBe(2);
+          .toBe(3);
 
       expect(context.outputPaths[0])
           .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
@@ -2577,21 +3339,48 @@ class GetDeliveryAddressResponse private constructor(
 package testing.ws.api
 
 import io.reactivex.Single
+import testing.model.DeliveryAddress
+import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
+
+interface DeliveryAddressApi {
+
+    fun getDeliveryAddress(
+            addressId: String,
+            primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+}
+`);
+
+      expect(context.outputPaths[2])
+          .toBe('testing/ws/controller/DeliveryAddressController.kt');
+
+      expect(context.contents[2])
+          .toBe(`\
+package testing.ws.controller
+
+import io.reactivex.Single
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import testing.model.DeliveryAddress
+import testing.ws.api.DeliveryAddressApi
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
+@RestController
 @RequestMapping("/delivery-address/{primary-id}")
-interface DeliveryAddressApi {
+class DeliveryAddressController(private val impl: DeliveryAddressApi) {
 
     @GetMapping
     fun getDeliveryAddress(
             @PathVariable("primary-id") addressId: String,
             @RequestBody primaryAddress: DeliveryAddress
-    ): Single\<GetDeliveryAddressResponse>
+    ): Single\<GetDeliveryAddressResponse> {
+
+        impl.getDeliveryAddress(
+                addressId,
+                primaryAddress)
+    }
 }
 `);
 

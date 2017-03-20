@@ -28,6 +28,7 @@ import {
   ExtensionFunctionKt,
   FileKt,
   FileMemberKt,
+  FunctionCallKt,
   FunctionKt,
   FunctionSignatureKt,
   IfBlockKt,
@@ -834,6 +835,23 @@ data class TestClass(val test1: String)
 `);
     });
 
+    it('should support annotations', () => {
+      const fileKt = createFile();
+      const classKt = new ClassKt('TestClass');
+
+      classKt.addAnnotation('com.example.Ann1');
+      classKt.addAnnotation('com.example.Ann2', annotationKt => {
+        annotationKt.addSimpleParameter('value', '"test1"');
+      });
+
+      expect(serializer.serializeClass(fileKt, classKt))
+          .toBe(`\
+@Ann1
+@Ann2("test1")
+class TestClass
+`);
+    });
+
     it('should support extends', () => {
       const fileKt = createFile();
       const classKt = new ClassKt('TestClass');
@@ -1319,6 +1337,48 @@ try {
     });
   });
 
+  describe('serializeFunctionCall()', () => {
+
+    it('should support omitting optional variable name', () => {
+      const fileKt = createFile();
+      const functionCallKt = new FunctionCallKt('', 'test1');
+
+      expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
+          .toBe('test1()\n');
+    });
+
+    it('should support including optional variable name', () => {
+      const fileKt = createFile();
+      const functionCallKt = new FunctionCallKt('var1', 'test1');
+
+      expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
+          .toBe('var1.test1()\n');
+    });
+
+    it('should support single args', () => {
+      const fileKt = createFile();
+      const functionCallKt = new FunctionCallKt('', 'test1');
+      functionCallKt.addArgument('arg1');
+
+      expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
+          .toBe('test1(arg1)\n');
+    });
+
+    it('should support multiple args', () => {
+      const fileKt = createFile();
+      const functionCallKt = new FunctionCallKt('', 'test1');
+      functionCallKt.addArgument('arg1');
+      functionCallKt.addArgument('arg2');
+
+      expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
+          .toBe(`\
+test1(
+        arg1,
+        arg2)
+`);
+    });
+  });
+
   describe('serializeBodyContent()', () => {
 
     it('should render text', () => {
@@ -1417,6 +1477,20 @@ try {
 } catch (e: RuntimeException) {
     return false
 }
+`);
+    });
+
+    it('should render function call', () => {
+      const fileKt = createFile();
+      const functionCallKt = new FunctionCallKt('var1', 'test1');
+      functionCallKt.addArgument('arg1');
+      functionCallKt.addArgument('arg2');
+
+      expect(serializer.serializeBodyContent(fileKt, functionCallKt))
+          .toBe(`\
+var1.test1(
+        arg1,
+        arg2)
 `);
     });
 

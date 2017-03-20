@@ -29,6 +29,7 @@ import {
   ExtensionFunctionKt,
   FileKt,
   FileMemberKt,
+  FunctionCallKt,
   FunctionKt,
   FunctionSignatureKt,
   IfBlockKt,
@@ -402,8 +403,14 @@ export class KotlinSerializer {
 
   public serializeClass(fileKt: FileKt, classKt: AbstractClassKt): string {
 
-    const {name, primaryConstructor, extendsClasses, members} = classKt;
+    const {annotations, name, primaryConstructor, extendsClasses, members} = classKt;
     let result = '';
+    if (annotations.length > 0) {
+      result += annotations
+          .map(annotationKt => this.serializeAnnotation(fileKt, annotationKt))
+          .join('\n');
+      result += '\n';
+    }
     if (classKt instanceof ClassKt) {
       const {dataClass} = classKt;
       if (dataClass) {
@@ -622,6 +629,32 @@ export class KotlinSerializer {
     return result;
   }
 
+  public serializeFunctionCall(fileKt: FileKt, functionCallKt: FunctionCallKt): string {
+
+    const {variableName, functionName} = functionCallKt;
+    const args = functionCallKt.arguments;
+
+    let result = '';
+    if (variableName !== '') {
+      result += `${variableName}.`;
+    }
+    result += `${functionName}(`;
+    const indent = this.indent;
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (i > 0) {
+        result += ',';
+      }
+      if (args.length > 1) {
+        result += `\n${indent(indent(arg))}`;
+      } else {
+        result += arg;
+      }
+    }
+    result += ')\n';
+    return result;
+  }
+
   public serializeBodyContent(fileKt: FileKt, content: BodyContentKt): string {
 
     if (content instanceof TextKt) {
@@ -657,6 +690,11 @@ export class KotlinSerializer {
     if (content instanceof TryBlockKt) {
 
       return this.serializeTryBlock(fileKt, content);
+    }
+
+    if (content instanceof FunctionCallKt) {
+
+      return this.serializeFunctionCall(fileKt, content);
     }
 
     throw new Error(`Unsupported BodyContentKt type: ${content.constructor.name}`);

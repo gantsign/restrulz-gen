@@ -28,6 +28,7 @@ import {
 } from '../../restrulz/model';
 import {GeneratorContext} from '../../generator';
 import {
+  ClassKt,
   CompanionObjectKt,
   FileKt,
   FunctionSignatureKt,
@@ -51,13 +52,30 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     return `${this.toKotlinClassName(pathScope.name)}Api`;
   }
 
+  public getQualifiedApiClass(spec: Specification, pathScope: RootPathScope): string {
+
+    const packageName = this.getControllerApiPackageName(spec);
+    const className = this.getControllerApiClassName(pathScope);
+    return `${packageName}.${className}`;
+  }
+
+  public getControllerPackageName(spec: Specification): string {
+
+    return this.packageMapping[`${spec.name}.ws.controller`]
+        || `${this.getPackageName(spec)}.ws.controller`;
+  }
+
+  public getControllerClassName(pathScope: RootPathScope): string {
+
+    return `${this.toKotlinClassName(pathScope.name)}Controller`;
+  }
+
   public getResponsePackageName(spec: Specification, pathScope: RootPathScope): string {
 
     const responsePackageName = kebabToCamel(pathScope.name).toLowerCase();
     return `${this.getControllerApiPackageName(spec)}.${responsePackageName}`;
   }
 
-  //noinspection JSMethodCanBeStatic
   public getResponseClassName(handler: HttpMethodHandler): string {
 
     return `${this.toKotlinClassName(handler.name)}Response`;
@@ -100,9 +118,47 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     return `org.springframework.web.bind.annotation.${method}Mapping`;
   }
 
-  public addPathParameter(functionSignature: FunctionSignatureKt,
-                          spec: Specification,
-                          parameter: PathParameterReference) {
+  public addFunctionSignaturePathParameter(functionSignature: FunctionSignatureKt,
+                                           spec: Specification,
+                                           parameter: PathParameterReference) {
+
+    const {name, value} = parameter;
+    const paramName = kebabToCamel(name);
+    const paramType = this.toKotlinType(spec, value.typeRef);
+
+    functionSignature.addParameter(paramName, paramType);
+  }
+
+  public addFunctionSignatureBodyParameter(functionSignature: FunctionSignatureKt,
+                                           spec: Specification,
+                                           parameter: BodyParameterReference) {
+
+    const paramName = kebabToCamel(parameter.name);
+    const paramType = this.getQualifiedModelClass(spec, parameter.typeRef);
+
+    functionSignature.addParameter(paramName, paramType);
+  }
+
+  public addFunctionSignatureParameter(functionSignature: FunctionSignatureKt,
+                                       spec: Specification,
+                                       parameter: HandlerParameter) {
+
+    if (parameter instanceof PathParameterReference) {
+
+      this.addFunctionSignaturePathParameter(functionSignature, spec, parameter);
+
+    } else if (parameter instanceof BodyParameterReference) {
+
+      this.addFunctionSignatureBodyParameter(functionSignature, spec, parameter);
+
+    } else {
+      throw new Error(`Unsupported HandlerParameter type: ${parameter.constructor.name}`);
+    }
+  }
+
+  public addFunctionPathParameter(functionSignature: FunctionSignatureKt,
+                                  spec: Specification,
+                                  parameter: PathParameterReference) {
 
     const {name, value} = parameter;
     const paramName = kebabToCamel(name);
@@ -119,9 +175,9 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     });
   }
 
-  public addBodyParameter(functionSignature: FunctionSignatureKt,
-                          spec: Specification,
-                          parameter: BodyParameterReference) {
+  public addFunctionBodyParameter(functionSignature: FunctionSignatureKt,
+                                  spec: Specification,
+                                  parameter: BodyParameterReference) {
 
     const paramName = kebabToCamel(parameter.name);
     const paramType = this.getQualifiedModelClass(spec, parameter.typeRef);
@@ -132,17 +188,17 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     });
   }
 
-  public addFunctionSignatureParameter(functionSignature: FunctionSignatureKt,
-                                       spec: Specification,
-                                       parameter: HandlerParameter) {
+  public addFunctionParameter(functionSignature: FunctionSignatureKt,
+                              spec: Specification,
+                              parameter: HandlerParameter) {
 
     if (parameter instanceof PathParameterReference) {
 
-      this.addPathParameter(functionSignature, spec, parameter);
+      this.addFunctionPathParameter(functionSignature, spec, parameter);
 
     } else if (parameter instanceof BodyParameterReference) {
 
-      this.addBodyParameter(functionSignature, spec, parameter);
+      this.addFunctionBodyParameter(functionSignature, spec, parameter);
 
     } else {
       throw new Error(`Unsupported HandlerParameter type: ${parameter.constructor.name}`);
@@ -159,9 +215,32 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
     interfaceKt.addFunctionSignature(kebabToCamel(handler.name), functionSignature => {
 
+      parameters.forEach(param =>
+          this.addFunctionSignatureParameter(functionSignature, spec, param));
+
+      functionSignature.alwaysWrapParameters = true;
+
+      functionSignature.setReturnType('io.reactivex.Single', returnType => {
+
+        returnType.addGenericParameter(this.getQualifiedResponseClass(spec, pathScope, handler));
+      });
+    });
+  }
+
+  public addControllerHttpMethodHandlerFunction(classKt: ClassKt,
+                                                spec: Specification,
+                                                path: string,
+                                                pathScope: RootPathScope,
+                                                handler: HttpMethodHandler) {
+
+    const {parameters} = handler;
+
+    const functionName = kebabToCamel(handler.name);
+    classKt.addFunction(functionName, (bodyKt, functionKt) => {
+
       const methodAnnotation = this.getSpringHttpMethodAnnotation(handler);
 
-      functionSignature.addAnnotation(methodAnnotation, annotationKt => {
+      functionKt.addAnnotation(methodAnnotation, annotationKt => {
 
         if (path !== '/' && path !== '') {
           annotationKt.addSimpleParameter('value', this.toKotlinString(path));
@@ -169,14 +248,21 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       });
 
       parameters.forEach(param =>
-          this.addFunctionSignatureParameter(functionSignature, spec, param));
+          this.addFunctionParameter(functionKt, spec, param));
 
-      functionSignature.alwaysWrapParameters = true;
-      functionSignature.wrapAfterParameters = true;
+      functionKt.alwaysWrapParameters = true;
+      functionKt.wrapAfterParameters = true;
 
-      functionSignature.setReturnType('io.reactivex.Single', returnType => {
+      functionKt.setReturnType('io.reactivex.Single', returnType => {
 
         returnType.addGenericParameter(this.getQualifiedResponseClass(spec, pathScope, handler));
+      });
+
+      bodyKt.writeLn('');
+      bodyKt.writeFunctionCall('impl', functionName, functionCallKt => {
+          parameters
+              .map(param => kebabToCamel(param.name))
+              .forEach(varName => functionCallKt.addArgument(varName));
       });
     });
   }
@@ -530,6 +616,27 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
     }
   }
 
+  public addControllerFunction(classKt: ClassKt,
+                               spec: Specification,
+                               path: string,
+                               pathScope: RootPathScope,
+                               mapping: Mapping) {
+
+    if (mapping instanceof HttpMethodHandler) {
+
+      this.addControllerHttpMethodHandlerFunction(classKt, spec, path, pathScope, mapping);
+
+    } else if (mapping instanceof SubPathScope) {
+
+      const newPath = path + mapping.getPathAsString();
+
+      mapping.mappings.forEach(
+          subMapping => this.addControllerFunction(classKt, spec, newPath, pathScope, subMapping));
+    } else {
+      throw new Error(`Unsupported Mapping type: ${mapping.constructor.name}`);
+    }
+  }
+
   public addControllerApiKotlinInterface(fileKt: FileKt,
                                          spec: Specification,
                                          pathScope: RootPathScope,
@@ -539,8 +646,32 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
     fileKt.addInterface(this.getControllerApiClassName(pathScope), interfaceKt => {
 
+      mappings.forEach(
+          mapping => this.addControllerApiFunction(
+              interfaceKt, spec, '', pathScope, mapping, context));
+    });
+  }
+
+  public addControllerKotlinClass(fileKt: FileKt,
+                                  spec: Specification,
+                                  pathScope: RootPathScope) {
+    const {mappings} = pathScope;
+    const path = pathScope.getPathAsString();
+
+    fileKt.addClass(this.getControllerClassName(pathScope), classKt => {
+
+      classKt.setPrimaryConstructor(constructorKt => {
+        const apiInterface = this.getQualifiedApiClass(spec, pathScope);
+
+        constructorKt.addProperty('impl', apiInterface, propertyKt => {
+          propertyKt.visibility = VisibilityKt.Private;
+        });
+      });
+
+      classKt.addAnnotation('org.springframework.web.bind.annotation.RestController');
+
       if (path !== '/' && path !== '') {
-        interfaceKt.addAnnotation(
+        classKt.addAnnotation(
             'org.springframework.web.bind.annotation.RequestMapping',
             annotationKt => {
 
@@ -549,8 +680,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
       }
 
       mappings.forEach(
-          mapping => this.addControllerApiFunction(
-              interfaceKt, spec, '', pathScope, mapping, context));
+          mapping => this.addControllerFunction(classKt, spec, '', pathScope, mapping));
     });
   }
 
@@ -565,14 +695,31 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
     return fileKt;
   }
 
+  public toControllerKotlinFile(spec: Specification,
+                                pathScope: RootPathScope): FileKt {
+
+    const className = this.getControllerClassName(pathScope);
+    const fileKt = this.createKotlinFile(this.getControllerPackageName(spec), className);
+
+    this.addControllerKotlinClass(fileKt, spec, pathScope);
+    return fileKt;
+  }
+
   public generateControllerApiFiles(spec: Specification, context: GeneratorContext): void {
 
     spec.pathScopes.forEach(pathScope =>
         this.writeFile(context, this.toControllerApiKotlinFile(spec, pathScope, context)));
   }
 
+  public generateControllerFiles(spec: Specification, context: GeneratorContext): void {
+
+    spec.pathScopes.forEach(pathScope =>
+        this.writeFile(context, this.toControllerKotlinFile(spec, pathScope)));
+  }
+
   generateFiles(spec: Specification, context: GeneratorContext): void {
 
     this.generateControllerApiFiles(spec, context);
+    this.generateControllerFiles(spec, context);
   }
 }

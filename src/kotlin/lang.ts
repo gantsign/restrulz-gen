@@ -152,6 +152,17 @@ export class TryBlockKt implements BodyContentKt {
   }
 }
 
+export class FunctionCallKt implements BodyContentKt {
+  arguments: string[] = [];
+
+  constructor(public variableName: string,
+              public functionName: string) {}
+
+  addArgument(value: string): void {
+    this.arguments.push(value);
+  }
+}
+
 export class BodyKt implements BodyContentKt {
   content: BodyContentKt[] = [];
 
@@ -199,6 +210,16 @@ export class BodyKt implements BodyContentKt {
 
     this.content.push(tryBlockKt);
     return tryBlockKt;
+  }
+
+  writeFunctionCall(variableName: string,
+                    functionName: string,
+                    callback: (functionCallKt: FunctionCallKt) => void): void {
+
+    const functionCallKt = new FunctionCallKt(variableName, functionName);
+    callback(functionCallKt);
+
+    this.content.push(functionCallKt);
   }
 }
 
@@ -317,6 +338,7 @@ export class CompanionObjectKt {
 }
 
 export abstract class AbstractClassKt {
+  annotations: AnnotationKt[] = [];
   primaryConstructor: PrimaryConstructorKt;
   extendsClasses: ExtendsOrImplementsKt[] = [];
   members: ClassMemberKt[] = [];
@@ -328,6 +350,14 @@ export abstract class AbstractClassKt {
     const constructorKt = new PrimaryConstructorKt();
     callback(constructorKt);
     this.primaryConstructor = constructorKt;
+  }
+
+  addAnnotation(className: string,
+                callback: (annotationKt: AnnotationKt) => void = () => {}): void {
+
+    const annotationKt = new AnnotationKt(className);
+    callback(annotationKt);
+    this.annotations.push(annotationKt);
   }
 
   extendsClass(name: string,
