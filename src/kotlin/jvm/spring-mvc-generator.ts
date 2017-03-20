@@ -259,6 +259,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       });
 
       bodyKt.writeLn('');
+      bodyKt.write('return ');
       bodyKt.writeFunctionCall('impl', functionName, functionCallKt => {
           parameters
               .map(param => kebabToCamel(param.name))

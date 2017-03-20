@@ -740,7 +740,7 @@ describe('KotlinSpringMvcGenerator', () => {
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-impl.getDeliveryAddress(
+return impl.getDeliveryAddress(
         addressId,
         primaryAddress)
 `);
@@ -856,7 +856,7 @@ impl.getDeliveryAddress(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-impl.getDeliveryAddress(
+return impl.getDeliveryAddress(
         addressId,
         primaryAddress)
 `);
@@ -2170,7 +2170,7 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-impl.getDeliveryAddress(
+return impl.getDeliveryAddress(
         addressId,
         primaryAddress)
 `);
@@ -2298,7 +2298,7 @@ impl.getDeliveryAddress(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-impl.getDeliveryAddress(
+return impl.getDeliveryAddress(
         addressId,
         primaryAddress)
 `);
@@ -2623,7 +2623,7 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-impl.getDeliveryAddress(
+return impl.getDeliveryAddress(
         addressId,
         primaryAddress)
 `);
@@ -2730,7 +2730,7 @@ impl.getDeliveryAddress(
           .toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('\nimpl.getDeliveryAddress(primaryAddress)\n');
+          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress)\n');
     });
   });
 
@@ -3234,7 +3234,7 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
             @RequestBody primaryAddress: DeliveryAddress
     ): Single\<GetDeliveryAddressResponse> {
 
-        impl.getDeliveryAddress(
+        return impl.getDeliveryAddress(
                 addressId,
                 primaryAddress)
     }
@@ -3377,7 +3377,7 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
             @RequestBody primaryAddress: DeliveryAddress
     ): Single\<GetDeliveryAddressResponse> {
 
-        impl.getDeliveryAddress(
+        return impl.getDeliveryAddress(
                 addressId,
                 primaryAddress)
     }
