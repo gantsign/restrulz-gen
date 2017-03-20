@@ -73,6 +73,7 @@ export {
   ExtendsOrImplementsKt,
   FileKt,
   FileMemberKt,
+  FunctionCallKt,
   FunctionKt,
   FunctionSignatureKt,
   IfBlockKt,
@@ -99,3 +100,4 @@ export {KotlinValidatorGenerator} from './kotlin/jvm/validator-generator';
 export {KotlinJsonWriterGenerator} from './kotlin/jvm/json-writer-generator';
 export {KotlinJsonReaderGenerator} from './kotlin/jvm/json-reader-generator';
 export {KotlinSpringMvcGenerator} from './kotlin/jvm/spring-mvc-generator';
+export {CompositeKotlinGenerator} from './kotlin/composite-generator';
