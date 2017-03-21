@@ -277,23 +277,13 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
 
     const {name, type, isArray, allowNull} = property;
     const propertyName = kebabToCamel(name);
-    const jsonToken = fileKt.tryImport('com.fasterxml.jackson.core.JsonToken');
     const readerClass = fileKt.tryImport(this.getQualifiedReaderClass(spec, type as ClassType));
+
+    const requiredPrefix = allowNull ? 'Optional' : 'Required';
     const valueType = isArray ? 'Array' : 'Object';
-    const indent = this.indent;
+    const methodName = `read${requiredPrefix}${valueType}`;
 
-    bodyKt.writeLn(`${propertyName}Value = ${readerClass}.read${valueType}(parser)`);
-
-    if (!allowNull) {
-      const expectedToken = isArray ? 'START_ARRAY' : 'START_OBJECT';
-
-      bodyKt.writeIf(() => `${propertyName}Value === null`, ifBlockKt => {
-
-        ifBlockKt.writeLn('parser.handleValidationFailure(');
-        ifBlockKt.writeLn(indent(indent(
-            `"Expected \${${jsonToken}.${expectedToken}} but was $token")`)));
-      });
-    }
+    bodyKt.writeLn(`${propertyName}Value = ${readerClass}.${methodName}(parser)`);
   }
 
   public writeParseField(bodyKt: BodyKt,
@@ -480,7 +470,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
 
       this.addFieldIndexProperties(objectKt, classType);
 
-      objectKt.addFunction('readObject', (bodyKt, functionKt) => {
+      objectKt.addFunction('readRequiredObject', (bodyKt, functionKt) => {
 
         functionKt.overrides = true;
         functionKt.addParameter(
@@ -496,22 +486,11 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
 
         const jsonToken = fileKt.tryImport('com.fasterxml.jackson.core.JsonToken');
 
-        bodyKt.writeWhen('startObject', whenKt => {
-
-          whenKt.addCase(() => `${jsonToken}.VALUE_NULL`, caseBodyKt => {
-            caseBodyKt.writeLn('return null');
-          });
-
-          whenKt.addCase(() => `${jsonToken}.START_OBJECT`, caseBodyKt => {
-            caseBodyKt.writeLn('// continue');
-          });
-
-          whenKt.setElse(elseBodyKt => {
-            elseBodyKt.writeLn('parser.handleValidationFailure(');
-            elseBodyKt.writeLn(indent(indent(
-                `"Expected \${${jsonToken}.START_OBJECT} but was $startObject")`)));
-            elseBodyKt.writeLn('return null');
-          });
+        bodyKt.writeIf(() => `startObject != ${jsonToken}.START_OBJECT`, whenBodyKt => {
+          whenBodyKt.writeLn('parser.handleValidationFailure(');
+          whenBodyKt.writeLn(indent(indent(
+              `"Expected \${${jsonToken}.START_OBJECT} but was $startObject")`)));
+          whenBodyKt.writeLn('return null');
         });
 
         bodyKt.writeLn('');

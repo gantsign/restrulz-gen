@@ -487,13 +487,7 @@ when (token) {
       generator.writeParseClassField(bodyKt, spec, fileKt, property);
 
       expect(serializer.serializeBody(fileKt, bodyKt))
-          .toBe(`\
-deliveryHistoryValue = DeliveryRecordReader.readObject(parser)
-if (deliveryHistoryValue === null) {
-    parser.handleValidationFailure(
-            "Expected \${JsonToken.START_OBJECT} but was $token")
-}
-`);
+          .toBe('deliveryHistoryValue = DeliveryRecordReader.readRequiredObject(parser)\n');
     });
 
     it('should support nullable classes', () => {
@@ -512,7 +506,7 @@ if (deliveryHistoryValue === null) {
       generator.writeParseClassField(bodyKt, spec, fileKt, property);
 
       expect(serializer.serializeBody(fileKt, bodyKt))
-          .toBe('deliveryHistoryValue = DeliveryRecordReader.readObject(parser)\n');
+          .toBe('deliveryHistoryValue = DeliveryRecordReader.readOptionalObject(parser)\n');
     });
 
     it('should support class arrays', () => {
@@ -531,13 +525,7 @@ if (deliveryHistoryValue === null) {
       generator.writeParseClassField(bodyKt, spec, fileKt, property);
 
       expect(serializer.serializeBody(fileKt, bodyKt))
-          .toBe(`\
-deliveryHistoryValue = DeliveryRecordReader.readArray(parser)
-if (deliveryHistoryValue === null) {
-    parser.handleValidationFailure(
-            "Expected \${JsonToken.START_ARRAY} but was $token")
-}
-`);
+          .toBe('deliveryHistoryValue = DeliveryRecordReader.readRequiredArray(parser)\n');
     });
   });
 
@@ -648,13 +636,7 @@ when (token) {
       generator.writeParseField(bodyKt, spec, fileKt, property);
 
       expect(serializer.serializeBody(fileKt, bodyKt))
-          .toBe(`\
-deliveryHistoryValue = DeliveryRecordReader.readObject(parser)
-if (deliveryHistoryValue === null) {
-    parser.handleValidationFailure(
-            "Expected \${JsonToken.START_OBJECT} but was $token")
-}
-`);
+          .toBe('deliveryHistoryValue = DeliveryRecordReader.readRequiredObject(parser)\n');
     });
 
     it('should throw error for unsupported type', () => {
@@ -1106,23 +1088,14 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
-        when (startObject) {
-
-            JsonToken.VALUE_NULL -> {
-                return null
-            }
-            JsonToken.START_OBJECT -> {
-                // continue
-            }
-            else -> {
-                parser.handleValidationFailure(
-                        "Expected \${JsonToken.START_OBJECT} but was $startObject")
-                return null
-            }
+        if (startObject != JsonToken.START_OBJECT) {
+            parser.handleValidationFailure(
+                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+            return null
         }
 
         val fieldNamesPresent = BitSet()
@@ -1319,23 +1292,14 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
-        when (startObject) {
-
-            JsonToken.VALUE_NULL -> {
-                return null
-            }
-            JsonToken.START_OBJECT -> {
-                // continue
-            }
-            else -> {
-                parser.handleValidationFailure(
-                        "Expected \${JsonToken.START_OBJECT} but was $startObject")
-                return null
-            }
+        if (startObject != JsonToken.START_OBJECT) {
+            parser.handleValidationFailure(
+                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+            return null
         }
 
         val fieldNamesPresent = BitSet()
@@ -1566,23 +1530,14 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
     private val addressLine1Index: Int = 0
     private val addressLine2Index: Int = 1
 
-    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
-        when (startObject) {
-
-            JsonToken.VALUE_NULL -> {
-                return null
-            }
-            JsonToken.START_OBJECT -> {
-                // continue
-            }
-            else -> {
-                parser.handleValidationFailure(
-                        "Expected \${JsonToken.START_OBJECT} but was $startObject")
-                return null
-            }
+        if (startObject != JsonToken.START_OBJECT) {
+            parser.handleValidationFailure(
+                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+            return null
         }
 
         val fieldNamesPresent = BitSet()
@@ -1692,23 +1647,14 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
     private val log: Logger = LoggerFactory.getLogger(PostalAddressReader::class.java)
     private val addressLine1Index: Int = 0
 
-    override fun readObject(parser: ValidationHandlingJsonParser): PostalAddress? {
+    override fun readRequiredObject(parser: ValidationHandlingJsonParser): PostalAddress? {
 
         val startObject = parser.currentToken()
 
-        when (startObject) {
-
-            JsonToken.VALUE_NULL -> {
-                return null
-            }
-            JsonToken.START_OBJECT -> {
-                // continue
-            }
-            else -> {
-                parser.handleValidationFailure(
-                        "Expected \${JsonToken.START_OBJECT} but was $startObject")
-                return null
-            }
+        if (startObject != JsonToken.START_OBJECT) {
+            parser.handleValidationFailure(
+                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+            return null
         }
 
         val fieldNamesPresent = BitSet()
@@ -1878,23 +1824,14 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
     private val log: Logger = LoggerFactory.getLogger(DeliveryAddressReader::class.java)
     private val addressLine1Index: Int = 0
 
-    override fun readObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
+    override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
         val startObject = parser.currentToken()
 
-        when (startObject) {
-
-            JsonToken.VALUE_NULL -> {
-                return null
-            }
-            JsonToken.START_OBJECT -> {
-                // continue
-            }
-            else -> {
-                parser.handleValidationFailure(
-                        "Expected \${JsonToken.START_OBJECT} but was $startObject")
-                return null
-            }
+        if (startObject != JsonToken.START_OBJECT) {
+            parser.handleValidationFailure(
+                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+            return null
         }
 
         val fieldNamesPresent = BitSet()
