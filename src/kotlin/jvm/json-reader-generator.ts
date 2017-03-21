@@ -163,7 +163,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
 
         elseBodyKt.writeLn('parser.handleValidationFailure(');
         elseBodyKt.writeLn(indent(indent(
-            `"Expected \${${jsonToken}.VALUE_STRING} but was $token")`)));
+            `"Expected \${${jsonToken}.VALUE_STRING} but was \${token.toString()}")`)));
       })
     });
   }
@@ -220,7 +220,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
         if (allowNull) {
           elseBodyKt.write(`or \${${jsonToken}.VALUE_NULL} `);
         }
-        elseBodyKt.writeLn('but was $token")');
+        elseBodyKt.writeLn('but was ${token.toString()}")');
       });
     });
   }
@@ -264,7 +264,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
         if (allowNull) {
           elseBodyKt.write(`or \${${jsonToken}.VALUE_NULL} `);
         }
-        elseBodyKt.writeLn('but was $token")')
+        elseBodyKt.writeLn('but was ${token.toString()}")')
       });
 
     });
@@ -480,16 +480,16 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
 
         bodyKt.writeLn('');
 
-        bodyKt.writeLn('val startObject = parser.currentToken()');
+        const jsonToken = fileKt.tryImport('com.fasterxml.jackson.core.JsonToken');
+
+        bodyKt.writeLn(`val startObject: ${jsonToken}? = parser.currentToken()`);
 
         bodyKt.writeLn('');
 
-        const jsonToken = fileKt.tryImport('com.fasterxml.jackson.core.JsonToken');
-
-        bodyKt.writeIf(() => `startObject != ${jsonToken}.START_OBJECT`, whenBodyKt => {
+        bodyKt.writeIf(() => `startObject !== ${jsonToken}.START_OBJECT`, whenBodyKt => {
           whenBodyKt.writeLn('parser.handleValidationFailure(');
           whenBodyKt.writeLn(indent(indent(
-              `"Expected \${${jsonToken}.START_OBJECT} but was $startObject")`)));
+              `"Expected \${${jsonToken}.START_OBJECT} but was \${startObject.toString()}")`)));
           whenBodyKt.writeLn('return null');
         });
 
@@ -508,7 +508,7 @@ export class KotlinJsonReaderGenerator extends KotlinGenerator {
           whileBodyKt.writeLn('val fieldName = parser.currentName');
           whileBodyKt.writeLn('');
           whileBodyKt.writeLn('// Move to value');
-          whileBodyKt.writeLn('val token = parser.nextToken()');
+          whileBodyKt.writeLn(`val token: ${jsonToken}? = parser.nextToken()`);
           whileBodyKt.writeLn('');
           this.writeWhenOverFields(whileBodyKt, spec, fileKt, classType);
         });

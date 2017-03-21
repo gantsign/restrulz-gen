@@ -227,7 +227,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_STRING} but was $token")
+                "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
     }
 }
 `);
@@ -264,7 +264,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_STRING} but was $token")
+                "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
     }
 }
 `);
@@ -298,7 +298,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_STRING} but was $token")
+                "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
     }
 }
 `);
@@ -331,7 +331,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_NUMBER_INT} but was $token")
+                "Expected \${JsonToken.VALUE_NUMBER_INT} but was \${token.toString()}")
     }
 }
 `);
@@ -365,7 +365,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_NUMBER_INT} or \${JsonToken.VALUE_NULL} but was $token")
+                "Expected \${JsonToken.VALUE_NUMBER_INT} or \${JsonToken.VALUE_NULL} but was \${token.toString()}")
     }
 }
 `);
@@ -398,7 +398,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_NUMBER_INT} but was $token")
+                "Expected \${JsonToken.VALUE_NUMBER_INT} but was \${token.toString()}")
     }
 }
 `);
@@ -430,7 +430,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} but was $token")
+                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} but was \${token.toString()}")
     }
 }
 `);
@@ -463,7 +463,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} or \${JsonToken.VALUE_NULL} but was $token")
+                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} or \${JsonToken.VALUE_NULL} but was \${token.toString()}")
     }
 }
 `);
@@ -557,7 +557,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_STRING} but was $token")
+                "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
     }
 }
 `);
@@ -587,7 +587,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_NUMBER_INT} but was $token")
+                "Expected \${JsonToken.VALUE_NUMBER_INT} but was \${token.toString()}")
     }
 }
 `);
@@ -616,7 +616,7 @@ when (token) {
     }
     else -> {
         parser.handleValidationFailure(
-                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} but was $token")
+                "Expected \${JsonToken.VALUE_TRUE}, \${JsonToken.VALUE_FALSE} but was \${token.toString()}")
     }
 }
 `);
@@ -693,7 +693,7 @@ when (test1) {
             }
             else -> {
                 parser.handleValidationFailure(
-                        "Expected \${JsonToken.VALUE_STRING} but was $token")
+                        "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
             }
         }
     }
@@ -746,7 +746,7 @@ when (fieldName) {
             }
             else -> {
                 parser.handleValidationFailure(
-                        "Expected \${JsonToken.VALUE_STRING} but was $token")
+                        "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
             }
         }
     }
@@ -769,7 +769,7 @@ when (fieldName) {
             }
             else -> {
                 parser.handleValidationFailure(
-                        "Expected \${JsonToken.VALUE_STRING} but was $token")
+                        "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
             }
         }
     }
@@ -1090,11 +1090,11 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
 
     override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
-        val startObject = parser.currentToken()
+        val startObject: JsonToken? = parser.currentToken()
 
-        if (startObject != JsonToken.START_OBJECT) {
+        if (startObject !== JsonToken.START_OBJECT) {
             parser.handleValidationFailure(
-                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+                    "Expected \${JsonToken.START_OBJECT} but was \${startObject.toString()}")
             return null
         }
 
@@ -1109,7 +1109,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
             val fieldName = parser.currentName
 
             // Move to value
-            val token = parser.nextToken()
+            val token: JsonToken? = parser.nextToken()
 
             when (fieldName) {
 
@@ -1132,7 +1132,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1155,7 +1155,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1294,11 +1294,11 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
 
     override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
-        val startObject = parser.currentToken()
+        val startObject: JsonToken? = parser.currentToken()
 
-        if (startObject != JsonToken.START_OBJECT) {
+        if (startObject !== JsonToken.START_OBJECT) {
             parser.handleValidationFailure(
-                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+                    "Expected \${JsonToken.START_OBJECT} but was \${startObject.toString()}")
             return null
         }
 
@@ -1313,7 +1313,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
             val fieldName = parser.currentName
 
             // Move to value
-            val token = parser.nextToken()
+            val token: JsonToken? = parser.nextToken()
 
             when (fieldName) {
 
@@ -1336,7 +1336,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1359,7 +1359,7 @@ object DeliveryAddressReader : JacksonObjectReader<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1532,11 +1532,11 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
 
     override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
-        val startObject = parser.currentToken()
+        val startObject: JsonToken? = parser.currentToken()
 
-        if (startObject != JsonToken.START_OBJECT) {
+        if (startObject !== JsonToken.START_OBJECT) {
             parser.handleValidationFailure(
-                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+                    "Expected \${JsonToken.START_OBJECT} but was \${startObject.toString()}")
             return null
         }
 
@@ -1551,7 +1551,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
             val fieldName = parser.currentName
 
             // Move to value
-            val token = parser.nextToken()
+            val token: JsonToken? = parser.nextToken()
 
             when (fieldName) {
 
@@ -1574,7 +1574,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1597,7 +1597,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1649,11 +1649,11 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
 
     override fun readRequiredObject(parser: ValidationHandlingJsonParser): PostalAddress? {
 
-        val startObject = parser.currentToken()
+        val startObject: JsonToken? = parser.currentToken()
 
-        if (startObject != JsonToken.START_OBJECT) {
+        if (startObject !== JsonToken.START_OBJECT) {
             parser.handleValidationFailure(
-                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+                    "Expected \${JsonToken.START_OBJECT} but was \${startObject.toString()}")
             return null
         }
 
@@ -1667,7 +1667,7 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
             val fieldName = parser.currentName
 
             // Move to value
-            val token = parser.nextToken()
+            val token: JsonToken? = parser.nextToken()
 
             when (fieldName) {
 
@@ -1690,7 +1690,7 @@ object PostalAddressReader : JacksonObjectReader\<PostalAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
@@ -1826,11 +1826,11 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
 
     override fun readRequiredObject(parser: ValidationHandlingJsonParser): DeliveryAddress? {
 
-        val startObject = parser.currentToken()
+        val startObject: JsonToken? = parser.currentToken()
 
-        if (startObject != JsonToken.START_OBJECT) {
+        if (startObject !== JsonToken.START_OBJECT) {
             parser.handleValidationFailure(
-                    "Expected \${JsonToken.START_OBJECT} but was $startObject")
+                    "Expected \${JsonToken.START_OBJECT} but was \${startObject.toString()}")
             return null
         }
 
@@ -1844,7 +1844,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
             val fieldName = parser.currentName
 
             // Move to value
-            val token = parser.nextToken()
+            val token: JsonToken? = parser.nextToken()
 
             when (fieldName) {
 
@@ -1867,7 +1867,7 @@ object DeliveryAddressReader : JacksonObjectReader\<DeliveryAddress>() {
                         }
                         else -> {
                             parser.handleValidationFailure(
-                                    "Expected \${JsonToken.VALUE_STRING} but was $token")
+                                    "Expected \${JsonToken.VALUE_STRING} but was \${token.toString()}")
                         }
                     }
                 }
