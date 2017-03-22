@@ -593,7 +593,7 @@ describe('KotlinSpringMvcGenerator', () => {
       handler.parameters = [parameterRef1, parameterRef2];
 
       generator.addControllerApiHttpMethodHandlerFunction(
-          interfaceKt, spec, '', pathScope, handler);
+          interfaceKt, spec, pathScope, handler);
 
       expect(interfaceKt.members.length).toBe(1);
       const functionKt = interfaceKt.members[0];

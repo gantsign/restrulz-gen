@@ -207,7 +207,6 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addControllerApiHttpMethodHandlerFunction(interfaceKt: InterfaceKt,
                                                    spec: Specification,
-                                                   path: string,
                                                    pathScope: RootPathScope,
                                                    handler: HttpMethodHandler): void {
 
@@ -603,7 +602,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
     if (mapping instanceof HttpMethodHandler) {
 
       this.generateResponseFile(spec, pathScope, mapping, context);
-      this.addControllerApiHttpMethodHandlerFunction(interfaceKt, spec, path, pathScope, mapping);
+      this.addControllerApiHttpMethodHandlerFunction(interfaceKt, spec, pathScope, mapping);
 
     } else if (mapping instanceof SubPathScope) {
 
@@ -643,7 +642,6 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
                                          pathScope: RootPathScope,
                                          context: GeneratorContext): void {
     const {mappings} = pathScope;
-    const path = pathScope.getPathAsString();
 
     fileKt.addInterface(this.getControllerApiClassName(pathScope), interfaceKt => {
 
