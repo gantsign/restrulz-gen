@@ -120,7 +120,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionSignaturePathParameter(functionSignature: FunctionSignatureKt,
                                            spec: Specification,
-                                           parameter: PathParameterReference) {
+                                           parameter: PathParameterReference): void {
 
     const {name, value} = parameter;
     const paramName = kebabToCamel(name);
@@ -131,7 +131,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionSignatureBodyParameter(functionSignature: FunctionSignatureKt,
                                            spec: Specification,
-                                           parameter: BodyParameterReference) {
+                                           parameter: BodyParameterReference): void {
 
     const paramName = kebabToCamel(parameter.name);
     const paramType = this.getQualifiedModelClass(spec, parameter.typeRef);
@@ -141,7 +141,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionSignatureParameter(functionSignature: FunctionSignatureKt,
                                        spec: Specification,
-                                       parameter: HandlerParameter) {
+                                       parameter: HandlerParameter): void {
 
     if (parameter instanceof PathParameterReference) {
 
@@ -158,7 +158,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionPathParameter(functionSignature: FunctionSignatureKt,
                                   spec: Specification,
-                                  parameter: PathParameterReference) {
+                                  parameter: PathParameterReference): void {
 
     const {name, value} = parameter;
     const paramName = kebabToCamel(name);
@@ -177,7 +177,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionBodyParameter(functionSignature: FunctionSignatureKt,
                                   spec: Specification,
-                                  parameter: BodyParameterReference) {
+                                  parameter: BodyParameterReference): void {
 
     const paramName = kebabToCamel(parameter.name);
     const paramType = this.getQualifiedModelClass(spec, parameter.typeRef);
@@ -190,7 +190,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
 
   public addFunctionParameter(functionSignature: FunctionSignatureKt,
                               spec: Specification,
-                              parameter: HandlerParameter) {
+                              parameter: HandlerParameter): void {
 
     if (parameter instanceof PathParameterReference) {
 
@@ -209,7 +209,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
                                                    spec: Specification,
                                                    path: string,
                                                    pathScope: RootPathScope,
-                                                   handler: HttpMethodHandler) {
+                                                   handler: HttpMethodHandler): void {
 
     const {parameters} = handler;
 
@@ -231,7 +231,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
                                                 spec: Specification,
                                                 path: string,
                                                 pathScope: RootPathScope,
-                                                handler: HttpMethodHandler) {
+                                                handler: HttpMethodHandler): void {
 
     const {parameters} = handler;
 
@@ -430,7 +430,7 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
                                     spec: Specification,
                                     pathScope: RootPathScope,
                                     handler: HttpMethodHandler,
-                                    response: Response) {
+                                    response: Response): void {
 
     const {status, bodyTypeRef} = response;
 
@@ -476,7 +476,7 @@ typedList, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
                                      spec: Specification,
                                      pathScope: RootPathScope,
                                      handler: HttpMethodHandler,
-                                     response: Response) {
+                                     response: Response): void {
 
     const {status, bodyTypeRef} = response;
 
@@ -516,7 +516,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
   public addResponseKotlinClass(fileKt: FileKt,
                                 spec: Specification,
                                 pathScope: RootPathScope,
-                                handler: HttpMethodHandler) {
+                                handler: HttpMethodHandler): void {
 
     fileKt.addClass(this.getResponseClassName(handler), classKt => {
 
@@ -598,7 +598,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
                                   path: string,
                                   pathScope: RootPathScope,
                                   mapping: Mapping,
-                                  context: GeneratorContext) {
+                                  context: GeneratorContext): void {
 
     if (mapping instanceof HttpMethodHandler) {
 
@@ -621,7 +621,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
                                spec: Specification,
                                path: string,
                                pathScope: RootPathScope,
-                               mapping: Mapping) {
+                               mapping: Mapping): void {
 
     if (mapping instanceof HttpMethodHandler) {
 
@@ -641,7 +641,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
   public addControllerApiKotlinInterface(fileKt: FileKt,
                                          spec: Specification,
                                          pathScope: RootPathScope,
-                                         context: GeneratorContext) {
+                                         context: GeneratorContext): void {
     const {mappings} = pathScope;
     const path = pathScope.getPathAsString();
 
@@ -655,7 +655,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
   public addControllerKotlinClass(fileKt: FileKt,
                                   spec: Specification,
-                                  pathScope: RootPathScope) {
+                                  pathScope: RootPathScope): void {
     const {mappings} = pathScope;
     const path = pathScope.getPathAsString();
 
