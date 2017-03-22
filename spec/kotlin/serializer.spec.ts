@@ -1358,23 +1358,23 @@ try {
     it('should support single args', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('', 'test1');
-      functionCallKt.addArgument('arg1');
+      functionCallKt.addArgument('arg1', 'arg1');
 
       expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
-          .toBe('test1(arg1)\n');
+          .toBe('test1(arg1 = arg1)\n');
     });
 
     it('should support multiple args', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('', 'test1');
-      functionCallKt.addArgument('arg1');
-      functionCallKt.addArgument('arg2');
+      functionCallKt.addArgument('arg1', 'arg1');
+      functionCallKt.addArgument('arg2', 'arg2');
 
       expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
           .toBe(`\
 test1(
-        arg1,
-        arg2)
+        arg1 = arg1,
+        arg2 = arg2)
 `);
     });
   });
@@ -1483,14 +1483,14 @@ try {
     it('should render function call', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('var1', 'test1');
-      functionCallKt.addArgument('arg1');
-      functionCallKt.addArgument('arg2');
+      functionCallKt.addArgument('arg1', 'arg1');
+      functionCallKt.addArgument('arg2', 'arg2');
 
       expect(serializer.serializeBodyContent(fileKt, functionCallKt))
           .toBe(`\
 var1.test1(
-        arg1,
-        arg2)
+        arg1 = arg1,
+        arg2 = arg2)
 `);
     });
 

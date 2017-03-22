@@ -153,13 +153,15 @@ export class TryBlockKt implements BodyContentKt {
 }
 
 export class FunctionCallKt implements BodyContentKt {
-  arguments: string[] = [];
+  arguments: ArgumentKt[] = [];
 
   constructor(public variableName: string,
               public functionName: string) {}
 
-  addArgument(value: string): void {
-    this.arguments.push(value);
+  addArgument(name: string, value: string): void {
+
+    const argumentKt = new ArgumentKt(name, value);
+    this.arguments.push(argumentKt);
   }
 }
 

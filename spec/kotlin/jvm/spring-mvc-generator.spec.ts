@@ -741,8 +741,8 @@ describe('KotlinSpringMvcGenerator', () => {
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
 return impl.getDeliveryAddress(
-        addressId,
-        primaryAddress)
+        addressId = addressId,
+        primaryAddress = primaryAddress)
 `);
     });
 
@@ -857,8 +857,8 @@ return impl.getDeliveryAddress(
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
 return impl.getDeliveryAddress(
-        addressId,
-        primaryAddress)
+        addressId = addressId,
+        primaryAddress = primaryAddress)
 `);
 
     });
@@ -2171,8 +2171,8 @@ class GetDeliveryAddressResponse private constructor(
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
 return impl.getDeliveryAddress(
-        addressId,
-        primaryAddress)
+        addressId = addressId,
+        primaryAddress = primaryAddress)
 `);
     });
 
@@ -2299,8 +2299,8 @@ return impl.getDeliveryAddress(
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
 return impl.getDeliveryAddress(
-        addressId,
-        primaryAddress)
+        addressId = addressId,
+        primaryAddress = primaryAddress)
 `);
     });
 
@@ -2624,8 +2624,8 @@ class GetDeliveryAddressResponse private constructor(
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
 return impl.getDeliveryAddress(
-        addressId,
-        primaryAddress)
+        addressId = addressId,
+        primaryAddress = primaryAddress)
 `);
     });
 
@@ -2730,7 +2730,7 @@ return impl.getDeliveryAddress(
           .toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress)\n');
+          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress = primaryAddress)\n');
     });
   });
 
@@ -3235,8 +3235,8 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
     ): Single\<GetDeliveryAddressResponse> {
 
         return impl.getDeliveryAddress(
-                addressId,
-                primaryAddress)
+                addressId = addressId,
+                primaryAddress = primaryAddress)
     }
 }
 `);
@@ -3378,8 +3378,8 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
     ): Single\<GetDeliveryAddressResponse> {
 
         return impl.getDeliveryAddress(
-                addressId,
-                primaryAddress)
+                addressId = addressId,
+                primaryAddress = primaryAddress)
     }
 }
 `);

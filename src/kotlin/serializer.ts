@@ -645,10 +645,11 @@ export class KotlinSerializer {
       if (i > 0) {
         result += ',';
       }
+      const argAssignment = `${arg.name} = ${arg.value}`;
       if (args.length > 1) {
-        result += `\n${indent(indent(arg))}`;
+        result += `\n${indent(indent(argAssignment))}`;
       } else {
-        result += arg;
+        result += argAssignment;
       }
     }
     result += ')\n';
