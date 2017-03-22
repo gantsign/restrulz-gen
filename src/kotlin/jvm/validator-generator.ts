@@ -16,7 +16,9 @@
 import {
   BooleanType,
   ClassType,
+  HandlerParameter,
   IntegerType,
+  PathParameterReference,
   Property,
   SimpleType,
   Specification,
@@ -28,6 +30,7 @@ import {KotlinGenerator} from '../generator';
 import {KotlinModelGenerator} from '../model-generator';
 import {kebabToCamel} from '../../util/kebab';
 import {KotlinJsonReaderGenerator} from './json-reader-generator';
+import {KotlinSpringMvcGenerator} from './spring-mvc-generator';
 
 export class KotlinValidatorGenerator extends KotlinGenerator {
 
@@ -60,8 +63,8 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
 
       objectKt.extendsClass(validatorClass, extendsKt => {
 
-        extendsKt.addArgument('minimumValue', `${minimum.toString()}${valueSuffix}`);
-        extendsKt.addArgument('maximumValue', `${maximum.toString()}${valueSuffix}`);
+        extendsKt.addSimpleArgument('minimumValue', `${minimum.toString()}${valueSuffix}`);
+        extendsKt.addSimpleArgument('maximumValue', `${maximum.toString()}${valueSuffix}`);
         extendsKt.wrapArguments = true;
       });
     });
@@ -75,9 +78,9 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
 
       objectKt.extendsClass('com.gantsign.restrulz.validation.StringValidator', extendsKt => {
 
-        extendsKt.addArgument('minimumLength', minLength.toString());
-        extendsKt.addArgument('maximumLength', maxLength.toString());
-        extendsKt.addArgument('pattern', this.toKotlinString(pattern));
+        extendsKt.addSimpleArgument('minimumLength', minLength.toString());
+        extendsKt.addSimpleArgument('maximumLength', maxLength.toString());
+        extendsKt.addSimpleArgument('pattern', this.toKotlinString(pattern));
         extendsKt.wrapArguments = true;
       });
     });
@@ -196,6 +199,39 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     }
   }
 
+  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
+  public generateParameterAssignmentValue(
+      spec: Specification,
+      fileKt: FileKt,
+      parameter: HandlerParameter,
+      modelGenerateParameterAssignmentValue: (
+          spec: Specification,
+          fileKt: FileKt,
+          parameter: HandlerParameter) => string): string {
+
+    const value = modelGenerateParameterAssignmentValue(spec, fileKt, parameter);
+    if (!(parameter instanceof PathParameterReference)) {
+      return value;
+    }
+
+    const type = parameter.value.typeRef;
+    if (type instanceof StringType || type instanceof IntegerType) {
+
+      const validatorType = fileKt.tryImport(this.getQualifiedValidatorClass(spec, type));
+
+      let result = `${validatorType}.requireValidValue`;
+      result += `(${this.toKotlinString(kebabToCamel(parameter.name))}, ${value})`;
+      return result;
+
+    } else if (type instanceof BooleanType || type instanceof ClassType) {
+
+      return value;
+
+    } else {
+      throw new Error(`Unsupported type: ${type.constructor.name}`);
+    }
+  }
+
   init(generators: Generator[]): void {
     generators.forEach(generator => {
 
@@ -211,12 +247,24 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
 
         generator.generatePropertyAssignmentValue = (fileKt: FileKt,
                                                      spec: Specification,
-                                                     property: Property) =>
+                                                     property: Property): string =>
             this.generatePropertyAssignmentValue(
                 fileKt, spec, property, modelGeneratePropertyAssignmentValue);
+
       } else if (KotlinJsonReaderGenerator.assignableFrom(generator)) {
 
         generator.getStringForValidateProperty = this.getStringForValidateProperty;
+
+      } else if (KotlinSpringMvcGenerator.assignableFrom(generator)) {
+
+        const mvcGenerateParameterAssignmentValue
+            = generator.generateParameterAssignmentValue.bind(generator);
+
+        generator.generateParameterAssignmentValue = (spec: Specification,
+                                                      fileKt: FileKt,
+                                                      parameter: HandlerParameter): string =>
+          this.generateParameterAssignmentValue(
+              spec, fileKt, parameter, mvcGenerateParameterAssignmentValue);
       }
     })
   }
@@ -230,5 +278,6 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     this.needsProcessing = this.needsProcessing.bind(this);
     this.generatePropertyAssignmentValue = this.generatePropertyAssignmentValue.bind(this);
     this.getStringForValidateProperty = this.getStringForValidateProperty.bind(this);
+    this.generateParameterAssignmentValue = this.generateParameterAssignmentValue.bind(this);
   }
 }

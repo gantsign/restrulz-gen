@@ -26,7 +26,7 @@ import {
   Specification,
   SubPathScope
 } from '../../restrulz/model';
-import {GeneratorContext} from '../../generator';
+import {GeneratorContext, Generator} from '../../generator';
 import {
   ClassKt,
   CompanionObjectKt,
@@ -39,6 +39,15 @@ import {KotlinGenerator} from '../generator';
 import {kebabToCamel} from '../../util/kebab';
 
 export class KotlinSpringMvcGenerator extends KotlinGenerator {
+
+  //noinspection JSUnusedGlobalSymbols
+  'classes:restrulz.kotlin.KotlinSpringMvcGenerator' = true;
+
+  public static assignableFrom(
+      generator: Generator): generator is KotlinSpringMvcGenerator {
+
+    return 'classes:restrulz.kotlin.KotlinSpringMvcGenerator' in generator;
+  }
 
   public getControllerApiPackageName(spec: Specification): string {
 
@@ -226,6 +235,13 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     });
   }
 
+  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
+  public generateParameterAssignmentValue(spec: Specification,
+                                          fileKt: FileKt,
+                                          parameter: HandlerParameter): string {
+    return kebabToCamel(parameter.name);
+  }
+
   public addControllerHttpMethodHandlerFunction(classKt: ClassKt,
                                                 spec: Specification,
                                                 path: string,
@@ -261,8 +277,12 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       bodyKt.write('return ');
       bodyKt.writeFunctionCall('impl', functionName, functionCallKt => {
           parameters
-              .map(param => kebabToCamel(param.name))
-              .forEach(varName => functionCallKt.addArgument(varName, varName));
+              .forEach(param => {
+                const argName = kebabToCamel(param.name);
+                functionCallKt.addArgument(argName, fileKt => {
+                  return this.generateParameterAssignmentValue(spec, fileKt, param);
+                });
+              });
       });
     });
   }

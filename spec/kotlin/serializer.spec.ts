@@ -782,8 +782,8 @@ companion object {
     it('should support extends with arguments', () => {
       const fileKt = createFile();
       const implementsKt = new ExtendsKt(new TypeSignatureKt('com.example.TestClass'));
-      implementsKt.addArgument('test1', '"value1"');
-      implementsKt.addArgument('test2', '"value2"');
+      implementsKt.addSimpleArgument('test1', '"value1"');
+      implementsKt.addSimpleArgument('test2', '"value2"');
 
       expect(serializer.serializeClassImplementsOrExtends(fileKt, implementsKt))
           .toBe('TestClass(test1 = "value1", test2 = "value2")');
@@ -792,8 +792,8 @@ companion object {
     it('should support extends with wrap arguments', () => {
       const fileKt = createFile();
       const implementsKt = new ExtendsKt(new TypeSignatureKt('com.example.TestClass'));
-      implementsKt.addArgument('test1', '"value1"');
-      implementsKt.addArgument('test2', '"value2"');
+      implementsKt.addSimpleArgument('test1', '"value1"');
+      implementsKt.addSimpleArgument('test2', '"value2"');
       implementsKt.wrapArguments = true;
 
       expect(serializer.serializeClassImplementsOrExtends(fileKt, implementsKt))
@@ -857,7 +857,7 @@ class TestClass
       const classKt = new ClassKt('TestClass');
       classKt.extendsClass('com.example.TestClass2');
       classKt.extendsClass('com.example.TestClass3', (extendsKt, typeSignatureKt) => {
-        extendsKt.addArgument('name1', '"value1"');
+        extendsKt.addSimpleArgument('name1', '"value1"');
         typeSignatureKt.addGenericParameter('kotlin.String')
       });
 
@@ -1358,7 +1358,7 @@ try {
     it('should support single args', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('', 'test1');
-      functionCallKt.addArgument('arg1', 'arg1');
+      functionCallKt.addSimpleArgument('arg1', 'arg1');
 
       expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
           .toBe('test1(arg1 = arg1)\n');
@@ -1367,8 +1367,8 @@ try {
     it('should support multiple args', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('', 'test1');
-      functionCallKt.addArgument('arg1', 'arg1');
-      functionCallKt.addArgument('arg2', 'arg2');
+      functionCallKt.addSimpleArgument('arg1', 'arg1');
+      functionCallKt.addSimpleArgument('arg2', 'arg2');
 
       expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
           .toBe(`\
@@ -1483,8 +1483,8 @@ try {
     it('should render function call', () => {
       const fileKt = createFile();
       const functionCallKt = new FunctionCallKt('var1', 'test1');
-      functionCallKt.addArgument('arg1', 'arg1');
-      functionCallKt.addArgument('arg2', 'arg2');
+      functionCallKt.addSimpleArgument('arg1', 'arg1');
+      functionCallKt.addSimpleArgument('arg2', 'arg2');
 
       expect(serializer.serializeBodyContent(fileKt, functionCallKt))
           .toBe(`\

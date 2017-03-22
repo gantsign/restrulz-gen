@@ -55,6 +55,27 @@ describe('KotlinSpringMvcGenerator', () => {
   const spec = new Specification();
   spec.name = 'testing';
 
+  describe('assignableFrom()', () => {
+
+    it('should support exact class', () => {
+      expect(KotlinSpringMvcGenerator.assignableFrom(new KotlinSpringMvcGenerator()))
+          .toBeTruthy()
+    });
+
+    it('should support sub-classes', () => {
+      class TestGenerator extends KotlinSpringMvcGenerator {}
+
+      expect(KotlinSpringMvcGenerator.assignableFrom(new TestGenerator()))
+          .toBeTruthy()
+    });
+
+    it('should return false for non-matches', () => {
+
+      expect(KotlinSpringMvcGenerator.assignableFrom(<KotlinSpringMvcGenerator>{}))
+          .toBeFalsy()
+    });
+  });
+
   describe('getControllerApiPackageName()', () => {
 
     it('should derive default package name from specification', () => {

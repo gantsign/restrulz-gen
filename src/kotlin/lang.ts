@@ -59,7 +59,7 @@ export class ParameterKt {
 
 export class ArgumentKt {
 
-  constructor(public name: string, public value: string) { }
+  constructor(public name: string, public valueFactory: (fileKt: FileKt) => string) { }
 
 }
 
@@ -158,10 +158,13 @@ export class FunctionCallKt implements BodyContentKt {
   constructor(public variableName: string,
               public functionName: string) {}
 
-  addArgument(name: string, value: string): void {
+  addArgument(name: string, valueFactory: (fileKt: FileKt) => string): void {
 
-    const argumentKt = new ArgumentKt(name, value);
-    this.arguments.push(argumentKt);
+    this.arguments.push(new ArgumentKt(name, valueFactory));
+  }
+
+  addSimpleArgument(name: string, value: string): void {
+    this.addArgument(name, () => value);
   }
 }
 
@@ -284,10 +287,14 @@ export class ExtendsKt extends ImplementsKt {
   arguments: ArgumentKt[] = [];
   wrapArguments: Boolean = false;
 
-  addArgument(name: string, value: string): void {
+  addArgument(name: string, valueFactory: (fileKt: FileKt) => string): void {
 
-    const argumentKt = new ArgumentKt(name, value);
-    this.arguments.push(argumentKt);
+    this.arguments.push(new ArgumentKt(name, valueFactory));
+  }
+
+  addSimpleArgument(name: string, value: string): void {
+
+    this.addArgument(name, () => value);
   }
 
   constructor(type: TypeSignatureKt) {

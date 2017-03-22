@@ -16,9 +16,12 @@
 /// <reference path="../../../typings/globals/jasmine/index.d.ts" />
 
 import {
+  BodyParameterReference,
   BooleanType,
   ClassType,
   IntegerType,
+  PathParameter,
+  PathParameterReference,
   Property,
   Specification,
   StringType
@@ -28,6 +31,7 @@ import {GeneratorContext} from '../../../src/generator';
 import {KotlinValidatorGenerator} from '../../../src/kotlin/jvm/validator-generator';
 import {KotlinModelGenerator} from '../../../src/kotlin/model-generator';
 import {KotlinJsonReaderGenerator} from '../../../src/kotlin/jvm/json-reader-generator';
+import {KotlinSpringMvcGenerator} from '../../../src/kotlin/jvm/spring-mvc-generator';
 
 describe('KotlinValidatorGenerator', () => {
 
@@ -110,11 +114,11 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(2);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumValue');
-      expect(arg1.value).toBe('0');
+      expect(arg1.valueFactory(fileKt)).toBe('0');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumValue');
-      expect(arg2.value).toBe('150');
+      expect(arg2.valueFactory(fileKt)).toBe('150');
     });
 
     it('should support long', () => {
@@ -148,11 +152,11 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(2);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumValue');
-      expect(arg1.value).toBe('0L');
+      expect(arg1.valueFactory(fileKt)).toBe('0L');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumValue');
-      expect(arg2.value).toBe('2147483648L');
+      expect(arg2.valueFactory(fileKt)).toBe('2147483648L');
     });
   });
 
@@ -190,15 +194,15 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(3);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumLength');
-      expect(arg1.value).toBe('1');
+      expect(arg1.valueFactory(fileKt)).toBe('1');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumLength');
-      expect(arg2.value).toBe('100');
+      expect(arg2.valueFactory(fileKt)).toBe('100');
 
       const arg3 = extendsKt.arguments[2];
       expect(arg3.name).toBe('pattern');
-      expect(arg3.value).toBe('"[a-zA-Z]+"');
+      expect(arg3.valueFactory(fileKt)).toBe('"[a-zA-Z]+"');
     });
 
   });
@@ -236,11 +240,11 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(2);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumValue');
-      expect(arg1.value).toBe('0');
+      expect(arg1.valueFactory(fileKt)).toBe('0');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumValue');
-      expect(arg2.value).toBe('150');
+      expect(arg2.valueFactory(fileKt)).toBe('150');
     });
 
     it('should support strings', () => {
@@ -275,15 +279,15 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(3);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumLength');
-      expect(arg1.value).toBe('1');
+      expect(arg1.valueFactory(fileKt)).toBe('1');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumLength');
-      expect(arg2.value).toBe('100');
+      expect(arg2.valueFactory(fileKt)).toBe('100');
 
       const arg3 = extendsKt.arguments[2];
       expect(arg3.name).toBe('pattern');
-      expect(arg3.value).toBe('"[a-zA-Z]+"');
+      expect(arg3.valueFactory(fileKt)).toBe('"[a-zA-Z]+"');
     });
 
     it('should throw error for unsupported types', () => {
@@ -331,11 +335,11 @@ describe('KotlinValidatorGenerator', () => {
       expect(extendsKt.arguments.length).toBe(2);
       const arg1 = extendsKt.arguments[0];
       expect(arg1.name).toBe('minimumValue');
-      expect(arg1.value).toBe('0');
+      expect(arg1.valueFactory(fileKt)).toBe('0');
 
       const arg2 = extendsKt.arguments[1];
       expect(arg2.name).toBe('maximumValue');
-      expect(arg2.value).toBe('150');
+      expect(arg2.valueFactory(fileKt)).toBe('150');
     });
 
   });
@@ -734,6 +738,121 @@ object OrgNameValidator : StringValidator(
     });
   });
 
+  describe('generateParameterAssignmentValue()', () => {
+
+    it('should support strings', () => {
+      const stringType = new StringType();
+      stringType.name = 'org-name';
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = stringType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toBe('OrgNameValidator.requireValidValue("testParam", testParam)');
+    });
+
+    it('should support integers', () => {
+
+      const integerType = new IntegerType();
+      integerType.name = 'person-age';
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = integerType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toBe('PersonAgeValidator.requireValidValue("testParam", testParam)');
+    });
+
+    it('should support booleans', () => {
+
+      const booleanType = new BooleanType();
+      booleanType.name = 'terms-agreed';
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = booleanType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toBe('testParam');
+
+    });
+
+    it('should support classes', () => {
+
+      const classType = new ClassType();
+      classType.name = 'work-address';
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = classType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toBe('testParam');
+
+    });
+
+    it('should throw errors for unsupported types', () => {
+      class UnsupportedTypeTest {}
+
+      const unsupportedType = new UnsupportedTypeTest();
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = <StringType>unsupportedType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(() => generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toThrowError('Unsupported type: UnsupportedTypeTest');
+    });
+
+    it('should support body reference parameters', () => {
+      const classType = new ClassType();
+      classType.name = 'work-address';
+
+      const parameterReference = new BodyParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.typeRef = classType;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(generator.generateParameterAssignmentValue(
+          spec, fileKt, parameterReference, () => 'testParam')
+      ).toBe('testParam');
+    });
+
+  });
+
   describe('init()', () => {
 
     it('should modify KotlinModelGenerator', () => {
@@ -795,7 +914,41 @@ object OrgNameValidator : StringValidator(
           .toBeTruthy();
     });
 
-    it('should ignore other validators', () => {
+    it('should modify KotlinSpringMvcGenerator', () => {
+
+      const mvcGenerator = new KotlinSpringMvcGenerator();
+      const mvcGenerateParameterAssignmentValue = mvcGenerator.generateParameterAssignmentValue;
+
+      generator.init([mvcGenerator]);
+
+      // tslint:disable-next-line:triple-equals
+      expect(mvcGenerateParameterAssignmentValue != mvcGenerator.generateParameterAssignmentValue)
+          .toBeTruthy();
+    });
+
+    it('should enhance generateParameterAssignmentValue', () => {
+
+      const mvcGenerator = new KotlinSpringMvcGenerator();
+
+      generator.init([mvcGenerator]);
+
+      const stringType = new StringType();
+      stringType.name = 'org-name';
+
+      const pathParameter = new PathParameter();
+      pathParameter.typeRef = stringType;
+
+      const parameterReference = new PathParameterReference();
+      parameterReference.name = 'test-param';
+      parameterReference.value = pathParameter;
+
+      const fileKt = new FileKt('com.example.package', 'TestValidator');
+
+      expect(mvcGenerator.generateParameterAssignmentValue(spec, fileKt, parameterReference))
+          .toBe('OrgNameValidator.requireValidValue("testParam", testParam)');
+    });
+
+    it('should ignore other generators', () => {
 
       const validatorGenerator = new KotlinValidatorGenerator();
 

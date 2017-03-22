@@ -388,8 +388,8 @@ export class KotlinSerializer {
       }
       result += implementsKt.arguments
           .map(arg => {
-            const {name, value} = arg;
-            const argString = `${name} = ${value}`;
+            const {name, valueFactory} = arg;
+            const argString = `${name} = ${valueFactory(fileKt)}`;
             if (wrapArguments) {
               return indent(indent(argString));
             }
@@ -645,7 +645,7 @@ export class KotlinSerializer {
       if (i > 0) {
         result += ',';
       }
-      const argAssignment = `${arg.name} = ${arg.value}`;
+      const argAssignment = `${arg.name} = ${arg.valueFactory(fileKt)}`;
       if (args.length > 1) {
         result += `\n${indent(indent(argAssignment))}`;
       } else {
