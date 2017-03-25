@@ -15,7 +15,7 @@
  */
 import {ClassType, Property, Specification, StringType} from '../restrulz/model';
 import {Generator, GeneratorContext} from '../generator';
-import {ClassKt, FileKt, FunctionKt, PrimaryConstructorKt, VisibilityKt} from './lang';
+import {ClassKt, FileKt, FunctionKt, PrimaryConstructorKt} from './lang';
 import {KotlinGenerator} from './generator';
 import {kebabToCamel} from '../util/kebab';
 
@@ -84,7 +84,8 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
     let value = kebabToCamel(prop.name);
     if (prop.type instanceof StringType) {
-      value += '.blankToEmpty()'
+
+      value += `.${fileKt.tryImport('com.gantsign.restrulz.util.string.blankOrNullToEmpty')}()`;
     }
     return value;
   }
@@ -194,54 +195,6 @@ export class KotlinModelGenerator extends KotlinGenerator {
     return fileKt;
   }
 
-  //noinspection JSMethodCanBeStatic
-  public addBlankToEmptyFunctions(fileKt: FileKt): void {
-
-    fileKt.addExtensionFunction(
-        'blankToEmpty',
-        'kotlin.String',
-        (bodyKt, functionKt, typeSignatureKt) => {
-
-      typeSignatureKt.isNullable = true;
-
-      functionKt.visibility = VisibilityKt.Internal;
-      functionKt.setReturnType('kotlin.String');
-
-      bodyKt.writeLn('return if (this === null || this.isBlank()) "" else this');
-
-    });
-
-    fileKt.addExtensionFunction(
-        'blankToEmpty',
-        'kotlin.collections.List',
-        (bodyKt, functionKt, extendedTypeSignatureKt) => {
-
-      extendedTypeSignatureKt.addGenericParameter('kotlin.String');
-
-      functionKt.visibility = VisibilityKt.Internal;
-      functionKt.setReturnType('kotlin.collections.List', returnTypeSignatureKt => {
-        returnTypeSignatureKt.addGenericParameter('kotlin.String');
-      });
-
-      const shortStringName = fileKt.tryImport('kotlin.String');
-
-      bodyKt.writeLn(`return this.map(${shortStringName}::blankToEmpty)`);
-
-    });
-  }
-
-  public createPackageFile(spec: Specification): FileKt {
-
-    const fileKt = this.createKotlinFile(this.getModelPackageName(spec), 'package');
-
-    this.addBlankToEmptyFunctions(fileKt);
-    return fileKt;
-  }
-
-  public generatePackageFile(spec: Specification, context: GeneratorContext): void {
-    this.writeFile(context, this.createPackageFile(spec));
-  }
-
   public generateModelFiles(spec: Specification, context: GeneratorContext): void {
 
     spec.classTypes.forEach(classType =>
@@ -250,7 +203,6 @@ export class KotlinModelGenerator extends KotlinGenerator {
 
   generateFiles(spec: Specification, context: GeneratorContext): void {
 
-    this.generatePackageFile(spec, context);
     this.generateModelFiles(spec, context);
   }
 

@@ -270,7 +270,7 @@ describe('KotlinModelGenerator', () => {
       property.type = stringType;
 
       expect(generator.generatePropertyAssignmentValue(fileKt, spec, property))
-          .toBe('testProperty.blankToEmpty()')
+          .toBe('testProperty.blankOrNullToEmpty()')
     });
   });
 
@@ -299,7 +299,7 @@ describe('KotlinModelGenerator', () => {
       const {name, type, defaultValueFactory} = propertyKt;
       expect(name).toBe('testProperty');
       expect(type.className).toBe('kotlin.String');
-      expect(defaultValueFactory(fileKt)).toBe('testProperty.blankToEmpty()')
+      expect(defaultValueFactory(fileKt)).toBe('testProperty.blankOrNullToEmpty()')
     });
 
     it('should support array properties', () => {
@@ -329,7 +329,7 @@ describe('KotlinModelGenerator', () => {
       expect(type.genericParameters.length).toBe(1);
       const genericType = type.genericParameters[0];
       expect(genericType.className).toBe('kotlin.String');
-      expect(defaultValueFactory(fileKt)).toBe('testProperty.blankToEmpty()')
+      expect(defaultValueFactory(fileKt)).toBe('testProperty.blankOrNullToEmpty()')
     });
 
   });
@@ -362,7 +362,7 @@ describe('KotlinModelGenerator', () => {
 
       expect(propertyKt1.name).toBe('testProperty1');
       expect(propertyKt1.type.className).toBe('kotlin.String');
-      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
+      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankOrNullToEmpty()');
 
       const propertyKt2 = classKt.members[1];
       if (!(propertyKt2 instanceof PropertyKt)) {
@@ -372,7 +372,7 @@ describe('KotlinModelGenerator', () => {
 
       expect(propertyKt2.name).toBe('testProperty2');
       expect(propertyKt2.type.className).toBe('kotlin.String');
-      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
+      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankOrNullToEmpty()');
     });
 
   });
@@ -605,7 +605,7 @@ return TestClass(
 
       expect(propertyKt1.name).toBe('testProperty1');
       expect(propertyKt1.type.className).toBe('kotlin.String');
-      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
+      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankOrNullToEmpty()');
 
       const propertyKt2 = classKt.members[1];
       if (!(propertyKt2 instanceof PropertyKt)) {
@@ -615,7 +615,7 @@ return TestClass(
 
       expect(propertyKt2.name).toBe('testProperty2');
       expect(propertyKt2.type.className).toBe('kotlin.String');
-      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
+      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankOrNullToEmpty()');
 
       const functionKt = classKt.members[2];
       if (!FunctionKt.assignableFrom(functionKt)) {
@@ -738,7 +738,7 @@ return TestClass(
 
       expect(propertyKt1.name).toBe('testProperty1');
       expect(propertyKt1.type.className).toBe('kotlin.String');
-      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankToEmpty()');
+      expect(propertyKt1.defaultValueFactory(fileKt)).toBe('testProperty1.blankOrNullToEmpty()');
 
       const propertyKt2 = classKt.members[1];
       if (!(propertyKt2 instanceof PropertyKt)) {
@@ -748,7 +748,7 @@ return TestClass(
 
       expect(propertyKt2.name).toBe('testProperty2');
       expect(propertyKt2.type.className).toBe('kotlin.String');
-      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankToEmpty()');
+      expect(propertyKt2.defaultValueFactory(fileKt)).toBe('testProperty2.blankOrNullToEmpty()');
 
       const functionKt = classKt.members[2];
       if (!FunctionKt.assignableFrom(functionKt)) {
@@ -777,101 +777,6 @@ return TestClass(
 
   });
 
-  describe('addBlankToEmptyFunctions()', () => {
-
-    it('should add functions', () => {
-
-      const fileKt = new FileKt('com.example.package', 'package');
-
-      generator.addBlankToEmptyFunctions(fileKt);
-
-      expect(fileKt.members.length).toBe(2);
-
-      const functionKt1 = fileKt.members[0];
-      if (!(functionKt1 instanceof ExtensionFunctionKt)) {
-        fail(`Expected ExtensionFunctionKt but was ${functionKt1.constructor.name}`);
-        return;
-      }
-      expect(functionKt1.name).toBe('blankToEmpty');
-      const extendedType1 = functionKt1.extendedType;
-      expect(extendedType1.className).toBe('kotlin.String');
-      expect(extendedType1.isNullable).toBeTruthy();
-      expect(functionKt1.visibility).toBe(VisibilityKt.Internal);
-      const returnType1 = functionKt1.returnType;
-      expect(returnType1.className).toBe('kotlin.String');
-      expect(returnType1.isNullable).toBeFalsy();
-      expect(serializer.serializeBody(fileKt, functionKt1.body))
-          .toBe('return if (this === null || this.isBlank()) "" else this\n');
-
-      const functionKt2 = fileKt.members[1];
-      if (!(functionKt2 instanceof ExtensionFunctionKt)) {
-        fail(`Expected ExtensionFunctionKt but was ${functionKt2.constructor.name}`);
-        return;
-      }
-      expect(functionKt2.name).toBe('blankToEmpty');
-      const extendedType2 = functionKt2.extendedType;
-      expect(extendedType2.className).toBe('kotlin.collections.List');
-      expect(extendedType2.isNullable).toBeFalsy();
-      expect(extendedType2.genericParameters.length).toBe(1);
-      expect(extendedType2.genericParameters[0].className).toBe('kotlin.String');
-      expect(functionKt2.visibility).toBe(VisibilityKt.Internal);
-      const returnType2 = functionKt1.returnType;
-      expect(returnType2.className).toBe('kotlin.String');
-      expect(returnType2.isNullable).toBeFalsy();
-      expect(serializer.serializeBody(fileKt, functionKt2.body))
-          .toBe('return this.map(String::blankToEmpty)\n');
-    });
-
-  });
-
-  describe('createPackageFile()', () => {
-
-    it('should add functions', () => {
-
-      const fileKt = generator.createPackageFile(spec);
-
-      expect(fileKt.packageName).toBe('testing.model');
-      expect(fileKt.fileName).toBe('package');
-
-      expect(fileKt.members.length).toBe(2);
-
-      const functionKt1 = fileKt.members[0];
-      if (!(functionKt1 instanceof ExtensionFunctionKt)) {
-        fail(`Expected ExtensionFunctionKt but was ${functionKt1.constructor.name}`);
-        return;
-      }
-      expect(functionKt1.name).toBe('blankToEmpty');
-      const extendedType1 = functionKt1.extendedType;
-      expect(extendedType1.className).toBe('kotlin.String');
-      expect(extendedType1.isNullable).toBeTruthy();
-      expect(functionKt1.visibility).toBe(VisibilityKt.Internal);
-      const returnType1 = functionKt1.returnType;
-      expect(returnType1.className).toBe('kotlin.String');
-      expect(returnType1.isNullable).toBeFalsy();
-      expect(serializer.serializeBody(fileKt, functionKt1.body))
-          .toBe('return if (this === null || this.isBlank()) "" else this\n');
-
-      const functionKt2 = fileKt.members[1];
-      if (!(functionKt2 instanceof ExtensionFunctionKt)) {
-        fail(`Expected ExtensionFunctionKt but was ${functionKt2.constructor.name}`);
-        return;
-      }
-      expect(functionKt2.name).toBe('blankToEmpty');
-      const extendedType2 = functionKt2.extendedType;
-      expect(extendedType2.className).toBe('kotlin.collections.List');
-      expect(extendedType2.isNullable).toBeFalsy();
-      expect(extendedType2.genericParameters.length).toBe(1);
-      expect(extendedType2.genericParameters[0].className).toBe('kotlin.String');
-      expect(functionKt2.visibility).toBe(VisibilityKt.Internal);
-      const returnType2 = functionKt1.returnType;
-      expect(returnType2.className).toBe('kotlin.String');
-      expect(returnType2.isNullable).toBeFalsy();
-      expect(serializer.serializeBody(fileKt, functionKt2.body))
-          .toBe('return this.map(String::blankToEmpty)\n');
-    });
-
-  });
-
   class MockGeneratorContext implements GeneratorContext {
     outputPaths: string[] = [];
     contents: string[] = [];
@@ -889,30 +794,6 @@ return TestClass(
       this.contents.push(data);
     }
   }
-
-  describe('generatePackageFile()', () => {
-
-    it('should add functions', () => {
-
-      const context = new MockGeneratorContext();
-
-      generator.generatePackageFile(spec, context);
-
-      expect(context.outputPaths[0]).toBe('testing/model/package.kt');
-      expect(context.contents[0]).toBe(`\
-package testing.model
-
-internal fun String?.blankToEmpty(): String {
-    return if (this === null || this.isBlank()) "" else this
-}
-
-internal fun List\<String>.blankToEmpty(): List\<String> {
-    return this.map(String::blankToEmpty)
-}
-`);
-    });
-
-  });
 
   describe('generateModelFiles()', () => {
 
@@ -944,14 +825,16 @@ internal fun List\<String>.blankToEmpty(): List\<String> {
       expect(context.contents[0]).toBe(`\
 package testing.model
 
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+
 class TestClass(
         testProperty1: String,
         testProperty2: String) {
 
     val testProperty1: String
-            = testProperty1.blankToEmpty()
+            = testProperty1.blankOrNullToEmpty()
     val testProperty2: String
-            = testProperty2.blankToEmpty()
+            = testProperty2.blankOrNullToEmpty()
 
     fun copy(
             testProperty1: String = this.testProperty1,
@@ -993,31 +876,20 @@ class TestClass(
 
       generator.generateFiles(completeSpec, context);
 
-      expect(context.outputPaths[0]).toBe('testing/model/package.kt');
+      expect(context.outputPaths[0]).toBe('testing/model/TestClass.kt');
       expect(context.contents[0]).toBe(`\
 package testing.model
 
-internal fun String?.blankToEmpty(): String {
-    return if (this === null || this.isBlank()) "" else this
-}
-
-internal fun List\<String>.blankToEmpty(): List\<String> {
-    return this.map(String::blankToEmpty)
-}
-`);
-
-    expect(context.outputPaths[1]).toBe('testing/model/TestClass.kt');
-      expect(context.contents[1]).toBe(`\
-package testing.model
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
 
 class TestClass(
         testProperty1: String,
         testProperty2: String) {
 
     val testProperty1: String
-            = testProperty1.blankToEmpty()
+            = testProperty1.blankOrNullToEmpty()
     val testProperty2: String
-            = testProperty2.blankToEmpty()
+            = testProperty2.blankOrNullToEmpty()
 
     fun copy(
             testProperty1: String = this.testProperty1,
