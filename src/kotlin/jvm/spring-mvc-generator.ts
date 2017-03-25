@@ -24,7 +24,9 @@ import {
   Response,
   RootPathScope,
   Specification,
-  SubPathScope
+  StringType,
+  SubPathScope,
+  Type
 } from '../../restrulz/model';
 import {GeneratorContext, Generator} from '../../generator';
 import {
@@ -33,6 +35,7 @@ import {
   FileKt,
   FunctionSignatureKt,
   InterfaceKt,
+  PrimaryConstructorKt,
   VisibilityKt
 } from '../lang';
 import {KotlinGenerator} from '../generator';
@@ -79,6 +82,26 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     return `${this.toKotlinClassName(pathScope.name)}Controller`;
   }
 
+  public getRequestPackageName(spec: Specification, pathScope: RootPathScope): string {
+
+    const requestPackageName = kebabToCamel(pathScope.name).toLowerCase();
+    return `${this.getControllerApiPackageName(spec)}.${requestPackageName}`;
+  }
+
+  public getRequestClassName(handler: HttpMethodHandler): string {
+
+    return `${this.toKotlinClassName(handler.name)}Request`;
+  }
+
+  public getQualifiedRequestClass(spec: Specification,
+                                  pathScope: RootPathScope,
+                                  handler: HttpMethodHandler): string {
+
+    const packageName = this.getRequestPackageName(spec, pathScope);
+    const className = this.getRequestClassName(handler);
+    return `${packageName}.${className}`;
+  }
+
   public getResponsePackageName(spec: Specification, pathScope: RootPathScope): string {
 
     const responsePackageName = kebabToCamel(pathScope.name).toLowerCase();
@@ -97,6 +120,115 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     const packageName = this.getResponsePackageName(spec, pathScope);
     const className = this.getResponseClassName(handler);
     return `${packageName}.${className}`;
+  }
+
+  //noinspection JSMethodCanBeStatic
+  public needsProcessing(type: Type): Boolean {
+    return type instanceof StringType;
+  }
+
+  public addRequestConstructorParameter(constructorKt: PrimaryConstructorKt,
+                                        spec: Specification,
+                                        parameter: HandlerParameter): void {
+
+    const {name} = parameter;
+    const type = parameter.getType();
+
+    const paramClass = this.toKotlinType(spec, type);
+    const paramName = kebabToCamel(name);
+
+    if (this.needsProcessing(type)) {
+      constructorKt.addParameter(paramName, paramClass);
+    } else {
+      constructorKt.addProperty(paramName, paramClass);
+    }
+  }
+
+  public setRequestConstructorParameters(classKt: ClassKt,
+                                         spec: Specification,
+                                         parameters: HandlerParameter[]): void {
+
+    classKt.setPrimaryConstructor(constructorKt => {
+
+      parameters.forEach(prop => this.addRequestConstructorParameter(constructorKt, spec, prop));
+    });
+  }
+
+  //noinspection JSUnusedLocalSymbols,JSMethodCanBeStatic
+  public generateRequestPropertyAssignmentValue(fileKt: FileKt,
+                                                spec: Specification,
+                                                param: HandlerParameter): string {
+
+    const type = param.getType();
+
+    let value = kebabToCamel(param.name);
+
+    if (type instanceof StringType) {
+
+      value += `.${fileKt.tryImport('com.gantsign.restrulz.util.string.blankOrNullToEmpty')}()`;
+    }
+    return value;
+  }
+
+  public addRequestProperty(classKt: ClassKt,
+                            spec: Specification,
+                            parameter: HandlerParameter): void {
+
+    const {name} = parameter;
+    const type = parameter.getType();
+
+    const entityClass = this.toKotlinType(spec, type);
+    const propertyName = kebabToCamel(name);
+
+    classKt.addProperty(propertyName, entityClass, param => {
+      param.setDefaultValue(fileKt =>
+          this.generateRequestPropertyAssignmentValue(fileKt, spec, parameter));
+      param.wrapAssignment = true;
+    });
+  }
+
+  public addRequestProperties(classKt: ClassKt,
+                              spec: Specification,
+                              parameters: HandlerParameter[]): void {
+
+    parameters
+        .filter(param => this.needsProcessing(param.getType()))
+        .forEach(param => this.addRequestProperty(classKt, spec, param));
+  }
+
+  public addRequestKotlinClass(fileKt: FileKt,
+                               spec: Specification,
+                               handler: HttpMethodHandler): void {
+
+    const {parameters} = handler;
+
+    fileKt.addClass(this.getRequestClassName(handler), classKt => {
+
+      if (parameters.length > 0) {
+        this.setRequestConstructorParameters(classKt, spec, parameters);
+
+        this.addRequestProperties(classKt, spec, parameters);
+      }
+    });
+  }
+
+  public toRequestKotlinFile(spec: Specification,
+                             pathScope: RootPathScope,
+                             handler: HttpMethodHandler): FileKt {
+
+    const className = this.getRequestClassName(handler);
+    const fileKt = this.createKotlinFile(this.getRequestPackageName(spec, pathScope), className);
+
+    this.addRequestKotlinClass(fileKt, spec, handler);
+    return fileKt;
+  }
+
+  public generateRequestFile(spec: Specification,
+                             pathScope: RootPathScope,
+                             handler: HttpMethodHandler,
+                             context: GeneratorContext): void {
+
+    this.writeFile(context, this.toRequestKotlinFile(spec, pathScope, handler));
   }
 
   //noinspection JSMethodCanBeStatic
@@ -127,42 +259,18 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
     return `org.springframework.web.bind.annotation.${method}Mapping`;
   }
 
-  public addFunctionSignaturePathParameter(functionSignature: FunctionSignatureKt,
-                                           spec: Specification,
-                                           parameter: PathParameterReference): void {
-
-    const {name, value} = parameter;
-    const paramName = kebabToCamel(name);
-    const paramType = this.toKotlinType(spec, value.typeRef);
-
-    functionSignature.addParameter(paramName, paramType);
-  }
-
-  public addFunctionSignatureBodyParameter(functionSignature: FunctionSignatureKt,
-                                           spec: Specification,
-                                           parameter: BodyParameterReference): void {
-
-    const paramName = kebabToCamel(parameter.name);
-    const paramType = this.getQualifiedModelClass(spec, parameter.typeRef);
-
-    functionSignature.addParameter(paramName, paramType);
-  }
-
   public addFunctionSignatureParameter(functionSignature: FunctionSignatureKt,
                                        spec: Specification,
-                                       parameter: HandlerParameter): void {
+                                       pathScope: RootPathScope,
+                                       handler: HttpMethodHandler): void {
 
-    if (parameter instanceof PathParameterReference) {
+    const requestClass = this.getQualifiedRequestClass(spec, pathScope, handler);
 
-      this.addFunctionSignaturePathParameter(functionSignature, spec, parameter);
+    functionSignature.addParameter(
+        'singleRequest', 'io.reactivex.Single', (parameterKt, typeSignatureKt) => {
 
-    } else if (parameter instanceof BodyParameterReference) {
-
-      this.addFunctionSignatureBodyParameter(functionSignature, spec, parameter);
-
-    } else {
-      throw new Error(`Unsupported HandlerParameter type: ${parameter.constructor.name}`);
-    }
+      typeSignatureKt.addGenericParameter(requestClass);
+    });
   }
 
   public addFunctionPathParameter(functionSignature: FunctionSignatureKt,
@@ -219,27 +327,18 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
                                                    pathScope: RootPathScope,
                                                    handler: HttpMethodHandler): void {
 
-    const {parameters} = handler;
-
     interfaceKt.addFunctionSignature(kebabToCamel(handler.name), functionSignature => {
 
-      parameters.forEach(param =>
-          this.addFunctionSignatureParameter(functionSignature, spec, param));
+      this.addFunctionSignatureParameter(functionSignature, spec, pathScope, handler);
 
       functionSignature.alwaysWrapParameters = true;
+      functionSignature.wrapAfterParameters = true;
 
       functionSignature.setReturnType('io.reactivex.Single', returnType => {
 
         returnType.addGenericParameter(this.getQualifiedResponseClass(spec, pathScope, handler));
       });
     });
-  }
-
-  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-  public generateParameterAssignmentValue(spec: Specification,
-                                          fileKt: FileKt,
-                                          parameter: HandlerParameter): string {
-    return kebabToCamel(parameter.name);
   }
 
   public addControllerHttpMethodHandlerFunction(classKt: ClassKt,
@@ -274,15 +373,25 @@ export class KotlinSpringMvcGenerator extends KotlinGenerator {
       });
 
       bodyKt.writeLn('');
+
+      const requestClass = this.getQualifiedRequestClass(spec, pathScope, handler);
+
+      bodyKt.write('val request = ');
+      bodyKt.writeInstantiateClass(requestClass, instantiateClassKt => {
+        parameters
+            .forEach(param => {
+              const argName = kebabToCamel(param.name);
+              instantiateClassKt.addSimpleArgument(argName, argName);
+            });
+      });
+
+      bodyKt.writeLn('');
       bodyKt.write('return ');
       bodyKt.writeFunctionCall('impl', functionName, functionCallKt => {
-          parameters
-              .forEach(param => {
-                const argName = kebabToCamel(param.name);
-                functionCallKt.addArgument(argName, fileKt => {
-                  return this.generateParameterAssignmentValue(spec, fileKt, param);
-                });
-              });
+        functionCallKt.addArgument('simpleRequest', fileKt => {
+          const single = fileKt.tryImport('io.reactivex.Single');
+          return `${single}.just(request)`;
+        });
       });
     });
   }
@@ -621,6 +730,7 @@ value, headers, ${httpStatusShortName}.${springHttpStatusValue}))`)}`;
 
     if (mapping instanceof HttpMethodHandler) {
 
+      this.generateRequestFile(spec, pathScope, mapping, context);
       this.generateResponseFile(spec, pathScope, mapping, context);
       this.addControllerApiHttpMethodHandlerFunction(interfaceKt, spec, pathScope, mapping);
 

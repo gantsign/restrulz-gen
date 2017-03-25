@@ -33,6 +33,7 @@ import {
   FunctionSignatureKt,
   IfBlockKt,
   InitBlockKt,
+  InstantiateClassKt,
   InterfaceKt,
   ImplementsKt,
   LineKt,
@@ -1379,6 +1380,40 @@ test1(
     });
   });
 
+  describe('serializeInstantiateClass()', () => {
+
+    it('should support no args', () => {
+      const fileKt = createFile();
+      const instantiateClassKt = new InstantiateClassKt('com.example.TestClass');
+
+      expect(serializer.serializeInstantiateClass(fileKt, instantiateClassKt))
+          .toBe('TestClass()\n');
+    });
+
+    it('should support single args', () => {
+      const fileKt = createFile();
+      const instantiateClassKt = new InstantiateClassKt('com.example.TestClass');
+      instantiateClassKt.addSimpleArgument('arg1', 'arg1');
+
+      expect(serializer.serializeInstantiateClass(fileKt, instantiateClassKt))
+          .toBe('TestClass(arg1)\n');
+    });
+
+    it('should support multiple args', () => {
+      const fileKt = createFile();
+      const instantiateClassKt = new InstantiateClassKt('com.example.TestClass');
+      instantiateClassKt.addSimpleArgument('arg1', 'arg1');
+      instantiateClassKt.addSimpleArgument('arg2', 'arg2');
+
+      expect(serializer.serializeInstantiateClass(fileKt, instantiateClassKt))
+          .toBe(`\
+TestClass(
+        arg1 = arg1,
+        arg2 = arg2)
+`);
+    });
+  });
+
   describe('serializeBodyContent()', () => {
 
     it('should render text', () => {
@@ -1492,6 +1527,15 @@ var1.test1(
         arg1 = arg1,
         arg2 = arg2)
 `);
+    });
+
+    it('should render class instantiation', () => {
+      const fileKt = createFile();
+      const instantiateClassKt = new InstantiateClassKt('com.example.TestClass');
+      instantiateClassKt.addSimpleArgument('arg1', 'arg1');
+
+      expect(serializer.serializeBodyContent(fileKt, instantiateClassKt))
+          .toBe('TestClass(arg1)\n');
     });
 
     it('should throw error for unsupported type', () => {

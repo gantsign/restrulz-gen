@@ -21,6 +21,7 @@ import {
   HttpMethod,
   HttpMethodHandler,
   HttpStatus,
+  IntegerType,
   PathParameter,
   PathParameterReference,
   Response,
@@ -41,6 +42,7 @@ import {
   ImplementsKt,
   InterfaceKt,
   PrimaryConstructorKt,
+  PropertyKt,
   VisibilityKt
 } from '../../../src/kotlin/lang';
 import {GeneratorContext} from '../../../src/generator';
@@ -173,6 +175,73 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
+  describe('getRequestPackageName()', () => {
+    const pathScope = new RootPathScope();
+    pathScope.name = 'delivery-address';
+
+    it('should derive default package name from specification', () => {
+
+      expect(generator.getRequestPackageName(spec, pathScope))
+          .toBe('testing.ws.api.deliveryaddress');
+    });
+
+    it('should support default package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing'] = 'com.example';
+
+      expect(generatorWithMapping.getRequestPackageName(spec, pathScope))
+          .toBe('com.example.ws.api.deliveryaddress');
+    });
+
+    it('should support api package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing.ws.api'] = 'com.example.mvc';
+
+      expect(generatorWithMapping.getRequestPackageName(spec, pathScope))
+          .toBe('com.example.mvc.deliveryaddress');
+    });
+  });
+
+  describe('getRequestClassName()', () => {
+    const handler = new HttpMethodHandler();
+    handler.name = 'get-delivery-address';
+
+    it('should convert kebab case to capitalized camel case', () => {
+      expect(generator.getRequestClassName(handler))
+          .toBe('GetDeliveryAddressRequest');
+    });
+  });
+
+  describe('getQualifiedRequestClass()', () => {
+    const pathScope = new RootPathScope();
+    pathScope.name = 'delivery-address';
+
+    const handler = new HttpMethodHandler();
+    handler.name = 'get-delivery-address';
+
+    it('should derive default package name from specification', () => {
+
+      expect(generator.getQualifiedRequestClass(spec, pathScope, handler))
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
+    });
+
+    it('should support default package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing'] = 'com.example';
+
+      expect(generatorWithMapping.getQualifiedRequestClass(spec, pathScope, handler))
+          .toBe('com.example.ws.api.deliveryaddress.GetDeliveryAddressRequest');
+    });
+
+    it('should support api package name mapping', () => {
+      const generatorWithMapping = new KotlinSpringMvcGenerator();
+      generatorWithMapping.packageMapping['testing.ws.api'] = 'com.example.mvc';
+
+      expect(generatorWithMapping.getQualifiedRequestClass(spec, pathScope, handler))
+          .toBe('com.example.mvc.deliveryaddress.GetDeliveryAddressRequest');
+    });
+  });
+
   describe('getResponsePackageName()', () => {
     const pathScope = new RootPathScope();
     pathScope.name = 'delivery-address';
@@ -240,6 +309,489 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
+  describe('needsProcessing()', () => {
+    it('should return true for string', () => {
+
+      expect(generator.needsProcessing(new StringType()))
+          .toBeTruthy();
+    });
+
+    it('should return false for integer', () => {
+
+      expect(generator.needsProcessing(new IntegerType()))
+          .toBeFalsy();
+    });
+  });
+
+  describe('addRequestConstructorParameter()', () => {
+    it('should support types needing processing', () => {
+
+      const constructorKt = new PrimaryConstructorKt();
+
+      const pathParam = new PathParameter();
+      pathParam.typeRef = new StringType();
+
+      const paramRef = new PathParameterReference();
+      paramRef.name = 'address-id';
+      paramRef.value = pathParam;
+
+      generator.addRequestConstructorParameter(constructorKt, spec, paramRef);
+
+      expect(constructorKt.parameters.length)
+          .toBe(1);
+
+      const paramKt = constructorKt.parameters[0];
+
+      expect(paramKt instanceof ConstructorPropertyKt)
+          .toBeFalsy();
+
+      expect(paramKt.name)
+          .toBe('addressId');
+
+      expect(paramKt.type.className)
+          .toBe('kotlin.String');
+    });
+
+    it('should support types not requiring processing', () => {
+
+      const constructorKt = new PrimaryConstructorKt();
+
+      const pathParam = new PathParameter();
+      const integerType = new IntegerType();
+      integerType.minimum = 0;
+      integerType.maximum = 2147483647;
+      pathParam.typeRef = integerType;
+
+      const paramRef = new PathParameterReference();
+      paramRef.name = 'address-id';
+      paramRef.value = pathParam;
+
+      generator.addRequestConstructorParameter(constructorKt, spec, paramRef);
+
+      expect(constructorKt.parameters.length)
+          .toBe(1);
+
+      const paramKt = constructorKt.parameters[0];
+
+      expect(paramKt instanceof ConstructorPropertyKt)
+          .toBeTruthy();
+
+      expect(paramKt.name)
+          .toBe('addressId');
+
+      expect(paramKt.type.className)
+          .toBe('kotlin.Int');
+    });
+  });
+
+  describe('setRequestConstructorParameters()', () => {
+
+    it('should support multiple parameters', () => {
+
+      const classKt = new ClassKt('TestClass');
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      const pathParam2 = new PathParameter();
+      const integerType = new IntegerType();
+      integerType.minimum = 0;
+      integerType.maximum = 2147483647;
+      pathParam2.typeRef = integerType;
+
+      const paramRef2 = new PathParameterReference();
+      paramRef2.name = 'address-id';
+      paramRef2.value = pathParam2;
+
+      generator.setRequestConstructorParameters(classKt, spec, [paramRef1, paramRef2]);
+
+      const constructorKt = classKt.primaryConstructor;
+
+      expect(constructorKt.parameters.length)
+          .toBe(2);
+
+      const paramKt1 = constructorKt.parameters[0];
+
+      expect(paramKt1 instanceof ConstructorPropertyKt)
+          .toBeFalsy();
+
+      expect(paramKt1.name)
+          .toBe('zipCode');
+
+      expect(paramKt1.type.className)
+          .toBe('kotlin.String');
+
+      const paramKt2 = constructorKt.parameters[1];
+
+      expect(paramKt2 instanceof ConstructorPropertyKt)
+          .toBeTruthy();
+
+      expect(paramKt2.name)
+          .toBe('addressId');
+
+      expect(paramKt2.type.className)
+          .toBe('kotlin.Int');
+    });
+  });
+
+  describe('generateRequestPropertyAssignmentValue()', () => {
+
+    it('should support strings', () => {
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      expect(generator.generateRequestPropertyAssignmentValue(fileKt, spec, paramRef1))
+          .toBe('zipCode.blankOrNullToEmpty()');
+    });
+
+    it('should support other types', () => {
+
+      const pathParam2 = new PathParameter();
+      const integerType = new IntegerType();
+      integerType.minimum = 0;
+      integerType.maximum = 2147483647;
+      pathParam2.typeRef = integerType;
+
+      const paramRef2 = new PathParameterReference();
+      paramRef2.name = 'address-id';
+      paramRef2.value = pathParam2;
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      expect(generator.generateRequestPropertyAssignmentValue(fileKt, spec, paramRef2))
+          .toBe('addressId');
+    });
+  });
+
+  describe('addRequestProperty()', () => {
+
+    it('should support strings', () => {
+
+      const classKt = new ClassKt('TestClass');
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      generator.addRequestProperty(classKt, spec, paramRef1);
+
+      expect(classKt.members.length)
+          .toBe(1);
+
+      const propertyKt = classKt.members[0];
+      if (!(propertyKt instanceof PropertyKt)) {
+        fail(`Expected PropertyKt but was ${propertyKt.constructor.name}`);
+        return;
+      }
+
+      expect(propertyKt.name)
+          .toBe('zipCode');
+
+      expect(propertyKt.type.className)
+          .toBe('kotlin.String');
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      expect(propertyKt.defaultValueFactory(fileKt))
+          .toBe('zipCode.blankOrNullToEmpty()');
+    });
+
+  });
+
+  describe('addRequestProperties()', () => {
+
+    it('should support strings', () => {
+
+      const classKt = new ClassKt('TestClass');
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      generator.addRequestProperties(classKt, spec, [paramRef1]);
+
+      expect(classKt.members.length)
+          .toBe(1);
+
+      const propertyKt = classKt.members[0];
+      if (!(propertyKt instanceof PropertyKt)) {
+        fail(`Expected PropertyKt but was ${propertyKt.constructor.name}`);
+        return;
+      }
+
+      expect(propertyKt.name)
+          .toBe('zipCode');
+
+      expect(propertyKt.type.className)
+          .toBe('kotlin.String');
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      expect(propertyKt.defaultValueFactory(fileKt))
+          .toBe('zipCode.blankOrNullToEmpty()');
+    });
+
+    it('should filter non-strings', () => {
+
+      const classKt = new ClassKt('TestClass');
+
+      const pathParam1 = new PathParameter();
+      const integerType = new IntegerType();
+      integerType.minimum = 0;
+      integerType.maximum = 2147483647;
+      pathParam1.typeRef = integerType;
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'address-id';
+      paramRef1.value = pathParam1;
+
+      generator.addRequestProperties(classKt, spec, [paramRef1]);
+
+      expect(classKt.members.length)
+          .toBe(0);
+    });
+
+  });
+
+  describe('addRequestKotlinClass()', () => {
+
+    it('should support invocation with parameters', () => {
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [paramRef1];
+
+      generator.addRequestKotlinClass(fileKt, spec, handler);
+
+      expect(fileKt.members.length)
+          .toBe(1);
+
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
+        return;
+      }
+
+      const constructorKt = classKt.primaryConstructor;
+
+      expect(constructorKt.parameters.length)
+          .toBe(1);
+
+      const paramKt1 = constructorKt.parameters[0];
+
+      expect(paramKt1 instanceof ConstructorPropertyKt)
+          .toBeFalsy();
+
+      expect(paramKt1.name)
+          .toBe('zipCode');
+
+      expect(paramKt1.type.className)
+          .toBe('kotlin.String');
+
+      expect(classKt.members.length)
+          .toBe(1);
+
+      const propertyKt = classKt.members[0];
+      if (!(propertyKt instanceof PropertyKt)) {
+        fail(`Expected PropertyKt but was ${propertyKt.constructor.name}`);
+        return;
+      }
+
+      expect(propertyKt.name)
+          .toBe('zipCode');
+
+      expect(propertyKt.type.className)
+          .toBe('kotlin.String');
+
+      expect(propertyKt.defaultValueFactory(fileKt))
+          .toBe('zipCode.blankOrNullToEmpty()');
+    });
+
+    it('should support invocation without parameters', () => {
+
+      const fileKt = new FileKt('com.example.package', 'Test');
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [];
+
+      generator.addRequestKotlinClass(fileKt, spec, handler);
+
+      expect(fileKt.members.length)
+          .toBe(1);
+
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
+        return;
+      }
+
+      expect(classKt.members.length)
+          .toBe(0);
+
+      expect(classKt.primaryConstructor)
+          .toBeUndefined();
+    });
+  });
+
+  describe('toRequestKotlinFile()', () => {
+
+    it('should support invocation with parameters', () => {
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [paramRef1];
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'address-ws';
+
+      const fileKt = generator.toRequestKotlinFile(spec, pathScope, handler);
+
+      expect(fileKt.packageName)
+          .toBe('testing.ws.api.addressws');
+
+      expect(fileKt.fileName)
+          .toBe('GetAddressRequest');
+
+      expect(fileKt.members.length)
+          .toBe(1);
+
+      const classKt = fileKt.members[0];
+      if (!(classKt instanceof ClassKt)) {
+        fail(`Expected ClassKt but was ${classKt.constructor.name}`);
+        return;
+      }
+
+      const constructorKt = classKt.primaryConstructor;
+
+      expect(constructorKt.parameters.length)
+          .toBe(1);
+
+      const paramKt1 = constructorKt.parameters[0];
+
+      expect(paramKt1 instanceof ConstructorPropertyKt)
+          .toBeFalsy();
+
+      expect(paramKt1.name)
+          .toBe('zipCode');
+
+      expect(paramKt1.type.className)
+          .toBe('kotlin.String');
+
+      expect(classKt.members.length)
+          .toBe(1);
+
+      const propertyKt = classKt.members[0];
+      if (!(propertyKt instanceof PropertyKt)) {
+        fail(`Expected PropertyKt but was ${propertyKt.constructor.name}`);
+        return;
+      }
+
+      expect(propertyKt.name)
+          .toBe('zipCode');
+
+      expect(propertyKt.type.className)
+          .toBe('kotlin.String');
+
+      expect(propertyKt.defaultValueFactory(fileKt))
+          .toBe('zipCode.blankOrNullToEmpty()');
+    });
+  });
+
+  class MockGeneratorContext implements GeneratorContext {
+    outputPaths: string[] = [];
+    contents: string[] = [];
+
+    writeJsonToFile(filePath: string, data: any): void {
+      throw new Error('Method not implemented.');
+    }
+
+    writeYamlToFile(filePath: string, data: any): void {
+      throw new Error('Method not implemented.');
+    }
+
+    writeStringToFile(filePath: string, data: any): void {
+      this.outputPaths.push(filePath);
+      this.contents.push(data);
+    }
+  }
+
+  describe('generateRequestFile()', () => {
+
+    it('should support invocation with parameters', () => {
+
+      const pathParam1 = new PathParameter();
+      pathParam1.typeRef = new StringType();
+
+      const paramRef1 = new PathParameterReference();
+      paramRef1.name = 'zip-code';
+      paramRef1.value = pathParam1;
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [paramRef1];
+
+      const pathScope = new RootPathScope();
+      pathScope.name = 'address-ws';
+
+      const context = new MockGeneratorContext();
+
+      generator.generateRequestFile(spec, pathScope, handler, context);
+
+      expect(context.outputPaths.length)
+          .toBe(1);
+
+      expect(context.outputPaths[0])
+          .toBe('testing/ws/api/addressws/GetAddressRequest.kt');
+
+      expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.addressws
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+
+class GetAddressRequest(zipCode: String) {
+
+    val zipCode: String
+            = zipCode.blankOrNullToEmpty()
+}
+`);
+    });
+  });
+
   describe('getSpringHttpMethodAnnotation()', () => {
 
     it('should support GET', () => {
@@ -283,67 +835,6 @@ describe('KotlinSpringMvcGenerator', () => {
     });
   });
 
-  describe('addFunctionSignaturePathParameter()', () => {
-
-    it('should support path parameters', () => {
-
-      const functionKt = new FunctionSignatureKt('test1');
-
-      const pathParameter = new PathParameter();
-      pathParameter.name = 'primary-id';
-      pathParameter.typeRef = new StringType();
-
-      const parameterRef = new PathParameterReference();
-      parameterRef.name = 'address-id';
-      parameterRef.value = pathParameter;
-
-      generator.addFunctionSignaturePathParameter(functionKt, spec, parameterRef);
-
-      expect(functionKt.parameters.length).toBe(1);
-
-      const parameterKt = functionKt.parameters[0];
-
-      expect(parameterKt.name)
-          .toBe('addressId');
-
-      expect(parameterKt.type.className)
-          .toBe('kotlin.String');
-
-      expect(parameterKt.annotations.length).toBe(0);
-    });
-
-  });
-
-  describe('addFunctionSignatureBodyParameter()', () => {
-
-    it('should support body parameters', () => {
-
-      const functionKt = new FunctionSignatureKt('test1');
-
-      const classType = new ClassType();
-      classType.name = 'delivery-address';
-
-      const parameterRef = new BodyParameterReference();
-      parameterRef.name = 'primary-address';
-      parameterRef.typeRef = classType;
-
-      generator.addFunctionSignatureBodyParameter(functionKt, spec, parameterRef);
-
-      expect(functionKt.parameters.length).toBe(1);
-
-      const parameterKt = functionKt.parameters[0];
-
-      expect(parameterKt.name)
-          .toBe('primaryAddress');
-
-      expect(parameterKt.type.className)
-          .toBe('testing.model.DeliveryAddress');
-
-      expect(parameterKt.annotations.length).toBe(0);
-    });
-
-  });
-
   describe('addFunctionSignatureParameter()', () => {
 
     it('should support path parameters', () => {
@@ -358,17 +849,30 @@ describe('KotlinSpringMvcGenerator', () => {
       parameterRef.name = 'address-id';
       parameterRef.value = pathParameter;
 
-      generator.addFunctionSignatureParameter(functionKt, spec, parameterRef);
+      const pathScope = new RootPathScope();
+      pathScope.name = 'address-ws';
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [parameterRef];
+
+      generator.addFunctionSignatureParameter(functionKt, spec, pathScope, handler);
 
       expect(functionKt.parameters.length).toBe(1);
 
       const parameterKt = functionKt.parameters[0];
 
       expect(parameterKt.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
 
       expect(parameterKt.type.className)
-          .toBe('kotlin.String');
+          .toBe('io.reactivex.Single');
+
+      expect(parameterKt.type.genericParameters.length)
+          .toBe(1);
+
+      expect(parameterKt.type.genericParameters[0].className)
+          .toBe('testing.ws.api.addressws.GetAddressRequest');
 
       expect(parameterKt.annotations.length).toBe(0);
     });
@@ -384,30 +888,32 @@ describe('KotlinSpringMvcGenerator', () => {
       parameterRef.name = 'primary-address';
       parameterRef.typeRef = classType;
 
-      generator.addFunctionSignatureParameter(functionKt, spec, parameterRef);
+      const pathScope = new RootPathScope();
+      pathScope.name = 'address-ws';
+
+      const handler = new HttpMethodHandler();
+      handler.name = 'get-address';
+      handler.parameters = [parameterRef];
+
+      generator.addFunctionSignatureParameter(functionKt, spec, pathScope, handler);
 
       expect(functionKt.parameters.length).toBe(1);
 
       const parameterKt = functionKt.parameters[0];
 
       expect(parameterKt.name)
-          .toBe('primaryAddress');
+          .toBe('singleRequest');
 
       expect(parameterKt.type.className)
-          .toBe('testing.model.DeliveryAddress');
+          .toBe('io.reactivex.Single');
+
+      expect(parameterKt.type.genericParameters.length)
+          .toBe(1);
+
+      expect(parameterKt.type.genericParameters[0].className)
+          .toBe('testing.ws.api.addressws.GetAddressRequest');
 
       expect(parameterKt.annotations.length).toBe(0);
-    });
-
-    it('should throw error for unsupported type', () => {
-
-      const functionKt = new FunctionSignatureKt('test1');
-
-      class UnsupportedTypeTest {}
-      const unsupportedType = <HandlerParameter>new UnsupportedTypeTest();
-
-      expect(() => generator.addFunctionSignatureParameter(functionKt, spec, unsupportedType))
-          .toThrowError('Unsupported HandlerParameter type: UnsupportedTypeTest');
     });
   });
 
@@ -623,7 +1129,7 @@ describe('KotlinSpringMvcGenerator', () => {
         return;
       }
 
-      expect(functionKt.parameters.length).toBe(2);
+      expect(functionKt.parameters.length).toBe(1);
 
       const returnType = functionKt.returnType;
 
@@ -639,17 +1145,18 @@ describe('KotlinSpringMvcGenerator', () => {
       const funParam1 = functionKt.parameters[0];
 
       expect(funParam1.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
+
+      expect(funParam1.type.className)
+          .toBe('io.reactivex.Single');
+
+      expect(funParam1.type.genericParameters.length)
+          .toBe(1);
+
+      expect(funParam1.type.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
 
       expect(funParam1.annotations.length)
-          .toBe(0);
-
-      const funParam2 = functionKt.parameters[1];
-
-      expect(funParam2.name)
-          .toBe('primaryAddress');
-
-      expect(funParam2.annotations.length)
           .toBe(0);
 
       expect(functionKt.annotations.length)
@@ -761,9 +1268,11 @@ describe('KotlinSpringMvcGenerator', () => {
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-return impl.getDeliveryAddress(
+val request = GetDeliveryAddressRequest(
         addressId = addressId,
         primaryAddress = primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
 `);
     });
 
@@ -877,9 +1386,11 @@ return impl.getDeliveryAddress(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-return impl.getDeliveryAddress(
+val request = GetDeliveryAddressRequest(
         addressId = addressId,
         primaryAddress = primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
 `);
 
     });
@@ -1722,24 +2233,6 @@ return GetDeliveryAddressResponse(
     });
   });
 
-  class MockGeneratorContext implements GeneratorContext {
-    outputPaths: string[] = [];
-    contents: string[] = [];
-
-    writeJsonToFile(filePath: string, data: any): void {
-      throw new Error('Method not implemented.');
-    }
-
-    writeYamlToFile(filePath: string, data: any): void {
-      throw new Error('Method not implemented.');
-    }
-
-    writeStringToFile(filePath: string, data: any): void {
-      this.outputPaths.push(filePath);
-      this.contents.push(data);
-    }
-  }
-
   describe('generateResponseFile()', () => {
 
     it('should generate file', () => {
@@ -1861,12 +2354,31 @@ class GetDeliveryAddressResponse private constructor(
       generator.addControllerApiFunction(interfaceKt, spec, '', pathScope, handler, context);
 
       expect(context.outputPaths.length)
-          .toBe(1);
+          .toBe(2);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -1905,7 +2417,7 @@ class GetDeliveryAddressResponse private constructor(
         return;
       }
 
-      expect(functionKt.parameters.length).toBe(2);
+      expect(functionKt.parameters.length).toBe(1);
 
       const returnType = functionKt.returnType;
 
@@ -1921,17 +2433,18 @@ class GetDeliveryAddressResponse private constructor(
       const funParam1 = functionKt.parameters[0];
 
       expect(funParam1.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
+
+      expect(funParam1.type.className)
+          .toBe('io.reactivex.Single');
+
+      expect(funParam1.type.genericParameters.length)
+          .toBe(1);
+
+      expect(funParam1.type.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
 
       expect(funParam1.annotations.length)
-          .toBe(0);
-
-      const funParam2 = functionKt.parameters[1];
-
-      expect(funParam2.name)
-          .toBe('primaryAddress');
-
-      expect(funParam2.annotations.length)
           .toBe(0);
 
       expect(functionKt.annotations.length)
@@ -1984,12 +2497,31 @@ class GetDeliveryAddressResponse private constructor(
       generator.addControllerApiFunction(interfaceKt, spec, '', pathScope, subPathScope, context);
 
       expect(context.outputPaths.length)
-          .toBe(1);
+          .toBe(2);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -2028,7 +2560,7 @@ class GetDeliveryAddressResponse private constructor(
         return;
       }
 
-      expect(functionKt.parameters.length).toBe(2);
+      expect(functionKt.parameters.length).toBe(1);
 
       const returnType = functionKt.returnType;
 
@@ -2044,14 +2576,18 @@ class GetDeliveryAddressResponse private constructor(
       const funParam1 = functionKt.parameters[0];
 
       expect(funParam1.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
+
+      expect(funParam1.type.className)
+          .toBe('io.reactivex.Single');
+
+      expect(funParam1.type.genericParameters.length)
+          .toBe(1);
+
+      expect(funParam1.type.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
 
       expect(funParam1.annotations.length)
-          .toBe(0);
-
-      const funParam2 = functionKt.parameters[1];
-
-      expect(funParam2.annotations.length)
           .toBe(0);
 
       expect(functionKt.annotations.length)
@@ -2191,9 +2727,11 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-return impl.getDeliveryAddress(
+val request = GetDeliveryAddressRequest(
         addressId = addressId,
         primaryAddress = primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
 `);
     });
 
@@ -2319,9 +2857,11 @@ return impl.getDeliveryAddress(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-return impl.getDeliveryAddress(
+val request = GetDeliveryAddressRequest(
         addressId = addressId,
         primaryAddress = primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
 `);
     });
 
@@ -2412,12 +2952,31 @@ return impl.getDeliveryAddress(
           .toBe('DeliveryAddressApi');
 
       expect(context.outputPaths.length)
-          .toBe(1);
+          .toBe(2);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -2456,7 +3015,7 @@ class GetDeliveryAddressResponse private constructor(
         return;
       }
 
-      expect(functionKt.parameters.length).toBe(2);
+      expect(functionKt.parameters.length).toBe(1);
 
       const returnType = functionKt.returnType;
 
@@ -2472,17 +3031,17 @@ class GetDeliveryAddressResponse private constructor(
       const funParam1 = functionKt.parameters[0];
 
       expect(funParam1.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
+
+      expect(funParam1.type.className).toBe('io.reactivex.Single');
+
+      expect(funParam1.type.genericParameters.length)
+          .toBe(1);
+
+      expect(funParam1.type.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
 
       expect(funParam1.annotations.length)
-          .toBe(0);
-
-      const funParam2 = functionKt.parameters[1];
-
-      expect(funParam2.name)
-          .toBe('primaryAddress');
-
-      expect(funParam2.annotations.length)
           .toBe(0);
 
       expect(functionKt.annotations.length)
@@ -2644,9 +3203,11 @@ class GetDeliveryAddressResponse private constructor(
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
           .toBe(`
-return impl.getDeliveryAddress(
+val request = GetDeliveryAddressRequest(
         addressId = addressId,
         primaryAddress = primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
 `);
     });
 
@@ -2751,7 +3312,11 @@ return impl.getDeliveryAddress(
           .toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress)\n');
+          .toBe(`
+val request = GetDeliveryAddressRequest(primaryAddress)
+
+return impl.getDeliveryAddress(Single.just(request))
+`);
     });
   });
 
@@ -2826,12 +3391,31 @@ return impl.getDeliveryAddress(
           .toBe('DeliveryAddressApi');
 
       expect(context.outputPaths.length)
-          .toBe(1);
+          .toBe(2);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -2870,7 +3454,7 @@ class GetDeliveryAddressResponse private constructor(
         return;
       }
 
-      expect(functionKt.parameters.length).toBe(2);
+      expect(functionKt.parameters.length).toBe(1);
 
       const returnType = functionKt.returnType;
 
@@ -2886,27 +3470,22 @@ class GetDeliveryAddressResponse private constructor(
       const funParam1 = functionKt.parameters[0];
 
       expect(funParam1.name)
-          .toBe('addressId');
+          .toBe('singleRequest');
+
+      expect(funParam1.type.className)
+          .toBe('io.reactivex.Single');
+
+      expect(funParam1.type.genericParameters.length)
+          .toBe(1);
+
+      expect(funParam1.type.genericParameters[0].className)
+          .toBe('testing.ws.api.deliveryaddress.GetDeliveryAddressRequest');
 
       expect(funParam1.annotations.length)
-          .toBe(0);
-
-      const funParam2 = functionKt.parameters[1];
-
-      expect(funParam2.name)
-          .toBe('primaryAddress');
-
-      expect(funParam2.annotations.length)
-          .toBe(0);
-
-      expect(functionKt.annotations.length)
           .toBe(0);
     });
 
   });
-
-
-
 
   describe('toControllerKotlinFile()', () => {
 
@@ -3117,12 +3696,31 @@ class GetDeliveryAddressResponse private constructor(
       generator.generateControllerApiFiles(fullSpec, context);
 
       expect(context.outputPaths.length)
-          .toBe(2);
+          .toBe(3);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -3153,22 +3751,22 @@ class GetDeliveryAddressResponse private constructor(
     }
 }
 `);
-      expect(context.outputPaths[1])
+      expect(context.outputPaths[2])
           .toBe('testing/ws/api/DeliveryAddressApi.kt');
 
-      expect(context.contents[1])
+      expect(context.contents[2])
           .toBe(`\
 package testing.ws.api
 
 import io.reactivex.Single
-import testing.model.DeliveryAddress
+import testing.ws.api.deliveryaddress.GetDeliveryAddressRequest
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 interface DeliveryAddressApi {
 
     fun getDeliveryAddress(
-            addressId: String,
-            primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+            singleRequest: Single<GetDeliveryAddressRequest>
+    ): Single<GetDeliveryAddressResponse>
 }
 `);
 
@@ -3243,6 +3841,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import testing.model.DeliveryAddress
 import testing.ws.api.DeliveryAddressApi
+import testing.ws.api.deliveryaddress.GetDeliveryAddressRequest
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 @RestController
@@ -3255,9 +3854,11 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
             @RequestBody primaryAddress: DeliveryAddress
     ): Single\<GetDeliveryAddressResponse> {
 
-        return impl.getDeliveryAddress(
+        val request = GetDeliveryAddressRequest(
                 addressId = addressId,
                 primaryAddress = primaryAddress)
+
+        return impl.getDeliveryAddress(Single.just(request))
     }
 }
 `);
@@ -3316,12 +3917,31 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
       generator.generateFiles(fullSpec, context);
 
       expect(context.outputPaths.length)
-          .toBe(3);
+          .toBe(4);
 
       expect(context.outputPaths[0])
-          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressRequest.kt');
 
       expect(context.contents[0])
+          .toBe(`\
+package testing.ws.api.deliveryaddress
+
+import com.gantsign.restrulz.util.string.blankOrNullToEmpty
+import testing.model.DeliveryAddress
+
+class GetDeliveryAddressRequest(
+        addressId: String,
+        val primaryAddress: DeliveryAddress) {
+
+    val addressId: String
+            = addressId.blankOrNullToEmpty()
+}
+`);
+
+      expect(context.outputPaths[1])
+          .toBe('testing/ws/api/deliveryaddress/GetDeliveryAddressResponse.kt');
+
+      expect(context.contents[1])
           .toBe(`\
 package testing.ws.api.deliveryaddress
 
@@ -3352,29 +3972,29 @@ class GetDeliveryAddressResponse private constructor(
     }
 }
 `);
-      expect(context.outputPaths[1])
+      expect(context.outputPaths[2])
           .toBe('testing/ws/api/DeliveryAddressApi.kt');
 
-      expect(context.contents[1])
+      expect(context.contents[2])
           .toBe(`\
 package testing.ws.api
 
 import io.reactivex.Single
-import testing.model.DeliveryAddress
+import testing.ws.api.deliveryaddress.GetDeliveryAddressRequest
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 interface DeliveryAddressApi {
 
     fun getDeliveryAddress(
-            addressId: String,
-            primaryAddress: DeliveryAddress): Single\<GetDeliveryAddressResponse>
+            singleRequest: Single\<GetDeliveryAddressRequest>
+    ): Single<GetDeliveryAddressResponse>
 }
 `);
 
-      expect(context.outputPaths[2])
+      expect(context.outputPaths[3])
           .toBe('testing/ws/controller/DeliveryAddressController.kt');
 
-      expect(context.contents[2])
+      expect(context.contents[3])
           .toBe(`\
 package testing.ws.controller
 
@@ -3386,6 +4006,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import testing.model.DeliveryAddress
 import testing.ws.api.DeliveryAddressApi
+import testing.ws.api.deliveryaddress.GetDeliveryAddressRequest
 import testing.ws.api.deliveryaddress.GetDeliveryAddressResponse
 
 @RestController
@@ -3398,9 +4019,11 @@ class DeliveryAddressController(private val impl: DeliveryAddressApi) {
             @RequestBody primaryAddress: DeliveryAddress
     ): Single\<GetDeliveryAddressResponse> {
 
-        return impl.getDeliveryAddress(
+        val request = GetDeliveryAddressRequest(
                 addressId = addressId,
                 primaryAddress = primaryAddress)
+
+        return impl.getDeliveryAddress(Single.just(request))
     }
 }
 `);

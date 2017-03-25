@@ -729,7 +729,7 @@ object OrgNameValidator : StringValidator(
     });
   });
 
-  describe('generateParameterAssignmentValue()', () => {
+  describe('generateRequestPropertyAssignmentValue()', () => {
 
     it('should support strings', () => {
       const stringType = new StringType();
@@ -744,8 +744,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toBe('OrgNameValidator.requireValidValue("testParam", testParam)');
     });
 
@@ -763,8 +763,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toBe('PersonAgeValidator.requireValidValue("testParam", testParam)');
     });
 
@@ -782,8 +782,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toBe('testParam');
 
     });
@@ -802,8 +802,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toBe('testParam');
 
     });
@@ -822,8 +822,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(() => generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(() => generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toThrowError('Unsupported type: UnsupportedTypeTest');
     });
 
@@ -837,8 +837,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(generator.generateParameterAssignmentValue(
-          spec, fileKt, parameterReference, () => 'testParam')
+      expect(generator.generateRequestPropertyAssignmentValue(
+          fileKt, spec, parameterReference, () => 'testParam')
       ).toBe('testParam');
     });
 
@@ -905,16 +905,32 @@ object OrgNameValidator : StringValidator(
     it('should modify KotlinSpringMvcGenerator', () => {
 
       const mvcGenerator = new KotlinSpringMvcGenerator();
-      const mvcGenerateParameterAssignmentValue = mvcGenerator.generateParameterAssignmentValue;
+
+      const mvcNeedsProcessing = mvcGenerator.needsProcessing;
+      const mvcGenerateParameterAssignmentValue
+          = mvcGenerator.generateRequestPropertyAssignmentValue;
 
       generator.init([mvcGenerator]);
 
       // tslint:disable-next-line:triple-equals
-      expect(mvcGenerateParameterAssignmentValue != mvcGenerator.generateParameterAssignmentValue)
+      expect(mvcNeedsProcessing != mvcGenerator.needsProcessing)
+          .toBeTruthy();
+
+      // tslint:disable-next-line:triple-equals
+      expect(mvcGenerateParameterAssignmentValue != mvcGenerator.generateRequestPropertyAssignmentValue)
           .toBeTruthy();
     });
 
-    it('should enhance generateParameterAssignmentValue', () => {
+    it('should enhance needsProcessing', () => {
+
+      const mvcGenerator = new KotlinSpringMvcGenerator();
+
+      generator.init([mvcGenerator]);
+
+      expect(mvcGenerator.needsProcessing(new IntegerType())).toBeTruthy();
+    });
+
+    it('should enhance generateRequestPropertyAssignmentValue', () => {
 
       const mvcGenerator = new KotlinSpringMvcGenerator();
 
@@ -932,8 +948,8 @@ object OrgNameValidator : StringValidator(
 
       const fileKt = new FileKt('com.example.package', 'TestValidator');
 
-      expect(mvcGenerator.generateParameterAssignmentValue(spec, fileKt, parameterReference))
-          .toBe('OrgNameValidator.requireValidValue("testParam", testParam)');
+      expect(mvcGenerator.generateRequestPropertyAssignmentValue(fileKt, spec, parameterReference))
+          .toBe('OrgNameValidator.requireValidValue("testParam", testParam.blankOrNullToEmpty())');
     });
 
     it('should ignore other generators', () => {

@@ -34,6 +34,7 @@ import {
   FunctionSignatureKt,
   IfBlockKt,
   InitBlockKt,
+  InstantiateClassKt,
   InterfaceKt,
   LineKt,
   ObjectKt,
@@ -656,6 +657,31 @@ export class KotlinSerializer {
     return result;
   }
 
+  public serializeInstantiateClass(fileKt: FileKt, instantiateClassKt: InstantiateClassKt): string {
+
+    const {className} = instantiateClassKt;
+    const args = instantiateClassKt.arguments;
+    const shortClassName = fileKt.tryImport(className);
+
+    let result = '';
+    result += `${shortClassName}(`;
+    const indent = this.indent;
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (i > 0) {
+        result += ',';
+      }
+      if (args.length > 1) {
+        const argAssignment = `${arg.name} = ${arg.valueFactory(fileKt)}`;
+        result += `\n${indent(indent(argAssignment))}`;
+      } else {
+        result += arg.valueFactory(fileKt);
+      }
+    }
+    result += ')\n';
+    return result;
+  }
+
   public serializeBodyContent(fileKt: FileKt, content: BodyContentKt): string {
 
     if (content instanceof TextKt) {
@@ -696,6 +722,11 @@ export class KotlinSerializer {
     if (content instanceof FunctionCallKt) {
 
       return this.serializeFunctionCall(fileKt, content);
+    }
+
+    if (content instanceof InstantiateClassKt) {
+
+      return this.serializeInstantiateClass(fileKt, content);
     }
 
     throw new Error(`Unsupported BodyContentKt type: ${content.constructor.name}`);

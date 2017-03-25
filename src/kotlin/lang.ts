@@ -168,6 +168,21 @@ export class FunctionCallKt implements BodyContentKt {
   }
 }
 
+export class InstantiateClassKt implements BodyContentKt {
+  arguments: ArgumentKt[] = [];
+
+  constructor(public className: string) {}
+
+  addArgument(name: string, valueFactory: (fileKt: FileKt) => string): void {
+
+    this.arguments.push(new ArgumentKt(name, valueFactory));
+  }
+
+  addSimpleArgument(name: string, value: string): void {
+    this.addArgument(name, () => value);
+  }
+}
+
 export class BodyKt implements BodyContentKt {
   content: BodyContentKt[] = [];
 
@@ -225,6 +240,15 @@ export class BodyKt implements BodyContentKt {
     callback(functionCallKt);
 
     this.content.push(functionCallKt);
+  }
+
+  writeInstantiateClass(className: string,
+                        callback: (instantiateClassKt: InstantiateClassKt) => void): void {
+
+    const instantiateClassKt = new InstantiateClassKt(className);
+    callback(instantiateClassKt);
+
+    this.content.push(instantiateClassKt);
   }
 }
 

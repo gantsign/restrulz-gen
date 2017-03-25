@@ -143,16 +143,26 @@ export type PathElement = StaticPathElement | PathParameter;
 
 export interface HandlerParameter {
   name: string;
+
+  getType(): Type;
 }
 
 export class PathParameterReference implements HandlerParameter {
   name: string;
   value: PathParameter;
+
+  getType(): Type {
+    return this.value.typeRef;
+  }
 }
 
 export class BodyParameterReference implements HandlerParameter {
   name: string;
   typeRef: ClassType;
+
+  getType(): Type {
+    return this.typeRef;
+  }
 }
 
 export interface Mapping {

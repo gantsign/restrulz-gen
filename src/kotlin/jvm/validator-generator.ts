@@ -18,7 +18,6 @@ import {
   ClassType,
   HandlerParameter,
   IntegerType,
-  PathParameterReference,
   Property,
   SimpleType,
   Specification,
@@ -200,33 +199,28 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     }
   }
 
-  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-  public generateParameterAssignmentValue(
-      spec: Specification,
+  public generateRequestPropertyAssignmentValue(
       fileKt: FileKt,
-      parameter: HandlerParameter,
-      modelGenerateParameterAssignmentValue: (
-          spec: Specification,
-          fileKt: FileKt,
-          parameter: HandlerParameter) => string): string {
+      spec: Specification,
+      param: HandlerParameter,
+      superGenerateRequestPropertyAssignmentValue: (fileKt: FileKt,
+                                                    spec: Specification,
+                                                    param: HandlerParameter) => string): string {
 
-    const value = modelGenerateParameterAssignmentValue(spec, fileKt, parameter);
-    if (!(parameter instanceof PathParameterReference)) {
-      return value;
-    }
+    const type = param.getType();
+    const expression = superGenerateRequestPropertyAssignmentValue(fileKt, spec, param);
 
-    const type = parameter.value.typeRef;
     if (type instanceof StringType || type instanceof IntegerType) {
 
       const validatorType = fileKt.tryImport(this.getQualifiedValidatorClass(spec, type));
 
       let result = `${validatorType}.requireValidValue`;
-      result += `(${this.toKotlinString(kebabToCamel(parameter.name))}, ${value})`;
+      result += `(${this.toKotlinString(kebabToCamel(param.name))}, ${expression})`;
       return result;
 
     } else if (type instanceof BooleanType || type instanceof ClassType) {
 
-      return value;
+      return expression;
 
     } else {
       throw new Error(`Unsupported type: ${type.constructor.name}`);
@@ -258,14 +252,18 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
 
       } else if (KotlinSpringMvcGenerator.assignableFrom(generator)) {
 
-        const mvcGenerateParameterAssignmentValue
-            = generator.generateParameterAssignmentValue.bind(generator);
+        const mvcNeedsProcessing = generator.needsProcessing.bind(generator);
 
-        generator.generateParameterAssignmentValue = (spec: Specification,
-                                                      fileKt: FileKt,
-                                                      parameter: HandlerParameter): string =>
-          this.generateParameterAssignmentValue(
-              spec, fileKt, parameter, mvcGenerateParameterAssignmentValue);
+        generator.needsProcessing = (type: Type) => this.needsProcessing(type, mvcNeedsProcessing);
+
+        const mvcGenerateRequestPropertyAssignmentValue
+            = generator.generateRequestPropertyAssignmentValue.bind(generator);
+
+        generator.generateRequestPropertyAssignmentValue = (fileKt: FileKt,
+                                                            spec: Specification,
+                                                            param: HandlerParameter): string =>
+          this.generateRequestPropertyAssignmentValue(
+              fileKt, spec, param, mvcGenerateRequestPropertyAssignmentValue);
       }
     })
   }
@@ -279,6 +277,7 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
     this.needsProcessing = this.needsProcessing.bind(this);
     this.generatePropertyAssignmentValue = this.generatePropertyAssignmentValue.bind(this);
     this.getStringForValidateProperty = this.getStringForValidateProperty.bind(this);
-    this.generateParameterAssignmentValue = this.generateParameterAssignmentValue.bind(this);
+    this.generateRequestPropertyAssignmentValue
+        = this.generateRequestPropertyAssignmentValue.bind(this);
   }
 }
