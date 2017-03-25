@@ -1361,7 +1361,7 @@ try {
       functionCallKt.addSimpleArgument('arg1', 'arg1');
 
       expect(serializer.serializeFunctionCall(fileKt, functionCallKt))
-          .toBe('test1(arg1 = arg1)\n');
+          .toBe('test1(arg1)\n');
     });
 
     it('should support multiple args', () => {

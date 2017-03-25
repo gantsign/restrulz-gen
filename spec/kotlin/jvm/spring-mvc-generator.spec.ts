@@ -2751,7 +2751,7 @@ return impl.getDeliveryAddress(
           .toBe(0);
 
       expect(serializer.serializeBody(fileKt, functionKt.body))
-          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress = primaryAddress)\n');
+          .toBe('\nreturn impl.getDeliveryAddress(primaryAddress)\n');
     });
   });
 
