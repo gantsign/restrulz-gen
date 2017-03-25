@@ -22,7 +22,8 @@ import {
   Property,
   SimpleType,
   Specification,
-  StringType
+  StringType,
+  Type
 } from '../../restrulz/model';
 import {Generator, GeneratorContext} from '../../generator';
 import {FileKt} from '../lang';
@@ -132,10 +133,10 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
   }
 
   //noinspection JSMethodCanBeStatic
-  public needsProcessing(property: Property,
-                         modelNeedsProcessing: (property: Property) => boolean): boolean {
+  public needsProcessing(type: Type,
+                         superNeedsProcessing: (type: Type) => boolean): boolean {
 
-    return modelNeedsProcessing(property) || this.supportsValidation(property.type);
+    return superNeedsProcessing(type) || this.supportsValidation(type);
   }
 
   public generatePropertyAssignmentValue(
@@ -239,8 +240,8 @@ export class KotlinValidatorGenerator extends KotlinGenerator {
 
         const modelNeedsProcessing = generator.needsProcessing.bind(generator);
 
-        generator.needsProcessing = (property: Property) =>
-            this.needsProcessing(property, modelNeedsProcessing);
+        generator.needsProcessing = (type: Type) =>
+            this.needsProcessing(type, modelNeedsProcessing);
 
         const modelGeneratePropertyAssignmentValue =
             generator.generatePropertyAssignmentValue.bind(generator);

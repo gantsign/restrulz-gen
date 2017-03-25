@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ClassType, Property, Specification, StringType} from '../restrulz/model';
+import {ClassType, Property, Specification, StringType, Type} from '../restrulz/model';
 import {Generator, GeneratorContext} from '../generator';
 import {ClassKt, FileKt, FunctionKt, PrimaryConstructorKt} from './lang';
 import {KotlinGenerator} from './generator';
@@ -30,9 +30,8 @@ export class KotlinModelGenerator extends KotlinGenerator {
     return 'classes:restrulz.kotlin.KotlinModelGenerator' in generator;
   }
 
-  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-  public needsProcessing(property: Property): Boolean {
-    const {type} = property;
+  //noinspection JSMethodCanBeStatic
+  public needsProcessing(type: Type): boolean {
     return type instanceof StringType;
   }
 
@@ -46,7 +45,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
     const paramName = kebabToCamel(name);
     const paramType = isArray ? 'kotlin.collections.List' : entityClass;
 
-    if (this.needsProcessing(property)) {
+    if (this.needsProcessing(property.type)) {
       constructorKt.addParameter(paramName, paramType, typeSignatureKt => {
 
         if (isArray) {
@@ -113,7 +112,7 @@ export class KotlinModelGenerator extends KotlinGenerator {
   public addModelProperties(classKt: ClassKt, spec: Specification, properties: Property[]): void {
 
     properties
-        .filter(prop => this.needsProcessing(prop))
+        .filter(prop => this.needsProcessing(prop.type))
         .forEach(prop => this.addModelProperty(classKt, spec, prop));
   }
 

@@ -66,18 +66,14 @@ describe('KotlinModelGenerator', () => {
 
   describe('needsProcessing()', () => {
     it('should return true for string', () => {
-      const property = new Property();
-      property.type = new StringType();
 
-      expect(generator.needsProcessing(property))
+      expect(generator.needsProcessing(new StringType()))
           .toBeTruthy();
     });
 
     it('should return false for integer', () => {
-      const property = new Property();
-      property.type = new IntegerType();
 
-      expect(generator.needsProcessing(property))
+      expect(generator.needsProcessing(new IntegerType()))
           .toBeFalsy();
     });
   });

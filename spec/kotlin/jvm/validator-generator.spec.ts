@@ -481,26 +481,17 @@ object OrgNameValidator : StringValidator(
 
     it('should return true if model requires processing', () => {
 
-      const property = new Property();
-      property.type = new BooleanType();
-
-      expect(generator.needsProcessing(property, () => true)).toBeTruthy();
+      expect(generator.needsProcessing(new BooleanType(), () => true)).toBeTruthy();
     });
 
     it('should return true if supports validation', () => {
 
-      const property = new Property();
-      property.type = new IntegerType();
-
-      expect(generator.needsProcessing(property, () => false)).toBeTruthy();
+      expect(generator.needsProcessing(new IntegerType(), () => false)).toBeTruthy();
     });
 
     it('should return false if not requires processing and not supports validation', () => {
 
-      const property = new Property();
-      property.type = new BooleanType();
-
-      expect(generator.needsProcessing(property, () => false)).toBeFalsy();
+      expect(generator.needsProcessing(new BooleanType(), () => false)).toBeFalsy();
     });
 
   });
@@ -878,10 +869,7 @@ object OrgNameValidator : StringValidator(
 
       generator.init([modelGenerator]);
 
-      const integerProperty = new Property();
-      integerProperty.type = new IntegerType();
-
-      expect(modelGenerator.needsProcessing(integerProperty)).toBeTruthy();
+      expect(modelGenerator.needsProcessing(new IntegerType())).toBeTruthy();
     });
 
     it('should enhance generatePropertyAssignmentValue', () => {
